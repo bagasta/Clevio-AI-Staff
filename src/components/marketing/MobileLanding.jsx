@@ -423,7 +423,7 @@ function HowItWorksSection() {
         color: "bg-[#FDF4C8]", // Cream
         cornerColor: "bg-[#C0A865]", // Dark Gold
         textColor: "text-[#5D4037]", // Dark Brown
-        image: "/carousel-works/daftarDanPilihPeran.png"
+        image: "/carousel-works/daftarDanPilihPeran.webp"
     },
     {
         title: "Kustomisasi & Latih",
@@ -431,7 +431,7 @@ function HowItWorksSection() {
         color: "bg-[#7895A9]", // Slate Blue
         cornerColor: "bg-[#455A64]", // Dark Slate
         textColor: "text-[#263238]", // Dark Blue Gray
-        image: "/carousel-works/kostumisasiDanLatih.png"
+        image: "/carousel-works/kostumisasiDanLatih.webp"
     },
     {
         title: "Aktifkan & Pantau",
@@ -439,7 +439,7 @@ function HowItWorksSection() {
         color: "bg-[#FAD9D5]", // Pink
         cornerColor: "bg-[#A67C7C]", // Dark Pink
         textColor: "text-[#4E342E]", // Dark Red Brown
-        image: "/carousel-works/aktifkanDanPantau.png"
+        image: "/carousel-works/aktifkanDanPantau.webp"
     }
   ];
 

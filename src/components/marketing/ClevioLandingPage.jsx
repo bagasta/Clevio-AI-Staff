@@ -112,6 +112,7 @@ export default function ClevioLandingPage() {
            <UseCasesSection />
            <HowItWorksSection />
            <FeatureSection />
+           <TestimonialSection />
         </main>
       </div>
     </>
@@ -234,7 +235,7 @@ function HowItWorksSection() {
         color: "bg-[#FDF4C8]", // Cream
         cornerColor: "bg-[#C0A865]", // Dark Gold
         textColor: "text-[#5D4037]", // Dark Brown
-        image: "/carousel-works/daftarDanPilihPeran.png"
+        image: "/carousel-works/daftarDanPilihPeran.webp"
     },
     {
         title: "Kustomisasi & Latih",
@@ -242,7 +243,7 @@ function HowItWorksSection() {
         color: "bg-[#7895A9]", // Slate Blue
         cornerColor: "bg-[#455A64]", // Dark Slate
         textColor: "text-[#263238]", // Dark Blue Gray
-        image: "/carousel-works/kostumisasiDanLatih.png"
+        image: "/carousel-works/kostumisasiDanLatih.webp"
     },
     {
         title: "Aktifkan & Pantau",
@@ -250,7 +251,7 @@ function HowItWorksSection() {
         color: "bg-[#FAD9D5]", // Pink
         cornerColor: "bg-[#A67C7C]", // Dark Pink
         textColor: "text-[#4E342E]", // Dark Red Brown
-        image: "/carousel-works/aktifkanDanPantau.png"
+        image: "/carousel-works/aktifkanDanPantau.webp"
     }
   ];
 
@@ -371,6 +372,75 @@ function FeatureSection() {
                         </div>
                     ))}
                 </div>
+            </div>
+        </div>
+    </section>
+  );
+}
+
+function TestimonialSection() {
+  const testimonials = [
+    {
+        name: "Dr. Kemal H.S. I Ist",
+        role: "Konsultan Manajemen Governance, Risk and Compliance",
+        quote: "Clevio menawarkan AI untuk Profesional, dirancang untuk tingkatkan kompetensi, produktivitas, dan efektivitas kerja dengan dukungan analisis data yang kuat.",
+        image: "/testimoni/kemal.webp"
+    },
+    {
+        name: "Gatot Nuradi Sam",
+        role: "Executive Director Bina Antarbudaya",
+        quote: "Kelemahan kita selalu di data dan managing information. AI bisa membantu meng-cluster informasi seperti relawan dan sponsor, lalu menunjukkan mana yang paling potensial untuk kita tindak lanjuti.",
+        image: "/testimoni/gatot.webp"
+    },
+    {
+        name: "Sara Dhewanto",
+        role: "Impact Incubator",
+        quote: "Saya memakai staf AI untuk membantu pekerjaan saya agar tugas-tugas rutin bisa selesai lebih cepat dan akurat.",
+        image: "/testimoni/sara.webp"
+    },
+    {
+        name: "Sinta Kaniawati",
+        role: "Ketua Dewan Pengurus Bina Antarbudaya",
+        quote: "AI itu membantu, tapi keseimbangan manusia tetap penting. Tantangan-nya adalah bagaimana kita menggunakan AI dengan bijak agar tidak kehilangan nilai manusiawi.",
+        image: "/testimoni/sinta.webp"
+    }
+  ];
+
+  return (
+    <section className="w-full bg-[#f8f9fa] py-24 px-8 flex justify-center z-20 relative">
+        <div className="container mx-auto max-w-7xl">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-16 text-center tracking-tight">
+                Ini Kata Mereka :
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {testimonials.map((item, idx) => (
+                    // Wooden Frame Container
+                    <div 
+                        key={idx}
+                        className="relative w-full aspect-[3/5] bg-[#EBCFB2] rounded-[2.5rem] p-4 shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center transition-transform hover:-translate-y-2 duration-300 ring-1 ring-black/5"
+                    >
+                         {/* Bevel/Depth Effect for Frame */}
+                         <div className="absolute inset-0 rounded-[2.5rem] shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] pointer-events-none"></div>
+
+                         {/* Inner Card Content */}
+                         <div className="w-full h-full bg-white rounded-[1.8rem] relative overflow-hidden shadow-[inset_0_2px_8px_rgba(0,0,0,0.15)] isolation-auto">
+                            
+                            {/* Full Background Image */}
+                            <div className="absolute inset-0 z-0">
+                                <Image
+                                    src={item.image}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover object-top"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                />
+                            </div>
+
+
+                         </div>
+                    </div>
+                ))}
             </div>
         </div>
     </section>
