@@ -1,6 +1,6 @@
 "use client";
 
-import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText } from "lucide-react";
+import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
 
@@ -111,6 +111,7 @@ export default function ClevioLandingPage() {
 
            <UseCasesSection />
            <HowItWorksSection />
+           <FeatureSection />
         </main>
       </div>
     </>
@@ -303,6 +304,73 @@ function HowItWorksSection() {
                          </div>
                     </div>
                 ))}
+            </div>
+        </div>
+    </section>
+  );
+}
+
+function FeatureSection() {
+  const features = [
+    {
+      icon: <div className="w-10 h-10 bg-[#E3F2FD] rounded-xl flex items-center justify-center"><Clock className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Tersedia 24/7",
+      desc: "Staff AI Anda tidak pernah tidur dan siap melayani kapan saja"
+    },
+    {
+      icon: <div className="w-10 h-10 bg-[#FFF9C4] rounded-xl flex items-center justify-center"><Brain className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Pembelajaran Berkelanjutan",
+      desc: "Semakin pintar seiring waktu dengan machine learning"
+    },
+    {
+      icon: <div className="w-10 h-10 bg-[#E8F5E9] rounded-xl flex items-center justify-center"><TrendingUp className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Analitik Real-time",
+      desc: "Pantau performa dan dapatkan insights mendalam"
+    },
+    {
+      icon: <div className="w-10 h-10 bg-[#E3F2FD] rounded-xl flex items-center justify-center"><ShieldCheck className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Keamanan Terjamin",
+      desc: "Data Anda dilindungi dengan enkripsi tingkat enterprise"
+    },
+    {
+      icon: <div className="w-10 h-10 bg-[#FFF9C4] rounded-xl flex items-center justify-center"><Zap className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Respons Instan",
+      desc: "Jawab pertanyaan pelanggan dalam hitungan detik"
+    },
+    {
+      icon: <div className="w-10 h-10 bg-[#E8F5E9] rounded-xl flex items-center justify-center"><Globe className="w-6 h-6 text-[#1A237E] stroke-[2]" /></div>,
+      title: "Multi-bahasa",
+      desc: "Berkomunikasi dalam berbagai bahasa dengan lancar"
+    }
+  ];
+
+  return (
+    <section className="w-full bg-white py-24 px-8 flex justify-center z-20 relative">
+        <div className="container mx-auto max-w-6xl">
+            {/* Wooden Table Container - Beige/Wood Color */}
+            <div className="w-full bg-[#EBCFB2] rounded-[3rem] p-12 md:p-16 flex flex-col items-center shadow-2xl relative overflow-hidden">
+                
+                <h2 className="text-4xl font-extrabold text-[#4E342E] mb-12 text-center tracking-tight">
+                    Fitur Unggulan
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                    {features.map((feature, idx) => (
+                        <div key={idx} className="w-full bg-white rounded-[1.5rem] p-6 flex flex-col items-start gap-4 shadow-xl border border-white/50 h-full transition-transform hover:-translate-y-1 duration-300">
+                            <div className="shrink-0">
+                                {feature.icon}
+                            </div>
+                            <div>
+                                <h3 className="text-[#1A237E] font-bold text-lg leading-tight mb-2">
+                                    {feature.title}
+                                </h3>
+                                <p className="text-gray-600 text-sm leading-relaxed font-medium">
+                                    {feature.desc}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     </section>
