@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Check } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
@@ -115,6 +116,7 @@ export default function ClevioLandingPage() {
            <TestimonialSection />
            <ComparisonSection />
            <PricingSection />
+           <WaitingListSection />
            <CTASection />
            <FooterSection />
         </main>
@@ -631,6 +633,171 @@ function PricingSection() {
                          ))}
                     </div>
                 </div>
+            </div>
+        </section>
+    );
+}
+
+function WaitingListSection() {
+    const [formData, setFormData] = useState({
+        Nama: '',
+        nomer_Whatsapp: '',
+        Kebutuhan: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(null);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitStatus(null);
+
+        try {
+            const response = await fetch('https://n8n.srv651498.hstgr.cloud/webhook/Waiting_list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                setSubmitStatus('success');
+                setFormData({ Nama: '', nomer_Whatsapp: '', Kebutuhan: '' });
+            } else {
+                setSubmitStatus('error');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <section className="w-full bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] py-24 px-4 md:px-8 flex justify-center z-20 relative overflow-hidden">
+            {/* Subtle Glow Effects */}
+            <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-[#E68A44]/10 rounded-full blur-[150px] -translate-y-1/2"></div>
+            <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] -translate-y-1/2"></div>
+
+            <div className="container mx-auto max-w-2xl relative z-10">
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <p className="text-[#E68A44] font-semibold text-sm tracking-widest uppercase mb-4">
+                        Early Access
+                    </p>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
+                        Jadilah yang Pertama
+                    </h2>
+                    <p className="text-gray-400 text-lg font-medium max-w-md mx-auto leading-relaxed">
+                        Daftar sekarang dan dapatkan akses eksklusif saat kami launch.
+                    </p>
+                </div>
+
+                {/* Glassmorphic Form Card */}
+                <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-white/10 shadow-2xl">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                        {/* Nama */}
+                        <div>
+                            <label htmlFor="nama" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                                Nama Lengkap
+                            </label>
+                            <input
+                                type="text"
+                                id="nama"
+                                name="Nama"
+                                value={formData.Nama}
+                                onChange={handleChange}
+                                required
+                                placeholder="John Doe"
+                                className="w-full px-5 py-4 bg-white/5 rounded-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500"
+                            />
+                        </div>
+
+                        {/* WhatsApp Number */}
+                        <div>
+                            <label htmlFor="whatsapp" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                                Nomor WhatsApp
+                            </label>
+                            <div className="flex">
+                                <span className="inline-flex items-center px-5 rounded-l-2xl border border-r-0 border-white/10 bg-white/5 text-gray-400 font-semibold text-sm">
+                                    +62
+                                </span>
+                                <input
+                                    type="tel"
+                                    id="whatsapp"
+                                    name="nomer_Whatsapp"
+                                    value={formData.nomer_Whatsapp}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="812 3456 7890"
+                                    className="flex-1 px-5 py-4 bg-white/5 rounded-r-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Kebutuhan (Text Area) */}
+                        <div>
+                            <label htmlFor="kebutuhan" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                                Kebutuhan Bisnis Anda
+                            </label>
+                            <textarea
+                                id="kebutuhan"
+                                name="Kebutuhan"
+                                value={formData.Kebutuhan}
+                                onChange={handleChange}
+                                required
+                                rows={4}
+                                placeholder="Ceritakan kebutuhan Anda..."
+                                className="w-full px-5 py-4 bg-white/5 rounded-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500 resize-none"
+                            />
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full py-4 mt-2 bg-gradient-to-r from-[#E68A44] to-[#F5A623] text-white font-bold rounded-2xl text-base shadow-lg shadow-[#E68A44]/25 hover:shadow-xl hover:shadow-[#E68A44]/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        >
+                            {isSubmitting ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                                    </svg>
+                                    Mengirim...
+                                </span>
+                            ) : 'Daftar Waiting List'}
+                        </button>
+
+                        {/* Status Messages */}
+                        {submitStatus === 'success' && (
+                            <div className="text-center py-4 px-6 bg-green-500/10 border border-green-500/20 rounded-2xl">
+                                <p className="text-green-400 font-semibold text-sm">
+                                    ✓ Terima kasih! Anda sudah terdaftar di waiting list.
+                                </p>
+                            </div>
+                        )}
+                        {submitStatus === 'error' && (
+                            <div className="text-center py-4 px-6 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                                <p className="text-red-400 font-semibold text-sm">
+                                    Terjadi kesalahan. Silakan coba lagi.
+                                </p>
+                            </div>
+                        )}
+                    </form>
+                </div>
+
+                {/* Trust Indicators */}
+                <p className="text-center text-gray-500 text-xs mt-8 font-medium">
+                    🔒 Data Anda aman dan tidak akan dibagikan ke pihak ketiga.
+                </p>
             </div>
         </section>
     );
