@@ -123,6 +123,17 @@ export default function MobileLanding() {
       }
   };
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     // Outer container
     <div className="flex min-h-[100dvh] w-full justify-center bg-black">
@@ -131,7 +142,11 @@ export default function MobileLanding() {
       <div className={`relative w-full max-w-[480px] bg-slate-900 font-sans shadow-2xl flex flex-col transition-all duration-500 min-h-[100dvh]`}>
         
         {/* Header */}
-        <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 pt-0 supports-[padding-top:env(safe-area-inset-top)]:pt-[env(safe-area-inset-top)]">
+        <header 
+          className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 flex items-center justify-between px-6 pt-0 transition-all duration-300 supports-[padding-top:env(safe-area-inset-top)]:pt-[env(safe-area-inset-top)] ${
+            isScrolled ? "backdrop-blur-xl bg-black/20" : ""
+          }`}
+        >
           <div className="relative h-20 w-20">
             <Image
               src="/clevioAISTAFF-Logo-White.png"

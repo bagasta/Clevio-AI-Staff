@@ -8,7 +8,13 @@ const description =
 export const metadata = {
   title,
   description,
-  keywords: ["AI Staff", "WhatsApp Automation", "Customer Service", "Sales Automation", "Chatbot Indonesia"],
+  keywords: [
+    "AI Staff",
+    "WhatsApp Automation",
+    "Customer Service",
+    "Sales Automation",
+    "Chatbot Indonesia",
+  ],
   authors: [{ name: "Clevio Team" }],
   openGraph: {
     title,
@@ -72,11 +78,12 @@ export default function Home() {
           </div>
           <div className="pt-4 border-t border-white/20">
             <p className="text-sm text-blue-200">
-              Silakan buka website menggunakan perangkat mobile untuk pengalaman penuh.
+              Silakan buka website menggunakan perangkat mobile untuk pengalaman
+              penuh.
             </p>
           </div>
         </div>
       </div>
     </main>
-  );                    
+  );
 }
