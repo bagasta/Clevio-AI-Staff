@@ -1,6 +1,6 @@
 "use client";
 
-import { Send } from "lucide-react";
+import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
 
@@ -108,8 +108,118 @@ export default function ClevioLandingPage() {
             </div>
 
            </section>
+
+           <UseCasesSection />
         </main>
       </div>
     </>
+  );
+}
+
+function UseCasesSection() {
+  const cards = [
+    {
+        icon: <MessageSquare className="w-6 h-6 text-black" />,
+        title: "Customer Service",
+        desc: "Layani pelanggan 24/7 dengan respons cepat dan akurat",
+        bg: "bg-[#F2F2F2]", 
+        foldColor: "bg-[#9E9E9E]",
+        iconBg: "bg-white",
+        text: "text-black"
+    },
+    {
+        icon: <ShoppingCart className="w-6 h-6 text-black" />,
+        title: "Sales Asistant",
+        desc: "Tingkatkan penjualan dengan rekomendasi produk yang tepat",
+        bg: "bg-[#90A4AE]", 
+        foldColor: "bg-[#546E7A]",
+        iconBg: "bg-white/30",
+        text: "text-black"
+    },
+    {
+        icon: <Headset className="w-6 h-6 text-black" />,
+        title: "Support Agent",
+        desc: "Berikan dukungan teknis yang efisien dan profesional",
+        bg: "bg-[#FFF59D]", 
+        foldColor: "bg-[#AFB42B]",
+        iconBg: "bg-white/40",
+        text: "text-black"
+    },
+    {
+        icon: <TrendingUp className="w-6 h-6 text-black" />,
+        title: "Marketing Assistant",
+        desc: "Otomatisasi kampanye marketing dan analisis data",
+        bg: "bg-[#A5D6A7]", 
+        foldColor: "bg-[#558B2F]",
+        iconBg: "bg-white/40",
+        text: "text-black"
+    },
+    {
+        icon: <Users className="w-6 h-6 text-black" />,
+        title: "HR Assistant",
+        desc: "Kelola rekrutmen dan onboarding karyawan dengan mudah",
+        bg: "bg-[#F48FB1]", 
+        foldColor: "bg-[#AD1457]",
+        iconBg: "bg-white/40",
+        text: "text-black"
+    },
+    {
+        icon: <FileText className="w-6 h-6 text-black" />,
+        title: "Admin Assistant",
+        desc: "Atur jadwal, dokumen, dan tugas administratif lainnya",
+        bg: "bg-[#FFCC80]", 
+        foldColor: "bg-[#EF6C00]",
+        iconBg: "bg-white/40",
+        text: "text-black"
+    }
+  ];
+
+  return (
+    <section className="w-full bg-white py-24 px-8 flex justify-center z-20 relative">
+        <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-20">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-6 tracking-tight">
+                    Staf AI Apa Lagi Yang Bisa Anda Buat?
+                </h2>
+                <p className="text-xl md:text-2xl text-gray-600 font-medium">
+                    Banyak tugas yang bisa dibantu para staf AI Anda :
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
+                {cards.map((card, idx) => (
+                    <div 
+                        key={idx}
+                        className={`relative w-full h-[260px] ${card.bg} rounded-[2.5rem] p-8 flex flex-col shadow-lg transition-transform hover:-translate-y-2 duration-300`}
+                    >
+                         {/* Binder Holes */}
+                        <div className="absolute top-5 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
+                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
+                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
+                        </div>
+
+                        <div className="flex flex-col gap-5 mt-4 relative z-10">
+                            <div className={`w-14 h-14 ${card.iconBg} rounded-[1.2rem] flex items-center justify-center shadow-sm`}>
+                                {card.icon}
+                            </div>
+                            <div>
+                                <h3 className={`font-black text-2xl mb-2 ${card.text} leading-tight`}>{card.title}</h3>
+                                <p className={`text-[15px] font-semibold leading-relaxed w-[90%] ${card.text} opacity-70`}>
+                                    {card.desc}
+                                </p>
+                            </div>
+                        </div>
+
+                         {/* Folded Corner Effect */}
+                         <div className="absolute bottom-0 right-0 w-[80px] h-[80px]">
+                            <div className={`absolute bottom-0 right-0 w-[80px] h-[80px] ${card.foldColor} rounded-br-[2.5rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] z-20`}></div>
+                            <div className="absolute bottom-0 right-0 w-[80px] h-[80px] bg-white rounded-br-[3rem] z-10"></div>
+                         </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
   );
 }
