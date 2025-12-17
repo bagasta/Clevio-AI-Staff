@@ -1,6 +1,6 @@
 "use client";
 
-import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe } from "lucide-react";
+import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Check } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
 
@@ -113,6 +113,10 @@ export default function ClevioLandingPage() {
            <HowItWorksSection />
            <FeatureSection />
            <TestimonialSection />
+           <ComparisonSection />
+           <PricingSection />
+           <CTASection />
+           <FooterSection />
         </main>
       </div>
     </>
@@ -445,4 +449,244 @@ function TestimonialSection() {
         </div>
     </section>
   );
+}
+
+function ComparisonSection() {
+    const staffBiasa = [
+      "Gaji bulanan + benefit + training",
+      "Jam kerja terbatas (8 jam/hari)",
+      "1 staf = 1 customer"
+    ];
+  
+    const staffAI = [
+      "Biaya langganan tetap, tanpa benefit & training",
+      "Kerja 24/7 tanpa lembur & tanpa cuti",
+      "1 Staf AI = ratusan customer sekaligus",
+      "Tidak resign, tidak sakit, selalu ikut SOP",
+      "Onboarding sangat cepat"
+    ];
+  
+    return (
+      <section className="w-full bg-white py-24 px-8 flex justify-center z-20 relative">
+          <div className="container mx-auto max-w-6xl">
+              <div className="text-center mb-16">
+                  <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-4 tracking-tight">
+                      Staf Biasa VS Staf AI
+                  </h2>
+                  <p className="text-xl text-gray-600 font-medium">
+                      Lihat perbedaan signifikan antara<br/>
+                      Staf Biasa dan Staf AI
+                  </p>
+              </div>
+  
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+                  
+                  {/* Staf Biasa */}
+                  <div className="w-full bg-white rounded-[2.5rem] p-10 pb-16 shadow-[0_10px_40px_rgba(0,0,0,0.1)] flex flex-col items-center border border-gray-100">
+                       {/* Header Pill */}
+                       <div className="bg-white border-2 border-gray-100 rounded-full py-4 px-10 flex items-center gap-3 shadow-md mb-12 min-w-[240px] justify-center">
+                          <User className="w-6 h-6 text-black" strokeWidth={2.5} />
+                          <span className="font-extrabold text-xl text-black">Staf Biasa</span>
+                      </div>
+  
+                      <ul className="flex flex-col gap-8 w-full max-w-md relative pl-6">
+                           {/* Connecting Line */}
+                          <div className="absolute left-[7px] top-2 bottom-6 w-[3px] bg-black/10 rounded-full"></div>
+  
+                          {staffBiasa.map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-6 relative z-10">
+                                  <div className="shrink-0 w-4 h-4 bg-black rounded-full mt-1.5 ring-4 ring-white"></div>
+                                  <span className="font-bold text-lg text-black leading-snug">{item}</span>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+  
+                  {/* Staf AI */}
+                  <div className="w-full bg-[#6B8594] rounded-[2.5rem] p-10 pb-16 shadow-[0_20px_50px_rgba(107,133,148,0.4)] flex flex-col items-center ring-4 ring-white/50">
+                       {/* Header Pill */}
+                       <div className="bg-white rounded-full py-4 px-10 flex items-center gap-3 shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-12 min-w-[240px] justify-center">
+                          <Bot className="w-7 h-7 text-[#6B8594]" strokeWidth={2.5} />
+                          <span className="font-extrabold text-xl text-[#6B8594]">Staf AI</span>
+                      </div>
+  
+                      <ul className="flex flex-col gap-8 w-full max-w-md relative pl-6">
+                           {/* Connecting Line */}
+                          <div className="absolute left-[7px] top-2 bottom-6 w-[3px] bg-white/30 rounded-full"></div>
+  
+                          {staffAI.map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-6 relative z-10">
+                                  <div className="shrink-0 w-4 h-4 bg-white rounded-full mt-1.5 shadow-lg"></div>
+                                  <span className="font-bold text-lg text-white leading-snug drop-shadow-md">{item}</span>
+                              </li>
+                          ))}
+                      </ul>
+                  </div>
+  
+              </div>
+          </div>
+      </section>
+    );
+}
+
+function PricingSection() {
+    const plans = [
+        {
+          name: "Gratis",
+          desc: "Sempurna untuk mencoba Staff AI",
+          features: [
+            "1 Staff AI",
+            "100 percakapan/bulan",
+            "Fitur dasar",
+            "Email support",
+            "Dashboard analytics"
+          ],
+          cta: "Coba Gratis"
+        },
+        {
+          name: "Pro",
+          desc: "Untuk bisnis yang sedang berkembang",
+          price: "Rp. 1.299.000",
+          period: "/Bulan",
+          features: [
+            "5 Staff AI",
+            "Unlimited percakapan",
+            "Semua fitur premium",
+            "Priority support 24/7",
+            "Advanced analytics",
+            "Custom branding",
+            "API access"
+          ],
+          cta: "Coba Sekarang"
+        },
+        {
+          name: "Enterprise",
+          desc: "Solusi lengkap untuk perusahaan",
+          customTitle: "Mari berdiskusi!", 
+          features: [
+            "Unlimited Staff AI",
+            "Unlimited percakapan",
+            "Semua fitur Pro",
+            "Dedicated account manager",
+            "Custom integration",
+            "SLA guarantee",
+            "Training & onboarding",
+            "White-label solution"
+          ],
+          cta: "Coba Sekarang"
+        }
+    ];
+
+    return (
+        <section className="w-full bg-white py-16 px-4 md:px-8 flex justify-center z-20 relative">
+            <div className="container mx-auto max-w-6xl">
+                 {/* Wooden Container */}
+                <div className="w-full bg-[#EBCFB2] rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl">
+                     <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#4E342E] mb-3 tracking-tight">
+                            Pilih Paket Anda
+                        </h2>
+                        <p className="text-lg text-[#795548] font-bold">
+                            Lihat perbedaan signifikan antara<br/>
+                            Staf Biasa dan Staf AI
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                         {plans.map((plan, idx) => (
+                             <div key={idx} className="bg-white rounded-[2rem] p-6 lg:p-8 flex flex-col shadow-xl h-full border border-white/60">
+                                 <h3 className="text-[#1565C0] font-bold text-xl mb-1">{plan.name}</h3>
+                                 <p className="text-gray-500 text-xs font-medium mb-6">{plan.desc}</p>
+
+                                {plan.price ? (
+                                    <div className="flex items-baseline gap-1 mb-6 mt-2">
+                                        <span className="text-black font-extrabold text-3xl tracking-tight">{plan.price}</span>
+                                        <span className="text-gray-500 text-xs font-bold">{plan.period}</span>
+                                    </div>
+                                ) : plan.customTitle ? (
+                                    <div className="mb-6 mt-2">
+                                        <span className="text-black font-extrabold text-2xl tracking-tight leading-tight block">
+                                            {plan.customTitle}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="mb-6 mt-2 h-[36px]"></div> 
+                                )}
+
+                                <div className="flex flex-col gap-3 mb-8 flex-grow">
+                                    {plan.features.map((feat, i) => (
+                                        <div key={i} className="flex items-start gap-2.5">
+                                            <Check className="w-4 h-4 text-[#4CAF50] shrink-0 mt-0.5" strokeWidth={3} />
+                                            <span className="text-gray-600 text-sm font-medium leading-relaxed">
+                                                {feat}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button className="w-full py-3 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-bold rounded-full text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.08),inset_0_-2px_4px_rgba(0,0,0,0.1)] border border-gray-100 hover:to-[#E0E0E0] active:scale-[0.98] transition-all">
+                                    {plan.cta}
+                                </button>
+                             </div>
+                         ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function CTASection() {
+    return (
+        <section className="w-full bg-white py-12 px-4 md:px-8 flex justify-center z-20 relative mb-[-40px]">
+            <div className="container mx-auto max-w-6xl">
+                <div className="w-full bg-[#E68A44] rounded-[2.5rem] py-12 px-6 md:py-16 md:px-12 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
+                     {/* Decorative Circles */}
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-black/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-4 relative z-10">
+                        Bangun tim <br/>
+                        staf AI Anda
+                    </h2>
+                    
+                    <p className="text-white/90 text-sm md:text-base font-medium mb-8 max-w-xl leading-relaxed relative z-10">
+                        Mulai transformasi digital bisnis Anda hari ini. Gratis untuk memulai,
+                        tidak perlu kartu kredit.
+                    </p>
+
+                    <button className="px-10 py-3 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-extrabold rounded-full text-base shadow-lg hover:shadow-xl active:scale-[0.98] transition-all relative z-10">
+                        Mulai Gratis
+                    </button>
+
+                    <p className="text-white/80 text-[10px] md:text-xs font-medium mt-4 relative z-10">
+                        Tidak perlu kartu kredit • Setup dalam 5 menit • Cancel kapan saja
+                    </p>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function FooterSection() {
+    return (
+        <footer className="w-full bg-[#DCC1A7] pt-32 pb-12 px-8 relative z-0 mt-[-80px]">
+             {/* Logo - No Background */}
+             <div className="flex justify-center mb-6">
+                <Image 
+                    src="/ClevioLogoLandingP.webp" 
+                    alt="Clevio Logo"
+                    width={240}
+                    height={80}
+                    className="w-[240px] h-auto object-contain"
+                />
+             </div>
+
+             <div className="text-center">
+                 <p className="text-[#4E342E] text-sm font-bold opacity-80">
+                    © 2025 Clevio AI Staff. All rights reserved.
+                 </p>
+             </div>
+        </footer>
+    );
 }
