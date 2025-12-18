@@ -427,14 +427,27 @@ function FeatureSection() {
   return (
     <section className="w-full bg-white py-24 px-8 flex justify-center z-20 relative">
         <div className="container mx-auto max-w-6xl">
-            {/* Wooden Table Container - Beige/Wood Color */}
-            <div className="w-full bg-[#EBCFB2] rounded-[3rem] p-12 md:p-16 flex flex-col items-center shadow-2xl relative overflow-hidden">
+            <h2 className="text-4xl font-extrabold text-black mb-12 text-center tracking-tight">
+                Fitur Unggulan
+            </h2>
+
+            {/* Sticky Note Container - Paper Look with Binder Holes */}
+            <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] px-5 md:px-16 pb-10 md:pb-16 pt-28 flex flex-col items-center shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)] relative overflow-hidden">
                 
-                <h2 className="text-4xl font-extrabold text-[#4E342E] mb-12 text-center tracking-tight">
-                    Fitur Unggulan
-                </h2>
+                {/* Binder Holes - WHITE with Stronger INNER SHADOW (Top Center) */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+                    {[0, 1, 2, 3].map((i) => (
+                        <div 
+                            key={i} 
+                            className="w-6 h-6 rounded-full bg-white"
+                            style={{
+                                boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                            }}
+                        ></div>
+                    ))}
+                </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full relative z-10 mt-1">
                     {features.map((feature, idx) => (
                         <div key={idx} className="w-full bg-white rounded-[1.5rem] p-6 flex flex-col items-start gap-4 shadow-xl border border-white/50 h-full transition-transform hover:-translate-y-1 duration-300">
                             <div className="shrink-0">
