@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Check } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Check, Signal, Wifi, BatteryMedium, Menu } from "lucide-react";
 import Image from "next/image";
 import Script from "next/script";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 
 const SOFTWARE_APP_SCHEMA = {
   "@context": "https://schema.org",
@@ -18,7 +19,71 @@ const SOFTWARE_APP_SCHEMA = {
   },
 };
 
+const HeaderClock = () => {
+    const [time, setTime] = useState("");
+  
+    useEffect(() => {
+      const updateTime = () => {
+        const now = new Date();
+        setTime(now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false }));
+      };
+      updateTime();
+      const interval = setInterval(updateTime, 1000);
+      return () => clearInterval(interval);
+    }, []);
+  
+    return <span>{time}</span>;
+  };
+
 export default function ClevioLandingPage() {
+  const [status, setStatus] = useState("initial"); // initial, interviewing, finished
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const inputRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll chat
+  useEffect(() => {
+    if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [messages, isTyping]);
+
+
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+
+    // Add user message
+    const userMsg = { role: "user", text: inputValue };
+    setMessages((prev) => [...prev, userMsg]);
+    setInputValue("");
+    
+    if (status === 'initial') {
+        setStatus("interviewing");
+    }
+    setIsTyping(true);
+
+    // Dummy Interview Logic
+    setTimeout(() => {
+      let aiResponseText = "";
+      if (messages.length === 0) {
+        aiResponseText = "Menarik! Apa detail tugas spesifik yang harus dilakukan oleh staf AI ini?";
+      } else if (messages.length === 2) {
+        aiResponseText = "Baik, saya mengerti kebutuhan Anda. Sistem kami sedang menyiapkan demo yang cocok.";
+      } else {
+        // Finish condition
+        setIsTyping(false);
+        setStatus("finished");
+        return;
+      }
+
+      setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
+      setIsTyping(false);
+    }, 1500); 
+  };
+
+
   return (
     <>
       <Script id="clevio-ai-staff-schema" type="application/ld+json">
@@ -37,32 +102,16 @@ export default function ClevioLandingPage() {
                 className="object-cover object-center"
              />
              {/* Optional Overlay if needed for contrast */}
-             {/* <div className="absolute inset-0 bg-black/10" /> */}
+             <div className="absolute inset-0 bg-black/50" />
         </div>
 
         {/* Content Overlay */}
         <main>
-           <section className="relative z-10 flex h-screen flex-col items-center justify-center px-4">
+           <section className="relative z-10 flex h-screen flex-col items-center justify-center px-4 overflow-hidden">
             
-            {/* 1. Floating Logo Pill */}
-            {/* Positioned top-left-ish based on design, or centered top. 
-                User image shows it floating top-left area. 
-            */}
-            <div className="absolute top-12 left-12 lg:top-16 lg:left-24 hidden md:block">
-                 <div className="flex items-center justify-center">
-                    <Image 
-                        src="/ClevioLogoLandingP.webp" // As requested
-                        alt="Clevio AI Staff"
-                        width={360}
-                        height={120}
-                        className="h-auto w-[360px]"
-                    />
-                 </div>
-            </div>
-
-
-             {/* Mobile Logo Fallback (if user checks on mobile despite shouting DESKTOP) */}
-             <div className="absolute top-6 left-6 md:hidden">
+            {/* Remove Absolute Floating Logo - Moving it inside the grid for better structure */}
+            {/* 1. Mobile Logo Fallback (keep specific absolute for mobile if needed, or unify) */}
+             <div className="absolute top-6 left-6 md:hidden z-50">
                  <div className="flex items-center justify-center rounded-full bg-white px-6 py-2 shadow-lg">
                     <Image 
                         src="/ClevioLogoLandingP.webp" 
@@ -74,37 +123,247 @@ export default function ClevioLandingPage() {
                  </div>
              </div>
 
-
-            {/* 2. Hero Content: Headline & Input */}
-            {/* Position based on image: The man/robot is on the right. Text is on the left.
-                So we need a container that splits or positions text to the left.
-            */}
-            <div className="container mx-auto h-full"> 
+            <div className="container mx-auto h-full relative"> 
                 <div className="flex h-full items-center">
-                    <div className="w-full md:max-w-xl lg:max-w-2xl pl-4 md:pl-16 lg:pl-24 mt-32">
+                    
+                    {/* LEFT COLUMN: Text & Input */}
+                    <div className="w-full md:w-1/2 lg:max-w-2xl pl-4 md:pl-12 lg:pl-16 relative z-20 flex flex-col justify-center h-full">
                         
-                        {/* Headline */}
-                        <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] sm:text-4xl lg:text-5xl mb-6">
+                        {/* Logo - Clean and Proportional */}
+                        {/* Logo - Absolute Position to avoid pushing text down */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="absolute top-8 left-4 md:left-12 lg:left-16 hidden md:block z-30"
+                        >
+                            <Image 
+                                src="/ClevioLogoLandingP.webp" 
+                                alt="Clevio AI Staff"
+                                width={500}
+                                height={166}
+                                className="h-32 w-auto object-contain"
+                            />
+                        </motion.div>
+
+                        <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl mb-8">
                             Jika Anda bisa mudah<br/>
                             membuat staf dari AI<br/>
-                            <span className="font-extrabold block mt-2 tracking-wide">APA PERAN AI ANDA?</span>
+                            <span className="font-extrabold block mt-2 tracking-wide text-white">APA PERAN AI ANDA?</span>
                         </h1>
 
-                        {/* Input Field */}
-                        <div className="relative mt-8 max-w-md">
-                            <input 
-                                type="text" 
-                                placeholder="Ketik disini......."
-                                className="w-full rounded-full border-none bg-white py-4 pl-6 pr-14 text-gray-700 shadow-xl focus:ring-2 focus:ring-blue-400 outline-none text-lg"
-                            />
-                            <button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-sky-300/30 p-2 text-sky-400 hover:bg-sky-400 hover:text-white transition-colors">
-                                <Send className="h-6 w-6 ml-0.5 fill-current" /> 
-                            </button>
+                        <div className="relative max-w-lg w-full">
+                            <AnimatePresence mode="wait">
+                                {status === 'initial' && (
+                                    <motion.div
+                                        key="input-field"
+                                        initial={{ opacity: 0, width: "100%" }}
+                                        animate={{ opacity: 1, width: "100%" }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                    >
+                                        <input 
+                                            ref={inputRef}
+                                            type="text" 
+                                            value={inputValue}
+                                            onChange={(e) => setInputValue(e.target.value)}
+                                            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                                            placeholder="Ketik disini......."
+                                            className="w-full rounded-full border-2 border-white/20 bg-white/95 backdrop-blur-xl py-5 pl-8 pr-16 text-[#2D2216] shadow-2xl focus:ring-4 focus:ring-[#5D4037]/30 focus:border-[#5D4037] outline-none text-xl font-medium placeholder:text-gray-400 transition-all font-sans"
+                                            disabled={status === "finished"}
+                                        />
+                                        <button 
+                                            onClick={handleSend}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-[#5D4037] text-white hover:bg-[#4E342E] hover:scale-105 active:scale-95 transition-all shadow-lg"
+                                        >
+                                            <Send className="h-5 w-5" /> 
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
-
                     </div>
-                    {/* Right side is empty for the image content */}
-                    <div className="hidden md:block md:w-1/2"></div>
+
+                    {/* RIGHT COLUMN: Dynamic Content (Chat -> Phone) */}
+                    <div className="hidden md:flex md:w-1/2 h-full items-center justify-center relative z-10 pl-12 lg:pl-20">
+                        <AnimatePresence mode="popLayout">
+                            
+                            {/* State 2: Interview Chat Bubble Window */}
+                            {status === 'interviewing' && (
+                                <motion.div
+                                    key="interviewing"
+                                    layoutId="chat-window"
+                                    initial={{ opacity: 0, x: -50, scale: 0.9 }}
+                                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9, x: 50 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                    className="w-full max-w-[480px] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/40 flex flex-col"
+                                >
+                                    {/* Chat Header - Matches Wood Theme */}
+                                    <div className="bg-[#5D4037] p-6 flex items-center gap-4 shrink-0">
+                                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/10">
+                                            <Bot className="w-7 h-7 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-xl tracking-tight">Clevio Assistant</h3>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="relative flex h-2.5 w-2.5">
+                                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C0A865] opacity-75"></span>
+                                                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#E6C985]"></span>
+                                                </span>
+                                                <span className="text-[#FDF4C8] text-sm font-medium">Online</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Chat Body */}
+                                    <div className="h-[400px] overflow-y-auto p-6 space-y-6 bg-[#FAF6F1]">
+                                        {messages.map((msg, idx) => (
+                                            <motion.div 
+                                                key={idx} 
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                                            >
+                                                <div className={`max-w-[85%] px-5 py-4 rounded-[1.5rem] text-[15px] leading-relaxed shadow-sm font-medium ${
+                                                    msg.role === "user" 
+                                                    ? "bg-[#5D4037] text-white rounded-br-none shadow-[#5D4037]/20" 
+                                                    : "bg-white text-[#2D2216] rounded-bl-none border border-[#E0D4BC] shadow-sm"
+                                                }`}>
+                                                    {msg.text}
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                        {isTyping && (
+                                            <div className="flex justify-start">
+                                                <div className="bg-white px-5 py-4 rounded-[1.5rem] rounded-bl-none border border-[#E0D4BC] shadow-sm">
+                                                    <div className="flex space-x-1.5">
+                                                        <div className="w-2 h-2 bg-[#5D4037] rounded-full animate-bounce" />
+                                                        <div className="w-2 h-2 bg-[#5D4037] rounded-full animate-bounce delay-75" />
+                                                        <div className="w-2 h-2 bg-[#5D4037] rounded-full animate-bounce delay-150" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div ref={messagesEndRef} />
+                                    </div>
+
+                                    {/* Interactive Chat Input Footer */}
+                                    <div className="p-4 bg-white border-t border-[#E0D4BC] shrink-0">
+                                        <div className="relative flex items-center">
+                                            <input 
+                                                type="text"
+                                                autoFocus
+                                                value={inputValue}
+                                                onChange={(e) => setInputValue(e.target.value)}
+                                                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                                                placeholder="Tulis pesan..."
+                                                className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-sm rounded-full py-3.5 pl-5 pr-12 focus:ring-2 focus:ring-[#5D4037]/20 focus:border-[#5D4037] outline-none transition-all placeholder:text-[#8D7F71]"
+                                            />
+                                            <button 
+                                                onClick={handleSend}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-[#5D4037] text-white rounded-full hover:bg-[#4E342E] transition"
+                                            >
+                                                <Send className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </motion.div>
+                            )}
+
+                            {/* State 3: Phone Mockup (Finished) */}
+                            {status === 'finished' && (
+                                <motion.div
+                                    key="finished" 
+                                    initial={{ opacity: 0, y: 100, rotate: 0 }}
+                                    animate={{ opacity: 1, y: 0, rotate: 0 }}
+                                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                                    className="w-full max-w-[320px] relative"
+                                >
+                                     {/* Realistic Frame */}
+                                     <div className="relative bg-black rounded-[55px] p-3 shadow-2xl border-4 border-[#323232] ring-4 ring-gray-200/50">
+                                        {/* Side Buttons */}
+                                        <div className="absolute top-32 -left-2 w-1 h-8 bg-gray-800 rounded-l-md opacity-90"></div>
+                                        <div className="absolute top-44 -left-2 w-1 h-8 bg-gray-800 rounded-l-md opacity-90"></div>
+                                        <div className="absolute top-36 -right-2 w-1 h-12 bg-gray-800 rounded-r-md opacity-90"></div>
+
+                                        {/* Screen Container */}
+                                        <div className="relative bg-white rounded-[45px] overflow-hidden h-full border border-gray-800/20 aspect-[9/19]">
+                                            
+                                            {/* Dynamic Island */}
+                                            <div className="absolute top-0 left-0 right-0 h-8 z-30 flex justify-center">
+                                                <div className="w-[120px] h-[28px] bg-black rounded-b-[18px] flex items-center justify-center">
+                                                    <div className="w-16 h-2 bg-gray-800/50 rounded-full blur-[1px]"></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Status Bar */}
+                                            <div className="flex justify-between items-center px-8 pt-3.5 pb-2 text-[10px] font-semibold text-gray-900 bg-white z-20 relative select-none">
+                                                <HeaderClock />
+                                                <div className="flex gap-1.5 opacity-80">
+                                                    <Signal className="w-3.5 h-3.5" />
+                                                    <Wifi className="w-3.5 h-3.5" />
+                                                    <BatteryMedium className="w-3.5 h-3.5" />
+                                                </div>
+                                            </div>
+
+                                            {/* App Header */}
+                                            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E0D4BC] bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                                                <div className="relative">
+                                                    <div className="w-11 h-11 rounded-full bg-[#5D4037] flex items-center justify-center border border-[#4E342E]">
+                                                        <span className="text-xl">🤖</span>
+                                                    </div>
+                                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#C0A865] border-2 border-white rounded-full"></div>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">Clevio Assistant</h3>
+                                                    <p className="text-xs text-[#C0A865] font-medium">Online • Mengetik...</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Chat Content Body */}
+                                            <div className="bg-[#FAF6F1] h-[380px] p-4 space-y-4 overflow-y-auto font-sans text-xs">
+                                                <div className="text-[10px] text-center text-[#8D7F71] mb-4 font-medium">Hari ini</div>
+                                                
+                                                <div className="flex justify-start">
+                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
+                                                        Halo James 👋, saya <span className="font-semibold text-[#5D4037]">Clevio</span>. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-start">
+                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
+                                                        Dari <b>follow-up pelanggan</b>, <b>mencatat order</b>, sampai <b>menagih invoice</b>—semua bisa saya kerjakan 24/7 tanpa lelah.
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-start">
+                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
+                                                        Ada yang bisa saya bantu mulai sekarang?
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Fake Input Footer */}
+                                            <div className="p-3 bg-white border-t border-[#E0D4BC] absolute bottom-0 left-0 right-0 z-20">
+                                                <div className="relative flex items-center">
+                                                    <input 
+                                                        disabled
+                                                        placeholder="Tulis pesan..."
+                                                        className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-[10px] rounded-full py-3.5 pl-4 pr-10 outline-none placeholder:text-[#8D7F71]"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#5D4037] text-white rounded-full shadow-md">
+                                                        <Send className="w-3.5 h-3.5" />
+                                                    </div>
+                                                </div>
+                                                <div className="mx-auto w-24 h-1 bg-gray-300 rounded-full mt-4"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
                 </div>
             </div>
 
@@ -539,10 +798,64 @@ function TestimonialSection() {
   );
 }
 
+
+const TiltCard = ({ children, className, glowColor = "white" }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const rotateX = useTransform(y, [-100, 100], [5, -5]);
+    const rotateY = useTransform(x, [-100, 100], [-5, 5]);
+
+    const handleMouseMove = (event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+        x.set(xPct * 200);
+        y.set(yPct * 200);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            style={{ 
+                rotateX, 
+                rotateY, 
+                transformStyle: "preserve-3d",
+                perspective: 1000 
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            initial={{ scale: 1 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className={`relative transition-all duration-200 ease-out ${className}`}
+        >
+             {/* Dynamic Glare Effect */}
+            <motion.div
+                style={{
+                    opacity: useTransform(rotateX, (val) => Math.abs(val) / 10), // Glare intensity based on tilt
+                    background: `radial-gradient(circle at 50% 0%, ${glowColor}, transparent 70%)`
+                }}
+                className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay rounded-[2.5rem]"
+            />
+            {children}
+        </motion.div>
+    );
+};
+
 function ComparisonSection() {
     const staffBiasa = [
-      "Gaji bulanan + benefit + training",
+      "Gaji bulanan + THR + Bonus",
       "Jam kerja terbatas (8 jam/hari)",
+      "Perlu cuti, sakit, & izin",
+      "Training lama & butuh adaptasi",
       "1 staf = 1 customer"
     ];
   
@@ -555,65 +868,87 @@ function ComparisonSection() {
     ];
   
     return (
-      <section className="w-full bg-white py-24 px-8 flex justify-center z-20 relative">
-          <div className="container mx-auto max-w-6xl">
-              <div className="text-center mb-16">
-                  <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-4 tracking-tight">
+      <section className="w-full bg-[#FAFAFA] py-28 px-4 flex justify-center z-20 relative overflow-hidden">
+          {/* Background Decor */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(circle_at_center,rgba(200,200,200,0.05),transparent_70%)] pointer-events-none"></div>
+
+          <div className="container mx-auto max-w-6xl relative z-10">
+              <div className="text-center mb-20">
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-4xl md:text-5xl font-extrabold text-black mb-6 tracking-tight"
+                  >
                       Staf Biasa VS Staf AI
-                  </h2>
-                  <p className="text-xl text-gray-600 font-medium">
+                  </motion.h2>
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="text-xl text-gray-600 font-medium"
+                  >
                       Lihat perbedaan signifikan antara<br/>
                       Staf Biasa dan Staf AI
-                  </p>
+                  </motion.p>
               </div>
   
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 perspective-[2000px]">
                   
-                  {/* Staf Biasa */}
-                  <div className="w-full bg-white rounded-[2.5rem] p-10 pb-16 shadow-[0_10px_40px_rgba(0,0,0,0.1)] flex flex-col items-center border border-gray-100">
+                  {/* Staf Biasa - "Flat" but 3D */}
+                  <TiltCard 
+                    className="w-full bg-white rounded-[2.5rem] p-10 pb-16 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-200 flex flex-col items-center group"
+                    glowColor="rgba(0,0,0,0.05)"
+                  >
                        {/* Header Pill */}
-                       <div className="bg-white border-2 border-gray-100 rounded-full py-4 px-10 flex items-center gap-3 shadow-md mb-12 min-w-[240px] justify-center">
-                          <User className="w-6 h-6 text-black" strokeWidth={2.5} />
-                          <span className="font-extrabold text-xl text-black">Staf Biasa</span>
+                       <div className="bg-gray-50 border border-gray-100 rounded-full py-4 px-10 flex items-center gap-3 shadow-inner mb-12 min-w-[240px] justify-center group-hover:scale-105 transition-transform duration-300" style={{ transform: "translateZ(30px)" }}>
+                          <User className="w-6 h-6 text-gray-500" strokeWidth={2.5} />
+                          <span className="font-extrabold text-xl text-gray-700">Staf Biasa</span>
                       </div>
   
-                      <div className="w-full max-w-md relative">
-                          {/* Connecting Line - positioned to align with dot centers */}
-                          <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[2px] bg-black/20 rounded-full"></div>
+                      <div className="w-full max-w-md relative" style={{ transform: "translateZ(20px)" }}>
+                          {/* Connecting Line - Adjusted for items-start */}
+                          <div className="absolute left-[7px] top-3 bottom-3 w-[2px] bg-gray-200 rounded-full"></div>
   
                           <ul className="flex flex-col gap-7">
                               {staffBiasa.map((item, idx) => (
-                                  <li key={idx} className="flex items-center gap-5 relative z-10">
-                                      <div className="shrink-0 w-4 h-4 bg-black rounded-full ring-4 ring-white shadow-sm"></div>
-                                      <span className="font-bold text-lg text-black leading-snug">{item}</span>
+                                  <li key={idx} className="flex items-start gap-5 relative z-10 opacity-70 group-hover:opacity-100 transition-opacity">
+                                      {/* Bullet - Adjusted margin for items-start */}
+                                      <div className="shrink-0 w-4 h-4 bg-gray-400 rounded-full ring-4 ring-white shadow-sm mt-1.5"></div>
+                                      <span className="font-bold text-lg text-gray-600 leading-snug">{item}</span>
                                   </li>
                               ))}
                           </ul>
                       </div>
-                  </div>
+                  </TiltCard>
   
-                  {/* Staf AI */}
-                  <div className="w-full bg-[#6B8594] rounded-[2.5rem] p-10 pb-16 shadow-[0_20px_50px_rgba(107,133,148,0.4)] flex flex-col items-center ring-4 ring-white/50">
+                  {/* Staf AI - "Pop" & Vibrant 3D */}
+                  <TiltCard 
+                    className="w-full bg-gradient-to-br from-[#6B8594] to-[#4A6475] rounded-[2.5rem] p-10 pb-16 shadow-[0_30px_60px_rgba(74,100,117,0.4)] ring-1 ring-white/20 flex flex-col items-center"
+                    glowColor="rgba(255,255,255,0.4)"
+                  >
                        {/* Header Pill */}
-                       <div className="bg-white rounded-full py-4 px-10 flex items-center gap-3 shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-12 min-w-[240px] justify-center">
-                          <Bot className="w-7 h-7 text-[#6B8594]" strokeWidth={2.5} />
-                          <span className="font-extrabold text-xl text-[#6B8594]">Staf AI</span>
+                       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-4 px-10 flex items-center gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.1)] mb-12 min-w-[240px] justify-center text-white relative z-20" style={{ transform: "translateZ(40px)" }}>
+                          <Bot className="w-7 h-7 text-white" strokeWidth={2.5} />
+                          <span className="font-extrabold text-xl text-white tracking-wide">Staf AI</span>
                       </div>
   
-                      <div className="w-full max-w-md relative">
-                          {/* Connecting Line - positioned to align with dot centers */}
-                          <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[2px] bg-white/40 rounded-full"></div>
+                      <div className="w-full max-w-md relative z-10" style={{ transform: "translateZ(20px)" }}>
+                          {/* Connecting Line - Adjusted for items-start */}
+                          <div className="absolute left-[7px] top-3 bottom-3 w-[2px] bg-white/60 rounded-full"></div>
   
                           <ul className="flex flex-col gap-6">
                               {staffAI.map((item, idx) => (
-                                  <li key={idx} className="flex items-center gap-5 relative z-10">
-                                      <div className="shrink-0 w-4 h-4 bg-white rounded-full shadow-lg"></div>
+                                  <li key={idx} className="flex items-start gap-5 relative z-10">
+                                      {/* Bullet - Adjusted margin for items-start */}
+                                      <div className="shrink-0 w-4 h-4 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.6)] mt-1.5"></div>
                                       <span className="font-bold text-lg text-white leading-snug drop-shadow-md">{item}</span>
                                   </li>
                               ))}
                           </ul>
                       </div>
-                  </div>
+                  </TiltCard>
   
               </div>
           </div>
