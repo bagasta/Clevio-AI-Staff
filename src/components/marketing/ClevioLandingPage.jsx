@@ -491,17 +491,19 @@ function ComparisonSection() {
                           <span className="font-extrabold text-xl text-black">Staf Biasa</span>
                       </div>
   
-                      <ul className="flex flex-col gap-8 w-full max-w-md relative pl-6">
-                           {/* Connecting Line */}
-                          <div className="absolute left-[7px] top-2 bottom-6 w-[3px] bg-black/10 rounded-full"></div>
+                      <div className="w-full max-w-md relative">
+                          {/* Connecting Line - positioned to align with dot centers */}
+                          <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[2px] bg-black/20 rounded-full"></div>
   
-                          {staffBiasa.map((item, idx) => (
-                              <li key={idx} className="flex items-start gap-6 relative z-10">
-                                  <div className="shrink-0 w-4 h-4 bg-black rounded-full mt-1.5 ring-4 ring-white"></div>
-                                  <span className="font-bold text-lg text-black leading-snug">{item}</span>
-                              </li>
-                          ))}
-                      </ul>
+                          <ul className="flex flex-col gap-7">
+                              {staffBiasa.map((item, idx) => (
+                                  <li key={idx} className="flex items-center gap-5 relative z-10">
+                                      <div className="shrink-0 w-4 h-4 bg-black rounded-full ring-4 ring-white shadow-sm"></div>
+                                      <span className="font-bold text-lg text-black leading-snug">{item}</span>
+                                  </li>
+                              ))}
+                          </ul>
+                      </div>
                   </div>
   
                   {/* Staf AI */}
@@ -512,17 +514,19 @@ function ComparisonSection() {
                           <span className="font-extrabold text-xl text-[#6B8594]">Staf AI</span>
                       </div>
   
-                      <ul className="flex flex-col gap-8 w-full max-w-md relative pl-6">
-                           {/* Connecting Line */}
-                          <div className="absolute left-[7px] top-2 bottom-6 w-[3px] bg-white/30 rounded-full"></div>
+                      <div className="w-full max-w-md relative">
+                          {/* Connecting Line - positioned to align with dot centers */}
+                          <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[2px] bg-white/40 rounded-full"></div>
   
-                          {staffAI.map((item, idx) => (
-                              <li key={idx} className="flex items-start gap-6 relative z-10">
-                                  <div className="shrink-0 w-4 h-4 bg-white rounded-full mt-1.5 shadow-lg"></div>
-                                  <span className="font-bold text-lg text-white leading-snug drop-shadow-md">{item}</span>
-                              </li>
-                          ))}
-                      </ul>
+                          <ul className="flex flex-col gap-6">
+                              {staffAI.map((item, idx) => (
+                                  <li key={idx} className="flex items-center gap-5 relative z-10">
+                                      <div className="shrink-0 w-4 h-4 bg-white rounded-full shadow-lg"></div>
+                                      <span className="font-bold text-lg text-white leading-snug drop-shadow-md">{item}</span>
+                                  </li>
+                              ))}
+                          </ul>
+                      </div>
                   </div>
   
               </div>
