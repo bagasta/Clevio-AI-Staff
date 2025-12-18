@@ -785,31 +785,41 @@ function WaitingListSection() {
     };
 
     return (
-        <section className="w-full bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] py-24 px-4 md:px-8 flex justify-center z-20 relative overflow-hidden">
-            {/* Subtle Glow Effects */}
-            <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-[#E68A44]/10 rounded-full blur-[150px] -translate-y-1/2"></div>
-            <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] -translate-y-1/2"></div>
-
+        <section className="w-full bg-[#F7F7F4] py-24 px-4 md:px-8 flex justify-center z-20 relative overflow-hidden">
             <div className="container mx-auto max-w-2xl relative z-10">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <p className="text-[#E68A44] font-semibold text-sm tracking-widest uppercase mb-4">
                         Early Access
                     </p>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
+                    <h2 className="text-4xl md:text-5xl font-bold text-[#2D2216] mb-4 tracking-tight leading-tight">
                         Gabung Waitlist
                     </h2>
-                    <p className="text-gray-400 text-lg font-medium max-w-3xl mx-auto leading-relaxed md:whitespace-nowrap">
+                    <p className="text-[#4A3C2F] text-lg font-medium max-w-3xl mx-auto leading-relaxed md:whitespace-nowrap">
                         Daftar sekarang dan dapatkan akses eksklusif saat kami launch.
                     </p>
                 </div>
 
-                {/* Glassmorphic Form Card */}
-                <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-white/10 shadow-2xl">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                {/* Sticky Note Form Card */}
+                <div className="bg-[#FDF4C8] rounded-[2.5rem] p-8 md:p-12 pt-24 border border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)] relative overflow-hidden">
+                    
+                     {/* Binder Holes - Top Center */}
+                     <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+                        {[0, 1, 2, 3].map((i) => (
+                            <div 
+                                key={i} 
+                                className="w-6 h-6 rounded-full bg-white"
+                                style={{
+                                    boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
                         {/* Nama */}
                         <div>
-                            <label htmlFor="nama" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <label htmlFor="nama" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-3">
                                 Nama Lengkap
                             </label>
                             <input
@@ -820,17 +830,17 @@ function WaitingListSection() {
                                 onChange={handleChange}
                                 required
                                 placeholder="John Doe"
-                                className="w-full px-5 py-4 bg-white/5 rounded-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500"
+                                className="w-full px-5 py-4 bg-white rounded-2xl border border-[#D7CCC8] focus:border-[#E68A44] focus:ring-0 outline-none transition-all duration-300 text-[#2D2216] font-medium placeholder:text-gray-400"
                             />
                         </div>
 
                         {/* WhatsApp Number */}
                         <div>
-                            <label htmlFor="whatsapp" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <label htmlFor="whatsapp" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-3">
                                 Nomor WhatsApp
                             </label>
                             <div className="flex">
-                                <span className="inline-flex items-center px-5 rounded-l-2xl border border-r-0 border-white/10 bg-white/5 text-gray-400 font-semibold text-sm">
+                                <span className="inline-flex items-center px-5 rounded-l-2xl border border-r-0 border-[#D7CCC8] bg-white text-[#5D4037] font-bold text-sm">
                                     +62
                                 </span>
                                 <input
@@ -841,14 +851,14 @@ function WaitingListSection() {
                                     onChange={handleChange}
                                     required
                                     placeholder="812 3456 7890"
-                                    className="flex-1 px-5 py-4 bg-white/5 rounded-r-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500"
+                                    className="flex-1 px-5 py-4 bg-white rounded-r-2xl border border-[#D7CCC8] focus:border-[#E68A44] focus:ring-0 outline-none transition-all duration-300 text-[#2D2216] font-medium placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
                         {/* Kebutuhan (Text Area) */}
                         <div>
-                            <label htmlFor="kebutuhan" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                            <label htmlFor="kebutuhan" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-3">
                                 Kebutuhan Bisnis Anda
                             </label>
                             <textarea
@@ -859,7 +869,7 @@ function WaitingListSection() {
                                 required
                                 rows={4}
                                 placeholder="Ceritakan kebutuhan Anda..."
-                                className="w-full px-5 py-4 bg-white/5 rounded-2xl border border-white/10 focus:border-[#E68A44]/50 focus:bg-white/10 focus:ring-0 outline-none transition-all duration-300 text-white font-medium placeholder:text-gray-500 resize-none"
+                                className="w-full px-5 py-4 bg-white rounded-2xl border border-[#D7CCC8] focus:border-[#E68A44] focus:ring-0 outline-none transition-all duration-300 text-[#2D2216] font-medium placeholder:text-gray-400 resize-none"
                             />
                         </div>
 
@@ -867,7 +877,7 @@ function WaitingListSection() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-4 mt-2 bg-gradient-to-r from-[#E68A44] to-[#F5A623] text-white font-bold rounded-2xl text-base shadow-lg shadow-[#E68A44]/25 hover:shadow-xl hover:shadow-[#E68A44]/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            className="w-full py-4 mt-2 bg-[#2D2216] text-white font-bold rounded-2xl text-base shadow-lg hover:bg-black hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -882,23 +892,21 @@ function WaitingListSection() {
 
                         {/* Status Messages */}
                         {submitStatus === 'success' && (
-                            <div className="text-center py-4 px-6 bg-green-500/10 border border-green-500/20 rounded-2xl">
-                                <p className="text-green-400 font-semibold text-sm">
+                            <div className="text-center py-4 px-6 bg-green-100 border border-green-200 rounded-2xl">
+                                <p className="text-green-700 font-semibold text-sm">
                                     ✓ Terima kasih! Anda sudah terdaftar di waiting list.
                                 </p>
                             </div>
                         )}
                         {submitStatus === 'error' && (
-                            <div className="text-center py-4 px-6 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                                <p className="text-red-400 font-semibold text-sm">
+                            <div className="text-center py-4 px-6 bg-red-100 border border-red-200 rounded-2xl">
+                                <p className="text-red-700 font-semibold text-sm">
                                     Terjadi kesalahan. Silakan coba lagi.
                                 </p>
                             </div>
                         )}
                     </form>
                 </div>
-
-
             </div>
         </section>
     );
