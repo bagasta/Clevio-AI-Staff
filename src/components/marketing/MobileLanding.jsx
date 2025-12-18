@@ -755,24 +755,37 @@ function FeatureSection() {
   return (
     // Wrap in bg-white to maintain page flow
     <div className="w-full bg-white pb-20 pt-8 px-6 flex flex-col items-center">
-        {/* Wooden Table Container - Beige/Wood Color */}
-        <div className="w-full bg-[#EBCFB2] rounded-[2.5rem] p-6 pb-8 flex flex-col items-center shadow-lg relative overflow-hidden">
+        {/* Sticky Note Container - Paper Look with Binder Holes (Beige/Wood) */}
+        <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-6 pb-8 flex flex-col items-center shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)] relative overflow-hidden">
             
-            <h2 className="text-[28px] font-black text-[#4E342E] mb-6 text-center tracking-tight">
-                Fitur Inovatif
+            {/* Binder Holes - Top Center */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                {[0, 1, 2, 3].map((i) => (
+                    <div 
+                        key={i} 
+                        className="w-5 h-5 rounded-full bg-white"
+                        style={{
+                            boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                        }}
+                    ></div>
+                ))}
+            </div>
+
+            <h2 className="text-[28px] font-black text-[#4E342E] mb-6 mt-12 text-center tracking-tight leading-tight">
+                Fitur Unggulan
             </h2>
             
-            <div className="w-full flex flex-col gap-3.5">
+            <div className="w-full flex flex-col gap-4">
                 {features.map((feature, idx) => (
-                    <div key={idx} className="w-full bg-white rounded-2xl p-5 flex flex-col items-start gap-3 shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-white/50">
+                    <div key={idx} className="w-full bg-white rounded-2xl p-5 flex flex-col items-start gap-3 shadow-md border border-white/50">
                         <div className="shrink-0 mb-1">
                             {feature.icon}
                         </div>
                         <div>
-                            <h3 className="text-[#1A237E] font-bold text-[17px] leading-tight mb-1.5">
+                            <h3 className="text-[#1A237E] font-bold text-[18px] leading-tight mb-1.5">
                                 {feature.title}
                             </h3>
-                            <p className="text-gray-600 text-[13px] leading-[1.4] font-medium">
+                            <p className="text-gray-600 text-[14px] leading-relaxed font-medium">
                                 {feature.desc}
                             </p>
                         </div>
@@ -1000,25 +1013,25 @@ function TestimonialSection() {
     const testimonials = [
         {
             name: "Dr. Kemal H.S. I Ist",
-            image: "/testimoni/kemal-card.png"
+            image: "/testimoni/kemal.webp"
         },
         {
             name: "Gatot Nuradi Sam",
-            image: "/testimoni/gatot-card.png"
+            image: "/testimoni/gatot.webp"
         },
         {
             name: "Sara Dhewanto",
-            image: "/testimoni/sara-card.png"
+            image: "/testimoni/sara.webp"
         },
         {
             name: "Sinta Kaniawati",
-            image: "/testimoni/sinta-card.png"
+            image: "/testimoni/sinta.webp"
         }
     ];
 
     return (
-        <div className="w-full bg-white pb-20 pt-10 flex flex-col items-center">
-            <h2 className="text-[26px] font-bold text-black mb-10 text-center px-4">
+        <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center">
+            <h2 className="text-[28px] font-extrabold text-black mb-10 text-center px-4 tracking-tight">
                 Ini Kata Mereka :
             </h2>
 
@@ -1028,16 +1041,27 @@ function TestimonialSection() {
                 style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
             >
                 {testimonials.map((item, idx) => (
+                    // Wooden Frame Container
                     <div 
                         key={idx}
-                        className="relative shrink-0 w-[300px] h-[480px] snap-center"
+                        className="relative shrink-0 w-[280px] h-[420px] bg-[#EBCFB2] rounded-[2.5rem] p-4 shadow-[0_15px_35px_rgba(0,0,0,0.15)] flex flex-col items-center snap-center ring-1 ring-black/5"
                     >
-                         <Image 
-                            src={item.image} 
-                            alt={item.name}
-                            fill
-                            className="object-contain"
-                        />
+                         {/* Bevel/Depth Effect for Frame */}
+                         <div className="absolute inset-0 rounded-[2.5rem] shadow-[inset_2px_2px_4px_rgba(255,255,255,0.4),inset_-2px_-2px_4px_rgba(0,0,0,0.05)] pointer-events-none"></div>
+
+                         {/* Inner Card Content */}
+                         <div className="w-full h-full bg-white rounded-[1.8rem] relative overflow-hidden shadow-[inset_0_2px_8px_rgba(0,0,0,0.15)] isolation-auto group">
+                            
+                            {/* Full Background Image */}
+                            <div className="absolute inset-0 z-0">
+                                <Image
+                                    src={item.image}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                                />
+                            </div>
+                         </div>
                     </div>
                 ))}
             </div>
