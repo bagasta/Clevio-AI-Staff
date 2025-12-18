@@ -134,17 +134,19 @@ export default function MobileLanding() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     // Outer container
     <div className="flex min-h-[100dvh] w-full justify-center bg-black">
       
       {/* Mobile Frame Container */}
-      <div className={`relative w-full max-w-[480px] bg-slate-900 font-sans shadow-2xl flex flex-col transition-all duration-500 min-h-[100dvh]`}>
+      <div className={`relative w-full max-w-[480px] bg-slate-900 font-sans shadow-2xl flex flex-col transition-all duration-500 min-h-[100dvh] overflow-hidden`}>
         
-        {/* Header */}
+        {/* Header - Fixed Z-50 */}
         <header 
-          className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 flex items-center justify-between px-6 pt-0 transition-all duration-300 supports-[padding-top:env(safe-area-inset-top)]:pt-[env(safe-area-inset-top)] ${
-            isScrolled ? "backdrop-blur-xl bg-black/20" : ""
+          className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50 flex items-center justify-between px-6 h-20 transition-all duration-300 supports-[padding-top:env(safe-area-inset-top)]:pt-[env(safe-area-inset-top)] ${
+            isScrolled || isMenuOpen ? "bg-black/40 backdrop-blur-md" : ""
           }`}
         >
           <div className="relative h-20 w-20">
@@ -156,10 +158,87 @@ export default function MobileLanding() {
               priority
             />
           </div>
-          <button className="text-white hover:text-gray-200 transition-colors">
-            <Menu className="h-8 w-8" />
+          
+          {/* Animated Hamburger Icon */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-white hover:text-gray-200 transition-colors p-2 -mr-2 relative w-10 h-10 flex items-center justify-center outline-none"
+          >
+            <div className="relative w-6 h-6">
+                <motion.div
+                    initial={false}
+                    animate={{ rotate: isMenuOpen ? 90 : 0, opacity: isMenuOpen ? 0 : 1 }}
+                    transition={{ duration: 0.2 }} // Snappy switch
+                    className="absolute inset-0"
+                >
+                    <Menu className="w-8 h-8" />
+                </motion.div>
+                <motion.div
+                    initial={false}
+                    animate={{ rotate: isMenuOpen ? 0 : -90, opacity: isMenuOpen ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0"
+                >
+                     {/* Manually constructing X for precise control if needed, or just Lucide X */}
+                     {/* Using Lucide 'X' but checking imports - wait, I need to import X or use standard svg? 
+                        Let's check imports. Just in case, I will use a custom SVG X for thickness match or check if X is imported.
+                        Ah, imports line 5 has many icons. Let's assume X is missing and add it or use SVG.
+                        Wait, X is not in line 5. I'll add X to imports or just use SVG.
+                        Let's use a simple SVG for X to be safe and match style.
+                      */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                    </svg>
+                </motion.div>
+            </div>
           </button>
         </header>
+
+        {/* Compact Dropdown Menu Overlay */}
+        <AnimatePresence>
+            {isMenuOpen && (
+                <>
+                     {/* Backdrop for click-outside close */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+                    />
+
+                    {/* Menu Content - Dropdown from Top */}
+                    <motion.div
+                        initial={{ y: "-100%", opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: "-100%", opacity: 0 }}
+                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-black/80 backdrop-blur-xl rounded-b-[2rem] border-b border-white/10 shadow-2xl overflow-hidden"
+                    >
+                        <nav className="flex flex-col items-center gap-6 py-10">
+                            {[
+                                { name: "Fitur", href: "#fitur" },
+                                { name: "Cara Kerja", href: "#cara-kerja" },
+                                { name: "Testimoni", href: "#testimoni" },
+                                { name: "Harga", href: "#harga" }
+                            ].map((item, idx) => (
+                                <motion.a
+                                    key={item.name}
+                                    href={item.href}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + idx * 0.05 }}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="text-xl font-bold text-white/90 hover:text-white transition-all tracking-wide"
+                                >
+                                    {item.name}
+                                </motion.a>
+                            ))}
+                        </nav>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
 
         {/* Hero Background */}
         <div 
@@ -607,7 +686,7 @@ function HowItWorksSection() {
   ];
 
   return (
-    <div className="w-full bg-[#F7F7F4] pb-20 pt-10 px-0 flex flex-col items-center">
+    <div id="cara-kerja" className="w-full bg-[#F7F7F4] pb-20 pt-10 px-0 flex flex-col items-center">
         <div className="px-6 text-center mb-10">
             <h2 className="text-3xl font-extrabold text-black mb-4 tracking-tight leading-tight">
                 Cara Kerja Clevio
@@ -754,7 +833,7 @@ function FeatureSection() {
 
   return (
     // Wrap in bg-white to maintain page flow
-    <div className="w-full bg-white pb-20 pt-8 px-6 flex flex-col items-center">
+    <div id="fitur" className="w-full bg-white pb-20 pt-8 px-6 flex flex-col items-center">
         {/* Sticky Note Container - Paper Look with Binder Holes (Beige/Wood) */}
         <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-6 pb-8 flex flex-col items-center shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)] relative overflow-hidden">
             
@@ -874,7 +953,7 @@ function CarouselSection() {
   ];
 
   return (
-    <div className="w-full bg-white pb-10 pt-10 px-4 flex justify-center">
+    <div id="use-cases" className="w-full bg-white pb-10 pt-10 px-4 flex justify-center">
         {/* Gray Rounded Container */}
         <div className="w-full bg-[#E5E7EB] rounded-[3rem] pt-12 pb-10 flex flex-col items-center relative overflow-hidden">
             
@@ -1030,7 +1109,7 @@ function TestimonialSection() {
     ];
 
     return (
-        <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center">
+        <div id="testimoni" className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center">
             <h2 className="text-[28px] font-extrabold text-black mb-10 text-center px-4 tracking-tight">
                 Ini Kata Mereka :
             </h2>
@@ -1136,7 +1215,7 @@ function PricingSection() {
 
   return (
 
-    <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center px-4">
+    <div id="harga" className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center px-4">
         {/* Sticky Note Container - Paper Look with Binder Holes (Beige) */}
         <div className="w-full bg-[#FDF4C8] rounded-[3rem] p-6 pb-12 pt-24 relative overflow-hidden shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)]">
             
