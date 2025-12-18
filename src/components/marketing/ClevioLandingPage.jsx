@@ -797,9 +797,9 @@ function WaitingListSection() {
                         Early Access
                     </p>
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight leading-tight">
-                        Jadilah yang Pertama
+                        Gabung Waitlist
                     </h2>
-                    <p className="text-gray-400 text-lg font-medium max-w-md mx-auto leading-relaxed">
+                    <p className="text-gray-400 text-lg font-medium max-w-3xl mx-auto leading-relaxed md:whitespace-nowrap">
                         Daftar sekarang dan dapatkan akses eksklusif saat kami launch.
                     </p>
                 </div>
@@ -898,10 +898,7 @@ function WaitingListSection() {
                     </form>
                 </div>
 
-                {/* Trust Indicators */}
-                <p className="text-center text-gray-500 text-xs mt-8 font-medium">
-                    🔒 Data Anda aman dan tidak akan dibagikan ke pihak ketiga.
-                </p>
+
             </div>
         </section>
     );
