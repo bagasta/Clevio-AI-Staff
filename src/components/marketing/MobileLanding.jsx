@@ -1135,19 +1135,34 @@ function PricingSection() {
   ];
 
   return (
-    <div className="w-full bg-white pb-20 pt-10 flex flex-col items-center px-4">
-        {/* Wooden Board Container */}
-        <div className="w-full bg-[#EBCFB2] rounded-[3rem] p-6 pb-12 flex flex-col items-center shadow-md border border-[#D7B696]">
-            <h2 className="text-[26px] font-black text-[#4E342E] text-center leading-tight mb-2 mt-4">
+
+    <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center px-4">
+        {/* Sticky Note Container - Paper Look with Binder Holes (Beige) */}
+        <div className="w-full bg-[#FDF4C8] rounded-[3rem] p-6 pb-12 pt-24 relative overflow-hidden shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)]">
+            
+             {/* Binder Holes - Top Center */}
+             <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                {[0, 1, 2, 3].map((i) => (
+                    <div 
+                        key={i} 
+                        className="w-5 h-5 rounded-full bg-white"
+                        style={{
+                            boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                        }}
+                    ></div>
+                ))}
+            </div>
+
+            <h2 className="text-[28px] font-extrabold text-[#2D2216] text-center leading-tight mb-2 relative z-10 tracking-tight">
                 Pilih Paket Anda
             </h2>
-            <p className="text-[#795548] text-[13px] text-center mb-10 font-bold max-w-[80%] leading-relaxed">
-                Lihat perbedaan signifikan antara <br /> Staf Biasa dan Staf AI
+            <p className="text-[#5D4037] text-[15px] text-center mb-10 font-bold max-w-[90%] leading-relaxed mx-auto relative z-10">
+                Sesuaikan dengan kebutuhan <br /> bisnis Anda
             </p>
 
-            <div className="flex flex-col gap-6 w-full">
+            <div className="flex flex-col gap-6 w-full relative z-10">
                 {plans.map((plan, idx) => (
-                    <div key={idx} className="relative w-full bg-white rounded-[2.5rem] p-8 pb-10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] flex flex-col items-start border border-white/50">
+                    <div key={idx} className="relative w-full bg-white rounded-[2.5rem] p-8 pb-10 shadow-xl flex flex-col items-start border border-white/60">
                         
                         {/* Title Section */}
                         <h3 className="text-[#1565C0] font-bold text-[20px] mb-2 leading-tight">
@@ -1222,73 +1237,70 @@ function ComparisonSection() {
 
   return (
     <div className="w-full bg-white pb-10 pt-10 px-4">
-        {/* Rounded Gray Container */}
-        <div className="w-full bg-[#E5E5E5] rounded-[3rem] p-6 pb-12 flex flex-col items-center shadow-sm">
-            <h2 className="text-[24px] font-black text-black text-center leading-tight mb-2 mt-4">
-                Staf Biasa VS Staf AI
-            </h2>
-            <p className="text-gray-600 text-[13px] text-center mb-10 font-medium max-w-[90%] leading-relaxed">
-                Lihat perbedaan signifikan antara <br /> Staf Biasa dan Staf AI
-            </p>
+        <h2 className="text-[28px] font-extrabold text-black text-center leading-tight mb-2 mt-4 tracking-tight">
+            Staf Biasa VS Staf AI
+        </h2>
+        <p className="text-gray-600 text-[15px] text-center mb-10 font-medium max-w-[90%] leading-relaxed mx-auto">
+            Lihat perbedaan signifikan antara <br /> Staf Biasa dan Staf AI
+        </p>
 
-            <div className="flex flex-col gap-6 w-full">
-                {/* Staf Biasa Card (White) */}
-                <div className="w-full bg-white rounded-[2.5rem] p-8 pb-12 shadow-sm relative flex flex-col items-center">
-                    
-                    {/* Header Pill */}
-                    <div className="bg-white border border-gray-200/50 rounded-full py-3 px-8 flex items-center gap-3 shadow-[0_4px_10px_rgba(0,0,0,0.05)] mb-10 min-w-[200px] justify-center relative z-10">
-                        <User className="w-6 h-6 text-black" strokeWidth={2.5} />
-                        <span className="font-black text-[18px] text-black tracking-wide">Staf Biasa</span>
-                    </div>
-
-                    {/* Timeline List */}
-                    <div className="relative w-full">
-                        {/* Vertical Line Container - Absolute to match height */}
-                        <div className="absolute left-[9px] top-2 bottom-6 w-[2px] bg-black rounded-full z-0"></div>
-
-                        <div className="flex flex-col gap-7 z-10 relative">
-                            {staffBiasa.map((item, idx) => (
-                                <div key={idx} className="flex items-start gap-4">
-                                    {/* Dot Column - Centered on line */}
-                                    <div className="shrink-0 w-[20px] h-[20px] flex items-center justify-center">
-                                        <div className="w-4 h-4 bg-black rounded-full border-[3px] border-white z-10 box-content shadow-sm"></div>
-                                    </div>
-                                    <span className="text-black font-bold text-[14px] leading-snug tracking-wide pt-0.5">
-                                        {item}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+        <div className="flex flex-col gap-8 w-full">
+            {/* Staf Biasa Card (White) */}
+            <div className="w-full bg-white rounded-[2.5rem] p-8 pb-12 shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-gray-200 relative flex flex-col items-center">
+                
+                {/* Header Pill */}
+                <div className="bg-gray-50 border border-gray-100 rounded-full py-3 px-8 flex items-center gap-3 shadow-inner mb-10 min-w-[200px] justify-center relative z-10">
+                    <User className="w-6 h-6 text-gray-500" strokeWidth={2.5} />
+                    <span className="font-extrabold text-[18px] text-gray-700 tracking-wide">Staf Biasa</span>
                 </div>
 
-                {/* Staf AI Card (Slate Blue) */}
-                <div className="w-full bg-[#6B8594] rounded-[2.5rem] p-8 pb-12 shadow-lg relative flex flex-col items-center border-[4px] border-white">
-                    
-                    {/* Header Pill (Glow Effect) */}
-                    <div className="bg-white rounded-full py-3 px-8 flex items-center gap-3 shadow-[0_0_20px_rgba(255,255,255,0.4)] mb-10 min-w-[200px] justify-center relative z-10">
-                        <Bot className="w-7 h-7 text-[#6B8594]" strokeWidth={2.5} />
-                        <span className="font-black text-[18px] text-[#6B8594] tracking-wide">Staf AI</span>
-                    </div>
+                {/* Timeline List */}
+                <div className="relative w-full">
+                    {/* Vertical Line Container */}
+                    <div className="absolute left-[9px] top-2 bottom-6 w-[2px] bg-gray-200 rounded-full z-0"></div>
 
-                    {/* Timeline List */}
-                    <div className="relative w-full">
-                         {/* Vertical Line Container */}
-                         <div className="absolute left-[9px] top-2 bottom-4 w-[2px] bg-white/60 rounded-full z-0"></div>
-
-                        <div className="flex flex-col gap-6 z-10 relative">
-                            {staffAI.map((item, idx) => (
-                                <div key={idx} className="flex items-start gap-4">
-                                    {/* Dot Column */}
-                                    <div className="shrink-0 w-[20px] h-[20px] flex items-center justify-center">
-                                        <div className="w-3.5 h-3.5 bg-white rounded-full z-10 shadow-sm"></div>
-                                    </div>
-                                    <span className="text-white font-bold text-[14px] leading-snug tracking-wide pt-0.5 text-shadow-sm">
-                                        {item}
-                                    </span>
+                    <div className="flex flex-col gap-7 z-10 relative">
+                        {staffBiasa.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-4">
+                                {/* Dot Column */}
+                                <div className="shrink-0 w-[20px] h-[20px] flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-gray-400 rounded-full ring-4 ring-white shadow-sm z-10"></div>
                                 </div>
-                            ))}
-                        </div>
+                                <span className="text-gray-600 font-bold text-[14px] leading-snug tracking-wide pt-0.5">
+                                    {item}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Staf AI Card (Gradient Blue) */}
+            <div className="w-full bg-gradient-to-br from-[#6B8594] to-[#4A6475] rounded-[2.5rem] p-8 pb-12 shadow-[0_30px_60px_rgba(74,100,117,0.4)] relative flex flex-col items-center ring-1 ring-white/20">
+                
+                {/* Header Pill (Glow Effect) */}
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full py-3 px-8 flex items-center gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.1)] mb-10 min-w-[200px] justify-center relative z-10 text-white">
+                    <Bot className="w-7 h-7 text-white" strokeWidth={2.5} />
+                    <span className="font-extrabold text-[18px] text-white tracking-wide">Staf AI</span>
+                </div>
+
+                {/* Timeline List */}
+                <div className="relative w-full">
+                     {/* Vertical Line Container */}
+                     <div className="absolute left-[9px] top-2 bottom-4 w-[2px] bg-white/60 rounded-full z-0"></div>
+
+                    <div className="flex flex-col gap-6 z-10 relative">
+                        {staffAI.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-4">
+                                {/* Dot Column */}
+                                <div className="shrink-0 w-[20px] h-[20px] flex items-center justify-center">
+                                    <div className="w-3.5 h-3.5 bg-white rounded-full z-10 shadow-[0_0_15px_rgba(255,255,255,0.6)]"></div>
+                                </div>
+                                <span className="text-white font-bold text-[14px] leading-snug tracking-wide pt-0.5 drop-shadow-md">
+                                    {item}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
