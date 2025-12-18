@@ -1151,7 +1151,7 @@ function WaitingListSection() {
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10 mt-10">
                         {/* Nama */}
                         <div>
                             <label htmlFor="nama" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-3">
