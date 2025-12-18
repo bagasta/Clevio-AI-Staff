@@ -1309,103 +1309,88 @@ function ComparisonSection() {
   );
 }
 
-// CTA Section: Orange Card with Folded Corner
+// CTA Section: Gold Sticky Note with Folded Corner
 function CTASection() {
   return (
-    <div className="w-full bg-white pb-20 pt-10 px-4 flex justify-center">
-        {/* Orange Card Container */}
-        <div className="w-full max-w-[360px] bg-[#E68A44] rounded-[2.5rem] p-8 pb-12 flex flex-col items-center text-center relative overflow-hidden shadow-xl">
+    <div className="w-full bg-white pb-20 pt-10 px-4 flex justify-center relative z-20 mb-[-50px]">
+        {/* Gold/Orange Card Container */}
+        <div className="w-full bg-[#f4d06f] rounded-[2.5rem] p-8 pb-32 flex flex-col items-center text-center relative overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1)]">
             
-            {/* Folded Corner Effect (Bottom Right) */}
-            <div className="absolute -bottom-1 -right-1 w-24 h-24 bg-[#8B5E3C] rounded-tl-[3rem] z-10"></div>
-            {/* Corner Cover to simulate fold shape */}
-             <div className="absolute -bottom-1 -right-1 w-24 h-24 bg-white rounded-tl-[3rem] z-0 translate-x-10 translate-y-10"></div>
+            {/* Binder Holes - Top Center */}
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+                {[0, 1, 2, 3].map((i) => (
+                    <div 
+                        key={i} 
+                        className="w-5 h-5 rounded-full bg-white"
+                        style={{
+                            boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                        }}
+                    ></div>
+                ))}
+            </div>
 
-
-            <h2 className="text-[32px] font-black text-white leading-[1.1] mb-6 mt-4">
+            <h2 className="text-[32px] font-black text-[#2D2216] leading-[1.1] mb-6 mt-12 relative z-10 tracking-tight">
                 Bangun tim <br/> staf AI Anda
             </h2>
 
-            <p className="text-white text-[15px] font-medium leading-relaxed mb-10 max-w-[90%]">
+            <p className="text-[#4A3C2F] text-[15px] font-bold leading-relaxed mb-10 max-w-[90%] relative z-10 opacity-90">
                 Mulai transformasi digital bisnis Anda hari ini. Gratis untuk memulai, <br/> tidak perlu kartu kredit.
             </p>
 
-            <button className="w-full py-4 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-extrabold rounded-full text-[16px] shadow-[0_4px_10px_rgba(0,0,0,0.2),inset_0_-3px_5px_rgba(0,0,0,0.1)] border border-white/50 active:scale-[0.98] transition-all relative z-20 mb-8">
+            <button className="w-full py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-[16px] shadow-xl active:scale-[0.98] transition-all relative z-10 mb-8">
                 Mulai Gratis
             </button>
 
-            <p className="text-white/90 text-[12px] font-medium leading-relaxed z-20">
+            <p className="text-[#4A3C2F]/70 text-[11px] font-bold leading-relaxed z-10">
                 Tidak perlu kartu kredit • Setup dalam 5 menit • Cancel kapan saja
             </p>
+
+            {/* Folded Corner Effect - 3D Peel (Bottom Right) */}
+            <div className="absolute bottom-0 right-0 w-[100px] h-[100px] drop-shadow-[-4px_-4px_8px_rgba(0,0,0,0.15)] z-20">
+                {/* Shadow Triangle (The Peel) */}
+                <div 
+                    className="absolute bottom-0 right-0 w-0 h-0"
+                    style={{
+                        borderStyle: 'solid',
+                        borderWidth: '0 0 100px 100px',
+                        borderColor: 'transparent transparent rgba(0,0,0,0.2) transparent',
+                    }}
+                ></div>
+                
+                {/* Fold Triangle (The Flap) - Slightly darker gold */}
+                <div 
+                    className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                    style={{
+                        borderStyle: 'solid',
+                        borderWidth: '100px 100px 0 0',
+                        borderColor: `#d6b048 transparent transparent transparent`, 
+                    }}
+                ></div>
+            </div>
         </div>
     </div>
   );
 }
 
 function FooterSection() {
-  const links = {
-    produk: ["Fitur", "Harga", "Integrasi", "API"],
-    perusahaan: ["Tentang Kami", "Blog", "Karir", "Kontak"],
-    legal: ["Privasi", "Syarat & Ketentuan", "Keamanan"]
-  };
-
   return (
-    <div className="w-full bg-[#1A237E] text-white pt-16 pb-8 px-8 rounded-t-[2.5rem] mt-[-60px] relative z-0">
-        <div className="flex flex-col gap-8 mb-12">
-            {/* Brand */}
-            <div>
-                <div className="relative w-[160px] h-[50px] mb-3">
-                    <Image 
-                        src="/clevioAISTAFF-Logo-White.png" 
-                        alt="Clevio AI Staff Output"
-                        fill
-                        className="object-contain object-left"
-                    />
-                </div>
-                <p className="text-white/70 text-[13px] font-medium leading-relaxed whitespace-nowrap">
-                    Solusi Staff AI terdepan untuk bisnis modern
-                </p>
-            </div>
+    <footer className="w-full bg-[#DCC1A7] pt-24 pb-12 px-8 relative z-10 mt-[-40px]">
+         {/* Logo - No Background */}
+         <div className="flex justify-center mb-6">
+            <Image 
+                src="/ClevioLogoLandingP.webp" 
+                alt="Clevio Logo"
+                width={200}
+                height={60}
+                className="w-[180px] h-auto object-contain"
+            />
+         </div>
 
-            {/* Links Grid */}
-            <div className="grid grid-cols-2 gap-y-8 gap-x-4">
-                {/* Produk */}
-                <div>
-                    <h4 className="font-bold text-[15px] mb-4">Produk</h4>
-                    <ul className="flex flex-col gap-3">
-                        {links.produk.map((item, i) => (
-                            <li key={i} className="text-white/70 text-[13px] font-medium hover:text-white transition-colors cursor-pointer">{item}</li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Perusahaan */}
-                <div>
-                    <h4 className="font-bold text-[15px] mb-4">Perusahaan</h4>
-                    <ul className="flex flex-col gap-3">
-                        {links.perusahaan.map((item, i) => (
-                            <li key={i} className="text-white/70 text-[13px] font-medium hover:text-white transition-colors cursor-pointer">{item}</li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Legal */}
-                <div className="col-span-2 mt-2">
-                    <h4 className="font-bold text-[15px] mb-4">Legal</h4>
-                    <ul className="flex flex-col gap-3">
-                        {links.legal.map((item, i) => (
-                            <li key={i} className="text-white/70 text-[13px] font-medium hover:text-white transition-colors cursor-pointer">{item}</li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        {/* Divider & Copyright */}
-        <div className="w-full h-[1px] bg-white/10 mb-6"></div>
-        <p className="text-center text-white/40 text-[11px] font-medium">
-            © 2025 Clevio AI Staff. All rights reserved.
-        </p>
-    </div>
+         <div className="text-center">
+             <p className="text-[#4E342E] text-[13px] font-bold opacity-80">
+                © 2025 Clevio AI Staff. All rights reserved.
+             </p>
+         </div>
+    </footer>
   );
 }
