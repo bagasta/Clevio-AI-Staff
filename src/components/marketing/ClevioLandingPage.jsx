@@ -539,8 +539,6 @@ export default function ClevioLandingPage() {
            <FeatureSection />
            <TestimonialSection />
            <ComparisonSection />
-           <TestimonialSection />
-           <ComparisonSection />
            <PricingSection onStartTrial={handleStartTrial} onScrollToEarlyAccess={scrollToEarlyAccess} />
            <WaitingListSection />
            <CTASection onStartTrial={handleStartTrial} />
