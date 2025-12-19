@@ -122,12 +122,13 @@ export default function ClevioLandingPage() {
 
   // POLLING LOGIC: Check for Interview Finish from Server
   useEffect(() => {
-    // Only poll if we are in 'interviewing' status
-    if (status !== 'interviewing') return;
+    // Only poll if we are in 'interviewing' status and have a chatSessionId
+    if (status !== 'interviewing' || !chatSessionId) return;
 
     const pollInterval = setInterval(async () => {
         try {
-            const res = await fetch("/api/interview/finish");
+            // Pass chatSessionId to get session-specific data
+            const res = await fetch(`/api/interview/finish?chatSessionId=${chatSessionId}`);
             if (res.ok) {
                 const json = await res.json();
                 if (json.data && json.data.agentName) {
@@ -147,7 +148,7 @@ export default function ClevioLandingPage() {
     }, 3000); // Poll every 3 seconds
 
     return () => clearInterval(pollInterval);
-  }, [status]);
+  }, [status, chatSessionId]);
 
   const handlePhoneSend = async () => {
     if (!phoneInput.trim()) return;
@@ -163,6 +164,7 @@ export default function ClevioLandingPage() {
     const agentData = storedData ? JSON.parse(storedData) : {};
 
     const payload = {
+        chatSessionId: chatSessionId,
         agentId: agentData.agentId,
         agentName: agentData.agentName,
         userMessage: currentInput
