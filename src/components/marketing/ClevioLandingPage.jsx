@@ -50,15 +50,26 @@ export default function ClevioLandingPage() {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) throw new Error("Failed to start trial");
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to start trial");
+      }
+
       startTrialSession(data);
       router.push("/trial/templates");
     } catch (error) {
       console.error("Trial Error:", error);
+      alert(error.message); // Show error to user
     } finally {
       setIsTrialLoading(false);
+    }
+  };
+
+  const scrollToEarlyAccess = () => {
+    const section = document.getElementById('early-access');
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -524,7 +535,7 @@ export default function ClevioLandingPage() {
            <ComparisonSection />
            <TestimonialSection />
            <ComparisonSection />
-           <PricingSection onStartTrial={handleStartTrial} />
+           <PricingSection onStartTrial={handleStartTrial} onScrollToEarlyAccess={scrollToEarlyAccess} />
            <WaitingListSection />
            <CTASection onStartTrial={handleStartTrial} />
            <FooterSection />
@@ -1106,7 +1117,7 @@ function ComparisonSection() {
     );
 }
 
-function PricingSection({ onStartTrial }) {
+function PricingSection({ onStartTrial, onScrollToEarlyAccess }) {
     const plans = [
         {
           name: "Gratis",
@@ -1217,7 +1228,9 @@ function PricingSection({ onStartTrial }) {
 
                                 <button 
                                     onClick={() => {
-                                        if (["Coba Sekarang", "Coba Gratis", "Mulai Gratis"].includes(plan.cta)) {
+                                        if (plan.cta === "Coba Sekarang") {
+                                            if (onScrollToEarlyAccess) onScrollToEarlyAccess();
+                                        } else if (["Coba Gratis", "Mulai Gratis"].includes(plan.cta)) {
                                             onStartTrial();
                                         }
                                     }}
@@ -1277,7 +1290,7 @@ function WaitingListSection() {
     };
 
     return (
-        <section className="w-full bg-[#F7F7F4] py-24 px-4 md:px-8 flex justify-center z-20 relative overflow-hidden">
+        <section id="early-access" className="w-full bg-[#F7F7F4] py-24 px-4 md:px-8 flex justify-center z-20 relative overflow-hidden">
             <div className="container mx-auto max-w-2xl relative z-10">
                 {/* Header */}
                 <div className="text-center mb-12">
