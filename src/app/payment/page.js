@@ -4,16 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   BadgeCheck,
-  CalendarClock,
-  CheckCircle, CheckCircle2,
+  Calendar,
+  CheckCircle,
   CreditCard,
   ShieldCheck,
-  Sparkles,
-  Rocket,
+  Gift,
+  Zap,
   Loader2,
   ArrowRight,
-  Crown,
-  Star,
   Check,
   AlertCircle,
   } from "lucide-react";
@@ -24,10 +22,18 @@ import {
   clearTrialAgentPayload,
 } from "@/lib/trialStorage";
 import { markTrialEmailUsed } from "@/lib/trialGuard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import toast, { Toaster } from 'react-hot-toast';
+
+const toastStyle = {
+  background: '#FFFFFF',
+  color: '#2D2216',
+  padding: '16px 20px',
+  borderRadius: '20px',
+  border: '1px solid #E0D4BC',
+  boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+  fontSize: '14px',
+  fontWeight: '600',
+};
 
 const PLAN_OPTIONS = [
   {
@@ -44,7 +50,7 @@ const PLAN_OPTIONS = [
       "Community support",
       "Basic automation tools",
     ],
-    icon: Sparkles,
+    icon: Gift,
     highlight: "0 Rp - No credit card required",
   },
   {
@@ -63,7 +69,7 @@ const PLAN_OPTIONS = [
       "Priority chat support",
       "Custom integrations",
     ],
-    icon: CalendarClock,
+    icon: Calendar,
     recommended: true,
     highlight: "25% OFF for limited time",
   },
@@ -82,7 +88,7 @@ const PLAN_OPTIONS = [
       "1:1 onboarding workshop",
       "Custom training sessions",
     ],
-    icon: Rocket,
+    icon: Zap,
     discountNote: "Save Rp 1.000.000 vs monthly",
     highlight: "Most popular choice",
   },
@@ -92,14 +98,14 @@ export default function PaymentPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E1] flex items-center justify-center">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto shadow-[0_4px_16px_rgba(45,34,22,0.24)]">
               <Loader2 className="h-8 w-8 text-white animate-spin" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-foreground">Loading Payment Details</h3>
-              <p className="text-sm text-muted-foreground">Please wait while we prepare your payment options...</p>
+              <h3 className="text-lg font-bold text-[#2D2216]">Loading Payment Details</h3>
+              <p className="text-sm text-[#5D4037]">Please wait while we prepare your payment options...</p>
             </div>
           </div>
         </div>
@@ -122,8 +128,6 @@ function PaymentContent() {
   const [plans] = useState(PLAN_OPTIONS);
   const [selectedPlan, setSelectedPlan] = useState(queryPlan);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [orderId, setOrderId] = useState(searchOrderId || "");
   const [storedPlan, setStoredPlan] = useState(queryPlan);
   const [pendingRegistration, setPendingRegistration] = useState(() =>
@@ -136,7 +140,6 @@ function PaymentContent() {
     state: "idle",
     message: "",
   });
-  const [statusError, setStatusError] = useState("");
   const [orderSuffix, setOrderSuffix] = useState(() => Date.now().toString());
   const {
     user,
@@ -256,11 +259,11 @@ function PaymentContent() {
           setOrderSuffix(Date.now().toString());
           setStoredPlan("");
           setPendingRegistration(null);
-          setStatusError("");
           setStatusState({
             state: "success",
             message: "Payment successful! Taking you to your dashboard.",
           });
+          toast.success("Payment successful! Redirecting to dashboard...", { style: toastStyle });
           hasRedirectedRef.current = true;
           router.replace("/dashboard");
           return;
@@ -270,11 +273,11 @@ function PaymentContent() {
         setOrderSuffix(Date.now().toString());
         setStoredPlan("");
         setPendingRegistration(null);
-        setStatusError("");
         setStatusState({
           state: "success",
           message: "Payment settled! Please log in to continue.",
         });
+        toast.success("Payment settled! Please log in to continue.", { style: toastStyle });
         const loginParams = new URLSearchParams({ settlement: "1" });
         if (normalizedPlanCode === "TRIAL") {
           loginParams.set("trial", "1");
@@ -485,7 +488,6 @@ function PaymentContent() {
         return;
       }
       if (!silent) {
-        setStatusError("");
         setStatusState({
           state: "checking",
           message: "Confirming your payment with our system...",
@@ -524,27 +526,22 @@ function PaymentContent() {
         ) {
           if (!silent) {
             setStatusState({ state: "idle", message: "" });
-            setStatusError(
-              transactionStatus === "pending"
-                ? "Your payment is still pending on Midtrans. We will keep checking automatically."
-                : `Latest payment status from Midtrans: ${transactionStatus}.`
-            );
+            const msg = transactionStatus === "pending"
+              ? "Your payment is still pending. We will keep checking automatically."
+              : `Latest payment status: ${transactionStatus}.`;
+            toast.error(msg, { style: toastStyle, duration: 5000 });
           }
           return;
         }
 
         if (!silent) {
           setStatusState({ state: "idle", message: "" });
-          setStatusError(
-            "We have not received a settlement confirmation yet. We'll keep watching this page for updates."
-          );
+          toast.error("We have not received a settlement confirmation yet.", { style: toastStyle, duration: 5000 });
         }
       } catch (_err) {
         if (!silent) {
           setStatusState({ state: "idle", message: "" });
-          setStatusError(
-            "We could not confirm your payment right now. Please refresh or try again shortly."
-          );
+          toast.error("Could not confirm your payment. Please refresh or try again.", { style: toastStyle });
         }
       }
     },
@@ -648,7 +645,7 @@ function PaymentContent() {
 
   const handlePayment = async () => {
     if (!selectedPlan) {
-      setError("Please select a payment plan");
+      toast.error("Please select a payment plan", { style: toastStyle });
       return;
     }
 
@@ -661,29 +658,21 @@ function PaymentContent() {
     const activeUserId = registrationUserId || user?.user_id || "";
 
     if (!activeEmail || !activeUserId) {
-      setError(
-        "Missing registrant information. Please restart registration or contact support."
-      );
+      toast.error("Missing registrant information. Please restart registration.", { style: toastStyle });
       return;
     }
 
     if (selectedPlan === "TRIAL") {
       if (!trialAgentDraft?.agentPayload) {
-        setError(
-          "We lost your trial configuration. Please restart from the template gallery."
-        );
+        toast.error("We lost your trial configuration. Please restart from the template gallery.", { style: toastStyle });
         return;
       }
       if (!trialCredentials?.password) {
-        setError(
-          "Trial activation requires your registration credentials. Please restart the trial enrollment."
-        );
+        toast.error("Trial activation requires your registration credentials. Please restart.", { style: toastStyle });
         return;
       }
 
       setLoading(true);
-      setError("");
-      setStatusError("");
       setStatusState({
         state: "processing",
         message: "Activating your free trial…",
@@ -741,15 +730,14 @@ function PaymentContent() {
           state: "success",
           message: "Trial activated! Redirecting you to login.",
         });
+        toast.success("Trial activated! Redirecting to login...", { style: toastStyle });
         hasRedirectedRef.current = true;
         const loginParams = new URLSearchParams({ trial: "1" });
         loginParams.set("email", activeEmail);
         router.replace(`/login?${loginParams.toString()}`);
       } catch (error) {
         console.error("Trial activation failed", error);
-        setError(
-          error?.message || "Failed to activate free trial. Please try again."
-        );
+        toast.error(error?.message || "Failed to activate free trial. Please try again.", { style: toastStyle });
         setStatusState({
           state: "error",
           message: "Trial activation failed.",
@@ -761,10 +749,8 @@ function PaymentContent() {
     }
 
     setLoading(true);
-    setError("");
 
     try {
-      setStatusError("");
       const planDetails = PLAN_OPTIONS.find(
         (plan) => plan.code === selectedPlan
       );
@@ -800,7 +786,7 @@ function PaymentContent() {
       const paymentMessage =
         webhookResponse?.message ||
         `Payment request submitted for ${planDetails?.name || selectedPlan}.`;
-      setSuccessMessage(paymentMessage);
+      toast.success(paymentMessage, { style: toastStyle });
 
       const generatedOrderId =
         webhookResponse?.order_id || webhookResponse?.data?.order_id || null;
@@ -868,9 +854,7 @@ function PaymentContent() {
       if (generatedOrderId) {
         void verifyPayment({ silent: true });
       } else {
-        setStatusError(
-          "We generated your payment request. Please check your email for instructions."
-        );
+        toast.error("Payment request submitted. Please check your email for instructions.", { style: toastStyle, duration: 6000 });
         console.warn(
           "Payment webhook response did not include a redirect URL or settlement status",
           webhookResponse
@@ -878,7 +862,7 @@ function PaymentContent() {
       }
     } catch (error) {
       console.error("Payment error:", error);
-      setError(error.message || "Payment failed");
+      toast.error(error.message || "Payment failed", { style: toastStyle });
     } finally {
       setLoading(false);
     }
@@ -901,40 +885,40 @@ function PaymentContent() {
     if (statusState.state === "idle") {
       return null;
     }
-    const isChecking = statusState.state === "checking";
+    const isChecking = statusState.state === "checking" || statusState.state === "processing";
     const isError = statusState.state === "error";
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md rounded-2xl bg-card border border-border p-6 text-center card-shadow"
+          className="w-full max-w-md rounded-[28px] bg-white p-8 text-center shadow-[0_20px_60px_rgba(0,0,0,0.24)] border border-white/60"
         >
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
             {isChecking ? (
-              <div className="bg-primary rounded-full h-16 w-16 flex items-center justify-center">
+              <div className="bg-gradient-to-b from-[#2D2216] to-[#1A1410] rounded-full h-16 w-16 flex items-center justify-center shadow-[0_4px_16px_rgba(45,34,22,0.24)]">
                 <Loader2 className="h-8 w-8 text-white animate-spin" />
               </div>
             ) : isError ? (
-              <div className="bg-destructive rounded-full h-16 w-16 flex items-center justify-center">
+              <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-full h-16 w-16 flex items-center justify-center shadow-[0_4px_16px_rgba(220,38,38,0.24)]">
                 <AlertCircle className="h-8 w-8 text-white" />
               </div>
             ) : (
-              <div className="bg-success rounded-full h-16 w-16 flex items-center justify-center">
+              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full h-16 w-16 flex items-center justify-center shadow-[0_4px_16px_rgba(16,185,129,0.24)]">
                 <CheckCircle className="h-8 w-8 text-white" />
               </div>
             )}
           </div>
-          <h2 className="text-xl font-bold text-foreground mb-2">
-            {isChecking ? "Checking Payment" : isError ? "Payment Failed" : "Payment Successful"}
+          <h2 className="text-2xl font-bold text-[#2D2216] mb-2">
+            {isChecking ? "Processing Payment" : isError ? "Payment Failed" : "Payment Successful"}
           </h2>
-          <p className="text-muted-foreground">{statusState.message}</p>
+          <p className="text-[#5D4037] font-medium">{statusState.message}</p>
 
           {!isChecking && !isError && (
-            <div className="mt-6 space-y-3">
-              <div className="w-full bg-success/10 rounded-lg p-3">
-                <div className="flex items-center justify-center gap-2 text-sm text-success">
+            <div className="mt-6">
+              <div className="w-full bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
+                <div className="flex items-center justify-center gap-2 text-sm text-emerald-600 font-semibold">
                   <CheckCircle className="h-4 w-4" />
                   <span>Transaction confirmed</span>
                 </div>
@@ -947,28 +931,28 @@ function PaymentContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E1] relative overflow-hidden">
+      <Toaster position="top-center" />
+      
+      {/* Subtle gradient orbs */}
+      <div className="absolute top-[-5%] right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 rounded-full blur-3xl opacity-50"></div>
+      <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-gradient-to-tr from-[#2D2216]/5 to-transparent rounded-full blur-3xl opacity-30"></div>
+      
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {renderStatusOverlay()}
 
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <div className="space-y-4">
-            <Badge className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-medium">
-              <Sparkles className="h-4 w-4" />
-              Premium Plans
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              <span className="bg-gradient-to-r from-primary via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Choose Your Perfect Plan
-              </span>
+          <div className="space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#2D2216]">
+              Choose Your Perfect Plan
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Unlock powerful AI automation, WhatsApp workflows, and dedicated support to transform your business
+            <p className="text-base md:text-lg text-[#5D4037] max-w-2xl mx-auto font-medium">
+              Unlock powerful AI automation, WhatsApp workflows, and dedicated support
             </p>
           </div>
         </motion.div>
@@ -978,55 +962,20 @@ function PaymentContent() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex justify-center mb-12"
+          className="flex justify-center mb-8"
         >
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <BadgeCheck className="h-4 w-4 text-primary" />
+          <div className="flex items-center gap-2 text-sm text-[#5D4037] font-medium">
+            <BadgeCheck className="h-4 w-4 text-[#E68A44]" />
             <span>Secure Payment Processing</span>
           </div>
         </motion.div>
-
-        {/* Error Messages */}
-        {statusError && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-6"
-          >
-            <Card className="card-shadow border-l-4 border-l-destructive">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                  <p className="text-sm text-destructive">{statusError}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-6"
-          >
-            <Card className="card-shadow border-l-4 border-l-destructive">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                  <p className="text-sm text-destructive">{error}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
 
         {/* Plan Cards Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid gap-6 md:gap-8 lg:grid-cols-3 mb-12"
+          className="grid gap-4 md:gap-6 lg:grid-cols-3 mb-8"
         >
           {plans.map((plan, index) => (
             <motion.div
@@ -1045,68 +994,48 @@ function PaymentContent() {
           ))}
         </motion.div>
 
-        {/* Success Message */}
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-6"
-          >
-            <Card className="card-shadow border-l-4 border-l-success bg-success/5">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
-                  <p className="text-sm text-success">{successMessage}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
-  
         {/* Payment Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-center space-y-6"
+          className="text-center space-y-4"
         >
-          <Button
+          <button
             onClick={handlePayment}
             disabled={loading || !selectedPlan}
-            size="lg"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-primary text-white hover:bg-primary/90 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-10 py-4 bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08] text-white font-bold rounded-2xl shadow-[0_4px_16px_rgba(45,34,22,0.24),0_1px_4px_rgba(45,34,22,0.12)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32),0_2px_8px_rgba(45,34,22,0.16)] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (
-              <>
+              <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 Processing...
-              </>
+              </span>
             ) : (
-              <>
+              <span className="flex items-center justify-center gap-2">
                 Continue to Payment
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </>
+                <ArrowRight className="h-5 w-5" />
+              </span>
             )}
-          </Button>
+          </button>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-border">
-              <ShieldCheck className="h-4 w-4 text-success" />
-              <span>Secure Checkout</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-[#5D4037]">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-[#E0D4BC] shadow-sm">
+              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              <span className="font-medium">Secure Checkout</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-border">
-              <CreditCard className="h-4 w-4 text-primary" />
-              <span>Bank Transfer</span>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-[#E0D4BC] shadow-sm">
+              <CreditCard className="h-4 w-4 text-[#E68A44]" />
+              <span className="font-medium">Bank Transfer</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface border border-border">
-              <BadgeCheck className="h-4 w-4 text-primary" />
-              <span>Instant Access</span>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/80 backdrop-blur-sm border border-[#E0D4BC] shadow-sm">
+              <BadgeCheck className="h-4 w-4 text-[#E68A44]" />
+              <span className="font-medium">Instant Access</span>
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-[#8D7F71] font-medium">
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
         </motion.div>
@@ -1116,104 +1045,105 @@ function PaymentContent() {
 }
 
 function PlanCard({ plan, isSelected, onSelect, formatPrice }) {
-  const Icon = plan.icon || Sparkles;
+  const Icon = plan.icon || Gift;
   return (
-    <Card
-      className={cn(
-        "relative cursor-pointer transition-all duration-300 hover:card-hover active:scale-95",
+    <div
+      className={`relative cursor-pointer transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] rounded-[24px] h-full ${
         isSelected
-          ? "ring-2 ring-primary bg-gradient-to-br from-primary/5 to-primary/10 border-primary"
-          : "border-border bg-card hover:border-primary/40"
-      )}
+          ? "ring-2 ring-[#E68A44] ring-offset-2"
+          : ""
+      }`}
       onClick={onSelect}
     >
-      <div className="p-6 md:p-8">
+      <div className={`bg-white/95 backdrop-blur-xl rounded-[24px] p-5 md:p-6 shadow-[0_4px_20px_rgba(45,34,22,0.06),0_2px_6px_rgba(45,34,22,0.04)] border h-full flex flex-col ${
+        isSelected ? "border-[#E68A44]" : "border-[#E0D4BC] hover:border-[#E68A44]/40"
+      }`}>
         {plan.badge && (
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-            <Badge
-              variant={plan.recommended ? "default" : "secondary"}
-              className={cn(
-                "px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-lg",
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+            <div
+              className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full shadow-md whitespace-nowrap ${
                 plan.recommended
-                  ? "bg-gradient-primary text-white"
-                  : "bg-surface text-muted-foreground border"
-              )}
+                  ? "bg-gradient-to-b from-[#2D2216] to-[#1A1410] text-white"
+                  : "bg-white text-[#5D4037] border border-[#E0D4BC]"
+              }`}
             >
               {plan.badge}
-            </Badge>
+            </div>
           </div>
         )}
 
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface border border-border p-4">
+        <div className="text-center space-y-3 pt-2">
+          <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl border ${
+            isSelected ? "bg-[#E68A44]/10 border-[#E68A44]/20" : "bg-[#FAF6F1] border-[#E0D4BC]"
+          }`}>
             <Icon
-              className={cn(
-                "h-8 w-8",
-                isSelected ? "text-primary" : "text-muted-foreground"
-              )}
+              className={`h-6 w-6 ${
+                isSelected ? "text-[#E68A44]" : "text-[#8D7F71]"
+              }`}
             />
           </div>
 
           <div>
-            <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{plan.subtitle}</p>
+            <h3 className="text-lg font-bold text-[#2D2216]">{plan.name}</h3>
+            <p className="text-xs text-[#5D4037] mt-0.5 font-medium">{plan.subtitle}</p>
           </div>
         </div>
 
         {/* Price Section */}
-        <div className="py-6 border-y border-border space-y-4">
+        <div className="py-4 border-y border-[#E0D4BC] my-4 space-y-2">
           <div className="text-center">
-            <div className="flex items-baseline justify-center gap-1">
-              <span className="text-4xl md:text-5xl font-extrabold text-foreground">
+            <div className="flex items-baseline justify-center gap-1 flex-wrap">
+              <span className="text-2xl md:text-3xl font-extrabold text-[#2D2216]">
                 {formatPrice(plan.price)}
               </span>
-              <span className="text-lg md:text-xl text-muted-foreground">/month</span>
+              <span className="text-sm text-[#8D7F71] font-medium">/month</span>
             </div>
 
             {plan.originalPrice && (
-              <div className="text-sm text-muted-foreground line-through">
+              <div className="text-xs text-[#8D7F71] line-through mt-1">
                 {formatPrice(plan.originalPrice)}
               </div>
             )}
 
             {plan.discountNote && (
-              <div className="flex items-center justify-center gap-2">
-                <Badge variant="success" className="text-xs font-semibold">
+              <div className="flex items-center justify-center mt-2">
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                   {plan.discountNote}
-                </Badge>
+                </span>
               </div>
             )}
           </div>
 
           {plan.highlight && (
-            <div className="flex items-center justify-center gap-2">
-              <Sparkles className="h-4 w-4 text-warning" />
-              <span className="text-sm font-medium text-warning">{plan.highlight}</span>
+            <div className="flex items-center justify-center gap-1.5">
+              <Gift className="h-3 w-3 text-[#E68A44]" />
+              <span className="text-xs font-semibold text-[#E68A44]">{plan.highlight}</span>
             </div>
           )}
         </div>
 
         {/* Select Button */}
-        <Button
+        <button
           onClick={onSelect}
-          variant={isSelected ? "default" : "outline"}
-          className="w-full"
-          size="lg"
+          className={`w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+            isSelected
+              ? "bg-gradient-to-b from-[#2D2216] to-[#1A1410] text-white shadow-[0_4px_12px_rgba(45,34,22,0.2)]"
+              : "bg-white border-2 border-[#E0D4BC] text-[#5D4037] hover:bg-[#FAF6F1] hover:border-[#E68A44]/40"
+          }`}
         >
           {plan.code === "TRIAL" ? "Get Started" : isSelected ? "Selected" : "Choose Plan"}
-        </Button>
+        </button>
 
         {/* Features */}
-        <div className="mt-6 space-y-3">
-          <ul className="space-y-3">
+        <div className="mt-4 flex-1">
+          <ul className="space-y-2">
             {plan.features.map((feature, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <Check className={cn(
-                  "h-5 w-5 mt-0.5 flex-shrink-0",
-                  isSelected ? "text-primary" : "text-muted-foreground"
-                )} />
-                <span className="text-sm text-muted-foreground">{feature}</span>
+              <li key={index} className="flex items-start gap-2">
+                <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+                  isSelected ? "text-[#E68A44]" : "text-[#8D7F71]"
+                }`} />
+                <span className="text-xs text-[#5D4037] font-medium">{feature}</span>
               </li>
             ))}
           </ul>
@@ -1228,6 +1158,6 @@ function PlanCard({ plan, isSelected, onSelect, formatPrice }) {
         onChange={onSelect}
         className="sr-only"
       />
-    </Card>
+    </div>
   );
 }
