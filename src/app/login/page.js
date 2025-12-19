@@ -5,12 +5,6 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
-const inputBase =
-  "w-full rounded-xl border border-border bg-surface/30 py-3 pl-12 pr-3 text-foreground placeholder-muted transition-all duration-200 focus:border-primary focus:bg-surface/40 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2 focus:ring-offset-background hover:border-primary/50";
 
 export default function Login() {
   const [formData, setFormData] = useState({ identifier: "", password: "" });
@@ -93,174 +87,164 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-surface/20 to-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg">
-        {/* Logo Section */}
+    <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E1] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Subtle gradient orbs - NO BLUE */}
+      <div className="absolute top-[-5%] right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 rounded-full blur-3xl opacity-50"></div>
+      <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-gradient-to-tr from-[#2D2216]/5 to-transparent rounded-full blur-3xl opacity-30"></div>
+
+      <div className="w-full max-w-[440px] relative z-10">
+        {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="flex justify-center mb-6">
-            <Image
-              src="/clevioAISTAFF-Logo-Black.png"
-              alt="Clevio AI Staff"
-              width={180}
-              height={102}
-              className="h-auto w-[180px]"
-              priority
-            />
-          </div>
-          <Badge className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-[#E0D4BC] text-[#5D4037] text-sm font-semibold mb-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             Welcome Back
-          </Badge>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Sign in to your account
+          </div>
+          <h1 className="text-4xl font-bold text-[#2D2216] mb-2 tracking-tight">
+            Masuk ke Akun
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Continue managing your AI assistants
+          <p className="text-[#5D4037] text-base font-medium">
+            Kelola staff AI anda dengan mudah
           </p>
         </motion.div>
 
-        {/* Login Form Card */}
+        {/* Login Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="card-shadow border-border bg-card">
-            <CardContent className="p-8">
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="mb-6"
-                >
-                  <Card className="border-l-4 border-l-destructive bg-destructive/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                        <p className="text-sm text-destructive">{error}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+          <div className="bg-white/90 backdrop-blur-xl rounded-[32px] p-10 shadow-[0_8px_30px_rgba(45,34,22,0.08),0_2px_8px_rgba(45,34,22,0.04)] border border-white/60 relative overflow-hidden">
+            
+            {/* Binder Holes Decoration */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4 z-10">
+              {[0, 1, 2].map((i) => (
+                <div 
+                  key={i} 
+                  className="w-4 h-4 rounded-full bg-gradient-to-br from-[#E8E3DB] to-[#D4CFCA] shadow-[inset_2px_2px_4px_rgba(0,0,0,0.15),inset_-1px_-1px_3px_rgba(255,255,255,0.7)]"
+                ></div>
+              ))}
+            </div>
+            
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
+              >
+                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm text-red-700 font-medium">{error}</p>
+              </motion.div>
+            )}
 
-              {infoMessage && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="mb-6"
-                >
-                  <Card className="border-l-4 border-l-primary bg-primary/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                        <p className="text-sm text-primary">{infoMessage}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+            {infoMessage && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mb-6 bg-emerald-50/80 backdrop-blur-sm border border-emerald-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
+              >
+                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+                  <p className="text-sm text-emerald-700 font-medium">{infoMessage}</p>
+              </motion.div>
+            )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label htmlFor="identifier" className="text-sm font-medium text-foreground">
-                    Email or Phone Number
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <input
-                      id="identifier"
-                      name="identifier"
-                      type="text"
-                      autoComplete="username"
-                      placeholder="you@example.com or +62 812-3456-7890"
-                      className={inputBase}
-                      value={formData.identifier}
-                      onChange={handleChange}
-                      disabled={loading}
-                      required
-                    />
-                  </div>
+            <form onSubmit={handleSubmit} className="space-y-5 mt-6">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <label htmlFor="identifier" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wide">
+                  Email / No. HP
+                </label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#8D7F71] group-focus-within:text-[#E68A44] transition-colors" />
+                  <input
+                    id="identifier"
+                    name="identifier"
+                    type="text"
+                    autoComplete="username"
+                    placeholder="contoh@email.com atau 628..."
+                    className="w-full rounded-2xl border border-[#E0D4BC] bg-white/50 py-3.5 pl-12 pr-4 text-[#2D2216] placeholder:text-[#B5A79B] transition-all duration-200 focus:border-[#E68A44] focus:bg-white focus:shadow-[0_0_0_4px_rgba(230,138,68,0.08)] outline-none font-medium shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
+                    value={formData.identifier}
+                    onChange={handleChange}
+                    disabled={loading}
+                    required
+                  />
                 </div>
-
-                {/* Password Input */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="text-sm font-medium text-foreground">
-                      Password
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setShowResetInfo(true)}
-                      className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      placeholder="Enter your password"
-                      className={inputBase}
-                      value={formData.password}
-                      onChange={handleChange}
-                      disabled={loading}
-                      required
-                    />
-                    <button
-                      type="button"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  size="lg"
-                  className="w-full bg-gradient-primary hover:bg-primary/90 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <ArrowRight className="h-5 w-5 ml-2" />
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              {/* Sign Up Link */}
-              <div className="mt-8 text-center">
-                <p className="text-muted-foreground">
-                  Don&apos;t have an account?{" "}
-                  <a
-                    href="/register"
-                    className="font-semibold text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Sign up here
-                  </a>
-                </p>
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wide">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowResetInfo(true)}
+                    className="text-xs font-bold text-[#E68A44] hover:text-[#D87A36] transition-colors uppercase tracking-wide"
+                  >
+                    Lupa?
+                  </button>
+                </div>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#8D7F71] group-focus-within:text-[#E68A44] transition-colors" />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    placeholder="Masukkan password"
+                    className="w-full rounded-2xl border border-[#E0D4BC] bg-white/50 py-3.5 pl-12 pr-12 text-[#2D2216] placeholder:text-[#B5A79B] transition-all duration-200 focus:border-[#E68A44] focus:bg-white focus:shadow-[0_0_0_4px_rgba(230,138,68,0.08)] outline-none font-medium shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]"
+                    value={formData.password}
+                    onChange={handleChange}
+                    disabled={loading}
+                    required
+                  />
+                  <button
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#8D7F71] hover:text-[#5D4037] transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-6 bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08] text-white font-bold rounded-2xl py-4 text-base shadow-[0_4px_16px_rgba(45,34,22,0.24),0_1px_4px_rgba(45,34,22,0.12)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32),0_2px_8px_rgba(45,34,22,0.16)] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Sign in...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    Sign In
+                    <ArrowRight className="h-5 w-5" />
+                  </span>
+                )}
+              </button>
+            </form>
+
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center">
+              <p className="text-[#8D7F71] text-sm font-medium">
+                Belum punya akun?{" "}
+                <a
+                  href="/register"
+                  className="font-bold text-[#E68A44] hover:text-[#D87A36] transition-colors"
+                >
+                  Daftar di sini
+                </a>
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
 
@@ -269,33 +253,32 @@ export default function Login() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md px-4"
+          onClick={() => setShowResetInfo(false)}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
           >
-            <Card className="card-shadow border-border bg-card">
-              <CardContent className="p-6">
+            <div className="bg-white rounded-[28px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.24)] border border-white/60">
                 <div className="text-center space-y-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Lock className="h-6 w-6 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FAF6F1] to-[#F0EBE4] flex items-center justify-center mx-auto mb-4 shadow-[inset_0_2px_8px_rgba(0,0,0,0.06)]">
+                    <Lock className="h-7 w-7 text-[#5D4037]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground">Reset Your Password</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Password resets require an authenticated request. Contact your administrator or support team for assistance.
+                  <h3 className="text-2xl font-bold text-[#2D2216]">Reset Password</h3>
+                  <p className="text-sm text-[#5D4037] font-medium leading-relaxed">
+                    Untuk reset password, silakan hubungi admin atau tim support kami untuk bantuan lebih lanjut.
                   </p>
-                  <Button
+                  <button
                     onClick={() => setShowResetInfo(false)}
-                    variant="outline"
-                    className="w-full"
+                    className="w-full mt-6 rounded-2xl border-2 border-[#E0D4BC] bg-white text-[#5D4037] hover:bg-[#FAF6F1] font-bold py-3.5 shadow-sm hover:shadow-md transition-all"
                   >
-                    Got it
-                  </Button>
+                    Mengerti
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
+            </div>
           </motion.div>
         </motion.div>
       )}
