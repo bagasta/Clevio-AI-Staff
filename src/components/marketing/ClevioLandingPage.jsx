@@ -87,16 +87,22 @@ export default function ClevioLandingPage() {
     }
   }, [messages, isTyping]);
 
-  const [ip, setIp] = useState("");
+  const [chatSessionId, setChatSessionId] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [agentName, setAgentName] = useState("Clevio Assistant"); // Default name
 
-  // Fetch IP on mount
+  // Generate or Retrieve chatSessionId from sessionStorage on mount
   useEffect(() => {
-    fetch("https://api.ipify.org?format=json")
-      .then((res) => res.json())
-      .then((data) => setIp(data.ip))
-      .catch((err) => console.error("IP Fetch Error:", err));
+    let storedSessionId = sessionStorage.getItem('chatSessionId');
+    if (!storedSessionId) {
+      // Generate new random ID (similar format to the example: mjcngwtvm02bb2ss98)
+      storedSessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      sessionStorage.setItem('chatSessionId', storedSessionId);
+      console.log("[Session] Generated new chatSessionId:", storedSessionId);
+    } else {
+      console.log("[Session] Retrieved existing chatSessionId:", storedSessionId);
+    }
+    setChatSessionId(storedSessionId);
   }, []);
 
   // Phone Chat State
@@ -219,14 +225,14 @@ export default function ClevioLandingPage() {
         setStatus("interviewing");
         // First Message Payload
         payload = {
-            ip: ip,
+            chatSessionId: chatSessionId,
             firstMessage: `Halo saya mau bikin agent AI ${currentInput}`,
             message: null
         };
     } else {
         // Subsequent Message Payload
         payload = {
-            ip: ip,
+            chatSessionId: chatSessionId,
             firstMessage: null,
             message: currentInput
         };
