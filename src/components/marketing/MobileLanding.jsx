@@ -21,7 +21,178 @@ const HeaderClock = () => {
   return <span>{time}</span>;
 };
 
+// Waiting List Section: Sticky Note Form
+function WaitingListSection() {
+  const [formData, setFormData] = useState({
+      Nama: '',
+      nomer_Whatsapp: '',
+      Kebutuhan: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState('idle'); // idle, success, error
+
+  const handleChange = (e) => {
+      setFormData({
+          ...formData,
+          [e.target.name]: e.target.value
+      });
+  };
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+      setSubmitStatus('idle');
+
+      try {
+          const response = await fetch('/api/n8n-webhook', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+          });
+
+          if (response.ok) {
+              setSubmitStatus('success');
+              setFormData({ Nama: '', nomer_Whatsapp: '', Kebutuhan: '' });
+          } else {
+              setSubmitStatus('error');
+          }
+      } catch (error) {
+          console.error("Error submitting form:", error);
+          setSubmitStatus('error');
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
+  return (
+    <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center px-4">
+         {/* Sticky Note Container - Paper Look with Binder Holes (Beige) */}
+         <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-6 pb-12 pt-24 border border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)] relative overflow-hidden">
+                    
+             {/* Binder Holes - Top Center */}
+             <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+                {[0, 1, 2, 3].map((i) => (
+                    <div 
+                        key={i} 
+                        className="w-6 h-6 rounded-full bg-white"
+                        style={{
+                            boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                        }}
+                    ></div>
+                ))}
+            </div>
+
+            <div className="text-center mb-8 relative z-10">
+                <p className="text-[#E68A44] font-semibold text-xs tracking-widest uppercase mb-3">
+                    Early Access
+                </p>
+                <h2 className="text-3xl font-extrabold text-[#2D2216] mb-3 tracking-tight leading-tight">
+                    Gabung Waitlist
+                </h2>
+                <p className="text-[#4A3C2F] text-[15px] font-medium leading-relaxed max-w-[260px] mx-auto">
+                    Daftar sekarang dan dapatkan akses eksklusif saat kami launch.
+                </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5 relative z-10 mt-4">
+                {/* Nama */}
+                <div>
+                    <label htmlFor="nama" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-2">
+                        Nama Lengkap
+                    </label>
+                    <input
+                        type="text"
+                        id="nama"
+                        name="Nama"
+                        value={formData.Nama}
+                        onChange={handleChange}
+                        required
+                        placeholder="John Doe"
+                        className="w-full px-5 py-3 bg-white rounded-2xl border border-[#D7CCC8] focus:border-[#E68A44] focus:ring-1 focus:ring-[#E68A44] outline-none transition-all duration-300 text-[#2D2216] font-medium placeholder:text-gray-400 text-sm"
+                    />
+                </div>
+
+                {/* WhatsApp Number - Unified Wrapper */}
+                <div>
+                    <label htmlFor="whatsapp" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-2">
+                        Nomor WhatsApp
+                    </label>
+                    <div className="flex bg-white rounded-2xl border border-[#D7CCC8] transition-all duration-300 focus-within:border-[#E68A44] focus-within:ring-1 focus-within:ring-[#E68A44] overflow-hidden">
+                        <span className="inline-flex items-center px-5 border-r border-[#D7CCC8] bg-gray-50 text-[#5D4037] font-bold text-sm">
+                            +62
+                        </span>
+                        <input
+                            type="tel"
+                            id="whatsapp"
+                            name="nomer_Whatsapp"
+                            value={formData.nomer_Whatsapp}
+                            onChange={handleChange}
+                            required
+                            placeholder="812 3456 7890"
+                            className="flex-1 px-5 py-3 bg-transparent outline-none text-[#2D2216] font-medium placeholder:text-gray-400 text-sm"
+                        />
+                    </div>
+                </div>
+
+                {/* Kebutuhan (Text Area) */}
+                <div>
+                    <label htmlFor="kebutuhan" className="block text-xs font-bold text-[#5D4037] uppercase tracking-wider mb-2">
+                        Kebutuhan Bisnis Anda
+                    </label>
+                    <textarea
+                        id="kebutuhan"
+                        name="Kebutuhan"
+                        value={formData.Kebutuhan}
+                        onChange={handleChange}
+                        required
+                        rows={3}
+                        placeholder="Ceritakan kebutuhan Anda..."
+                        className="w-full px-5 py-3 bg-white rounded-2xl border border-[#D7CCC8] focus:border-[#E68A44] focus:ring-1 focus:ring-[#E68A44] outline-none transition-all duration-300 text-[#2D2216] font-medium placeholder:text-gray-400 text-sm resize-none"
+                    />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 mt-4 bg-[#2D2216] text-white font-bold rounded-2xl text-[15px] shadow-lg hover:bg-black active:scale-[0.98] transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                    {isSubmitting ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                            </svg>
+                            Mengirim...
+                        </span>
+                    ) : 'Daftar Waiting List'}
+                </button>
+
+                {/* Status Messages */}
+                {submitStatus === 'success' && (
+                    <div className="text-center py-4 px-6 bg-green-100 border border-green-200 rounded-2xl animate-in fade-in slide-in-from-bottom-2">
+                        <p className="text-green-700 font-semibold text-sm">
+                            ✓ Terima kasih! Anda sudah terdaftar di waiting list.
+                        </p>
+                    </div>
+                )}
+                {submitStatus === 'error' && (
+                    <div className="text-center py-4 px-6 bg-red-100 border border-red-200 rounded-2xl animate-in fade-in slide-in-from-bottom-2">
+                        <p className="text-red-700 font-semibold text-sm">
+                            Terjadi kesalahan. Silakan coba lagi.
+                        </p>
+                    </div>
+                )}
+            </form>
+         </div>
+    </div>
+  );
+}
+
 export default function MobileLanding() {
+
   const [status, setStatus] = useState("initial"); // initial, interviewing, finished
   const [isChatOpen, setIsChatOpen] = useState(false); // Controls chat expansion
   const [inputValue, setInputValue] = useState("");
@@ -476,6 +647,7 @@ export default function MobileLanding() {
       <TestimonialSection />
       <ComparisonSection />
       <PricingSection />
+        <WaitingListSection />
       <CTASection />
       <FooterSection />
 
