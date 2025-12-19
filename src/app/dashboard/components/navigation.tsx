@@ -9,15 +9,12 @@ import {
   Settings,
   X,
   Package,
-  Zap,
   LogOut,
   Menu
 } from 'lucide-react'
 import { FEATURES } from '@/config/features'
 import { navigateTo } from '@/lib/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -73,53 +70,15 @@ const SignOutButton = ({ isMobile = false }: { isMobile?: boolean }) => {
 
   return (
     <motion.div
-      className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer",
-        "text-muted-foreground hover:text-destructive"
-      )}
-      whileHover={{
-        scale: 1.02,
-        transition: { duration: 0.15 }
-      }}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer text-[#8D7F71] hover:text-red-500 hover:bg-red-50"
+      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleSignOut}
     >
-      <div className="flex items-center justify-center w-5 h-5 text-muted-foreground">
-        <LogOut className="h-5 w-5" />
-      </div>
-
-      <span className={cn(
-        "font-medium",
-        isMobile ? "text-sm" : "text-sm"
-      )}>
-        Sign Out
-      </span>
+      <LogOut className="h-5 w-5" />
+      <span className="font-semibold text-sm">Sign Out</span>
     </motion.div>
   )
-}
-
-const STATUS_CONFIG = {
-  active: {
-    label: 'Live',
-    bgColor: 'bg-success/10',
-    textColor: 'text-success',
-    borderColor: 'border-success/20',
-    iconColor: 'text-success'
-  },
-  'coming-soon': {
-    label: 'Coming Soon',
-    bgColor: 'bg-warning/10',
-    textColor: 'text-warning',
-    borderColor: 'border-warning/20',
-    iconColor: 'text-warning'
-  },
-  'under-development': {
-    label: 'In Development',
-    bgColor: 'bg-muted/10',
-    textColor: 'text-muted-foreground',
-    borderColor: 'border-muted/20',
-    iconColor: 'text-muted-foreground'
-  }
 }
 
 interface NavItemProps {
@@ -132,7 +91,6 @@ interface NavItemProps {
 const NavItemComponent = ({ item, isActive, isMobile = false, onClick }: NavItemProps) => {
   const feature = FEATURES[item.key]
   const status = feature?.status || 'active'
-  const statusConfig = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG.active
   const Icon = item.icon
 
   const handleClick = () => {
@@ -142,16 +100,11 @@ const NavItemComponent = ({ item, isActive, isMobile = false, onClick }: NavItem
     }
 
     if (item.path) {
-      // If the feature exists and is active, navigate
       if (feature?.status === 'active') {
         window.location.href = item.path
-      }
-      // If feature doesn't exist, navigate anyway (for items not in FEATURES config)
-      else if (!feature) {
+      } else if (!feature) {
         window.location.href = item.path
-      }
-      // Handle coming soon and under development
-      else if (feature) {
+      } else if (feature) {
         if (feature.status === 'coming-soon') {
           navigateTo.comingSoon()
         } else if (feature.status === 'under-development') {
@@ -161,63 +114,32 @@ const NavItemComponent = ({ item, isActive, isMobile = false, onClick }: NavItem
     }
   }
 
-  const content = (
+  return (
     <motion.div
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all cursor-pointer",
+        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer",
         isActive
-          ? "text-white shadow-md"
-          : "text-muted-foreground"
+          ? "bg-gradient-to-b from-[#2D2216] to-[#1A1410] text-white shadow-[0_2px_8px_rgba(45,34,22,0.16)]"
+          : "text-[#5D4037]"
       )}
-      style={{
-        background: isActive
-          ? 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)'
-          : 'transparent'
-      }}
-      whileHover={{
-        scale: 1.02,
-        transition: { duration: 0.15 }
-      }}
+      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       onClick={handleClick}
     >
-      <div className={cn(
-        "flex items-center justify-center w-5 h-5",
-        isActive ? "text-white" : statusConfig.iconColor
-      )}>
-        <Icon className="h-5 w-5" />
-      </div>
+      <Icon className={cn(
+        "h-5 w-5",
+        isActive ? "text-white" : "text-[#8D7F71]"
+      )} />
 
-      <span className={cn(
-        "font-medium",
-        isMobile ? "text-sm" : "text-sm"
-      )}>
-        {item.label}
-      </span>
-
-      {item.badge && (
-        <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0.5">
-          {item.badge}
-        </Badge>
-      )}
+      <span className="font-semibold text-sm">{item.label}</span>
 
       {feature && feature.status !== 'active' && (
-        <Badge
-          variant="outline"
-          className={cn(
-            "ml-auto text-xs px-2 py-0.5 border-current/20",
-            statusConfig.bgColor,
-            statusConfig.textColor,
-            statusConfig.borderColor
-          )}
-        >
-          {statusConfig.label}
-        </Badge>
+        <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50">
+          Soon
+        </span>
       )}
     </motion.div>
   )
-
-  return content
 }
 
 interface DesktopNavProps {
@@ -229,7 +151,7 @@ export const DesktopNav = ({ className }: DesktopNavProps) => {
 
   return (
     <nav className={cn("hidden lg:block", className)}>
-      <div className="bg-card border border-border rounded-xl card-shadow p-4">
+      <div className="bg-white/90">
         <div className="space-y-1">
           {NAV_ITEMS.map((item) => {
             const isActive = Boolean(item.path && (
@@ -246,7 +168,7 @@ export const DesktopNav = ({ className }: DesktopNavProps) => {
           })}
 
           {/* Divider */}
-          <div className="my-2 border-t border-border"></div>
+          <div className="my-3 border-t border-[#E0D4BC]"></div>
 
           {/* Sign Out Button */}
           <SignOutButton />
@@ -269,7 +191,7 @@ export const MobileNav = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
             onClick={onClose}
           />
 
@@ -279,20 +201,18 @@ export const MobileNav = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-80 bg-card border-l border-border z-50 lg:hidden"
+            className="fixed top-0 right-0 h-full w-80 bg-white"
           >
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <h2 className="text-lg font-semibold">Navigation</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
+              <div className="flex items-center justify-between p-4 border-b border-[#E0D4BC]">
+                <h2 className="text-lg font-bold text-[#2D2216]">Navigation</h2>
+                <button
                   onClick={onClose}
-                  className="h-8 w-8"
+                  className="h-10 w-10 rounded-xl bg-[#FAF6F1]"
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  <X className="h-5 w-5 text-[#5D4037]" />
+                </button>
               </div>
 
               {/* Navigation Items */}
@@ -314,7 +234,7 @@ export const MobileNav = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                   })}
 
                   {/* Divider */}
-                  <div className="my-2 border-t border-border"></div>
+                  <div className="my-3 border-t border-[#E0D4BC]"></div>
 
                   {/* Sign Out Button */}
                   <SignOutButton isMobile />
@@ -322,9 +242,8 @@ export const MobileNav = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t border-border">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Zap className="h-3 w-3" />
+              <div className="p-4 border-t border-[#E0D4BC]">
+                <div className="flex items-center gap-2 text-xs text-[#8D7F71] font-medium">
                   <span>Powered by Clevio AI</span>
                 </div>
               </div>
@@ -350,10 +269,10 @@ export const BottomNav = ({ className }: BottomNavProps) => {
 
   return (
     <nav className={cn(
-      "fixed bottom-0 left-0 right-0 bg-card border-t border-border z-30 lg:hidden",
+      "fixed bottom-0 left-0 right-0 bg-white/95",
       className
     )}>
-      <div className="flex items-center justify-around py-2">
+      <div className="flex items-center justify-around py-2 px-2">
         {bottomNavItems.map((item) => {
           const isActive = Boolean(item.path && (
             pathname === item.path ||
@@ -365,10 +284,10 @@ export const BottomNav = ({ className }: BottomNavProps) => {
             <motion.button
               key={item.key}
               className={cn(
-                "flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors",
+                "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors",
                 isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-[#E68A44]"
+                  : "text-[#8D7F71] hover:text-[#5D4037]"
               )}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
@@ -378,9 +297,7 @@ export const BottomNav = ({ className }: BottomNavProps) => {
               }}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium">
-                {item.label}
-              </span>
+              <span className="text-[10px] font-bold">{item.label}</span>
             </motion.button>
           )
         })}
@@ -396,14 +313,15 @@ interface MobileMenuButtonProps {
 
 export const MobileMenuButton = ({ onClick, className }: MobileMenuButtonProps) => {
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
       onClick={onClick}
-      className={cn("lg:hidden", className)}
+      className={cn(
+        "lg:hidden h-10 w-10 rounded-xl bg-white/80",
+        className
+      )}
     >
-      <Menu className="h-5 w-5" />
-    </Button>
+      <Menu className="h-5 w-5 text-[#5D4037]" />
+    </button>
   )
 }
 

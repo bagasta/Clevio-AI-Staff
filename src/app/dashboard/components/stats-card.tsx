@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
 import NumberFlow from '@number-flow/react'
 
 interface StatsCardProps {
@@ -27,61 +25,52 @@ export function StatsCard({
   return (
     <motion.div
       whileHover={{
-        scale: 1.02,
+        scale: 1.01,
         transition: { duration: 0.15, ease: 'easeInOut' }
       }}
-      whileTap={{ scale: 0.98 }}
-      className={cn("hover-lift", className)}
+      whileTap={{ scale: 0.99 }}
+      className={className}
     >
-      <Card className="relative overflow-hidden border-0 card-shadow-xl">
-        <CardContent className="p-6">
-          {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-primary opacity-90" />
+      <div className="bg-white/90">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <p className="text-xs font-bold text-[#8D7F71]">
+              {title}
+            </p>
 
-          {/* Content */}
-          <div className="relative z-10">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-white/90 mb-2">
-                  {title}
-                </p>
+            <div className="flex items-baseline gap-2 mb-1">
+              <p className="text-3xl font-extrabold text-[#2D2216]">
+                <NumberFlow
+                  value={value}
+                  format={{
+                    notation: 'compact',
+                    maximumFractionDigits: 1
+                  }}
+                />
+              </p>
 
-                <div className="flex items-baseline gap-2 mb-2">
-                  <p className="text-3xl font-bold text-white">
-                    <NumberFlow
-                      value={value}
-                      format={{
-                        notation: 'compact',
-                        maximumFractionDigits: 1
-                      }}
-                    />
-                  </p>
-
-                  {trend && (
-                    <span className={cn(
-                      "text-xs font-medium flex items-center gap-1",
-                      trend.isPositive ? "text-green-300" : "text-red-300"
-                    )}>
-                      {trend.isPositive ? '↑' : '↓'}
-                      {Math.abs(trend.value)}%
-                    </span>
-                  )}
-                </div>
-
-                {description && (
-                  <p className="text-sm text-white/80">
-                    {description}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm">
-                <Icon className="h-6 w-6 text-white" />
-              </div>
+              {trend && (
+                <span className={`text-xs font-bold flex items-center gap-1 ${
+                  trend.isPositive ? "text-emerald-600" : "text-red-500"
+                }`}>
+                  {trend.isPositive ? '↑' : '↓'}
+                  {Math.abs(trend.value)}%
+                </span>
+              )}
             </div>
+
+            {description && (
+              <p className="text-sm text-[#5D4037]">
+                {description}
+              </p>
+            )}
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 border border-[#E68A44]/20">
+            <Icon className="h-6 w-6 text-[#E68A44]" />
+          </div>
+        </div>
+      </div>
     </motion.div>
   )
 }

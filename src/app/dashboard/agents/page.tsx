@@ -73,9 +73,9 @@ const AgentsPageSkeleton = () => (
     {/* Agents Grid Skeleton */}
     <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 lg:grid-cols-2">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <Card key={i} className="card-shadow overflow-hidden bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+        <Card key={i} className="card-shadow overflow-hidden bg-gradient-to-br from-background to-muted/50 ">
           {/* Card Header Skeleton */}
-          <div className="h-1 sm:h-2 bg-gradient-to-r from-primary via-primary/80 to-primary/60"></div>
+          <div className="h-1 sm:h-2 bg-gradient-to-r from-[#E68A44] via-[#D87A36] to-[#C86A26]"></div>
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-start justify-between mb-4 sm:mb-6">
               <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
@@ -132,9 +132,9 @@ const EmptyState = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="rounded-xl border border-dashed border-border p-6 sm:p-10 text-center bg-card dark:bg-gray-800/50"
+    className="rounded-xl border border-dashed border-border p-6 sm:p-10 text-center bg-card "
   >
-    <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-6">
+    <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto mb-6">
       <Bot className="h-8 w-8 text-white" />
     </div>
 
@@ -150,7 +150,7 @@ const EmptyState = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
       onClick={onCreateAgent}
       size="lg"
       variant="default"
-      className="px-8 bg-gradient-primary hover-lift"
+      className="px-8 bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover-lift"
     >
       <Plus className="h-5 w-5 mr-2" />
       Create your first agent
@@ -362,16 +362,16 @@ const AgentCard = ({
       className="hover-lift cursor-pointer group w-full h-full"
       onClick={() => onView(agent)}
     >
-      <Card className="card-shadow hover:shadow-2xl transition-all duration-300 overflow-hidden border-0 bg-gradient-to-br from-background to-muted/50 h-full rounded-2xl sm:rounded-3xl dark:from-gray-900 dark:to-gray-800/50">
+      <Card className="card-shadow hover:shadow-2xl transition-all duration-300 overflow-hidden border-0 bg-gradient-to-br from-background to-muted/50 h-full rounded-2xl sm:rounded-3xl ">
         {/* Card Header with Gradient */}
-        <div className="h-1 sm:h-2 bg-gradient-to-r from-primary via-primary/80 to-primary/60"></div>
+        <div className="h-1 sm:h-2 bg-gradient-to-r from-[#E68A44] via-[#D87A36] to-[#C86A26]"></div>
 
         <CardContent className="p-4 sm:p-6 flex flex-col h-full">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
               <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                   <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 {/* Status Indicator */}
@@ -382,7 +382,7 @@ const AgentCard = ({
               </div>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-lg sm:text-xl text-foreground mb-2 group-hover:text-primary transition-colors">
+                <h4 className="font-bold text-lg sm:text-xl text-foreground mb-2 group-hover:text-[#E68A44] transition-colors">
                   {agent.name}
                 </h4>
                 {agent.model_name && (
@@ -397,9 +397,9 @@ const AgentCard = ({
               <span
                 className={cn(
                   "inline-flex items-center gap-1 rounded-full px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold",
-                  config.label === 'Active' && "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200",
-                  config.label === 'Inactive' && "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-200",
-                  config.label === 'Training' && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200"
+                  config.label === 'Active' && "bg-green-100 text-green-800 ",
+                  config.label === 'Inactive' && "bg-gray-100 text-gray-800 ",
+                  config.label === 'Training' && "bg-yellow-100 text-yellow-800 "
                 )}
               >
                 <span className="inline-flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-current opacity-70"></span>
@@ -1015,7 +1015,7 @@ export default function AgentsPage() {
           onClick={handleCreateAgent}
           size="lg"
           variant="default"
-          className="bg-gradient-primary hover-lift w-full sm:w-auto"
+          className="bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover-lift w-full sm:w-auto"
         >
           <Plus className="h-5 w-5 mr-2" />
           New Agent
@@ -1046,7 +1046,7 @@ export default function AgentsPage() {
             placeholder="Search agents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 sm:py-3 border border-border rounded-lg bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#E68A44] focus:border-transparent"
           />
         </div>
       </motion.div>
@@ -1101,7 +1101,7 @@ export default function AgentsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-md rounded-2xl bg-card dark:bg-gray-800 border border-border dark:border-gray-700 shadow-xl p-6 max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-md rounded-2xl bg-card "
           >
             <Button
               onClick={closeQrModal}
@@ -1113,7 +1113,7 @@ export default function AgentsPage() {
             </Button>
 
             <div className="text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto">
                 <QrCode className="h-8 w-8 text-white" />
               </div>
 
@@ -1141,7 +1141,7 @@ export default function AgentsPage() {
                   </div>
 
                   
-                  <div className="text-left space-y-2 bg-card rounded-lg p-4 dark:bg-gray-800/50">
+                  <div className="text-left space-y-2 bg-card rounded-lg p-4 ">
                     <h4 className="font-semibold text-foreground text-sm">How to connect:</h4>
                     <ol className="space-y-1 text-sm text-muted-foreground">
                       <li>1. Open WhatsApp on your phone</li>
