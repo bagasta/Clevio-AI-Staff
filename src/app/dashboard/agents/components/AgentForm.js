@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import AgentFormTour from "@/components/ui/AgentFormTour";
 import mcpTools from "@/data/mcp-tools.json";
@@ -14,6 +15,7 @@ import {
   ChevronRight,
   FileSpreadsheet,
   FileText,
+  Maximize2,
 } from "lucide-react";
 
 export const TOOL_OPTIONS = [
@@ -213,36 +215,11 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
   if (!isOpen) return null;
 
   const gmailTools = [
-    {
-      id: "gmail_get_message",
-      label: "Read Email",
-      description: "Baca email tertentu dari Gmail",
-      icon: Mail
-    },
-    {
-      id: "gmail_create_draft",
-      label: "Create Draft",
-      description: "Buat draf email baru",
-      icon: Mail
-    },
-    {
-      id: "gmail_send_message",
-      label: "Send Email",
-      description: "Kirim email melalui Gmail",
-      icon: Mail
-    },
-    {
-      id: "gmail_read_messages",
-      label: "Read Multiple Emails",
-      description: "Baca beberapa email sekaligus",
-      icon: Mail
-    },
-    {
-      id: "gmail_list_messages",
-      label: "List Emails",
-      description: "Daftar email berdasarkan kriteria",
-      icon: Mail
-    }
+    { id: "gmail_get_message", label: "Read Email", description: "Baca email tertentu dari Gmail", icon: Mail },
+    { id: "gmail_create_draft", label: "Create Draft", description: "Buat draf email baru", icon: Mail },
+    { id: "gmail_send_message", label: "Send Email", description: "Kirim email melalui Gmail", icon: Mail },
+    { id: "gmail_read_messages", label: "Read Multiple Emails", description: "Baca beberapa email sekaligus", icon: Mail },
+    { id: "gmail_list_messages", label: "List Emails", description: "Daftar email berdasarkan kriteria", icon: Mail }
   ];
 
   const handleToggle = (toolId) => {
@@ -250,10 +227,9 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
     onSave(toolId, event);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
-        {/* Header */}
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#EA4335]/10 flex items-center justify-center">
@@ -264,39 +240,22 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
               <p className="text-sm text-[#5D4037]">Pilih aksi Gmail yang diinginkan</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
-          >
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]">
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Tools List */}
         <div className="space-y-3 mb-6">
           {gmailTools.map((tool) => {
             const Icon = tool.icon;
             const isEnabled = values.tools[tool.id];
-
             return (
               <div
                 key={tool.id}
                 onClick={() => handleToggle(tool.id)}
-                className={`
-                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
-                  ${isEnabled
-                    ? 'border-[#EA4335] bg-white ring-1 ring-[#EA4335]/20 shadow-sm'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50 hover:bg-[#EA4335]/5'
-                  }
-                `}
+                className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200 ${isEnabled ? 'border-[#EA4335] bg-[#EA4335]/5 ring-1 ring-[#EA4335]/20 shadow-sm' : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50 hover:bg-[#EA4335]/5'}`}
               >
-                <div className={`
-                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
-                  ${isEnabled
-                    ? 'border-[#EA4335] bg-[#EA4335]'
-                    : 'border-[#D0C4A8] bg-white group-hover:border-[#EA4335]'
-                  }
-                `}>
+                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isEnabled ? 'border-[#EA4335] bg-[#EA4335]' : 'border-[#D0C4A8] bg-white'}`}>
                   {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                 </div>
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#EA4335]/10' : 'bg-[#FAF6F1]'}`}>
@@ -311,23 +270,17 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
           })}
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
-          >
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors">
             Batal
           </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
-          >
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl">
             Simpan
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
@@ -335,24 +288,9 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
   if (!isOpen) return null;
 
   const calendarTools = [
-    {
-      id: "google_calendar_create_event",
-      label: "Create Event",
-      description: "Buat event baru di kalender",
-      icon: Calendar
-    },
-    {
-      id: "google_calendar_list_events",
-      label: "List Events",
-      description: "Lihat daftar event terjadwal",
-      icon: Calendar
-    },
-    {
-      id: "google_calendar_get_event",
-      label: "Get Event",
-      description: "Ambil detail event spesifik",
-      icon: Calendar
-    }
+    { id: "google_calendar_create_event", label: "Create Event", description: "Buat event baru di kalender", icon: Calendar },
+    { id: "google_calendar_list_events", label: "List Events", description: "Lihat daftar event terjadwal", icon: Calendar },
+    { id: "google_calendar_get_event", label: "Get Event", description: "Ambil detail event spesifik", icon: Calendar }
   ];
 
   const handleToggle = (toolId) => {
@@ -360,10 +298,9 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
     onSave(toolId, event);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
-        {/* Header */}
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#4285F4]/10 flex items-center justify-center">
@@ -374,39 +311,22 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
               <p className="text-sm text-[#5D4037]">Pilih aksi Kalender yang diinginkan</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
-          >
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]">
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Tools List */}
         <div className="space-y-3 mb-6">
           {calendarTools.map((tool) => {
             const Icon = tool.icon;
             const isEnabled = values.tools[tool.id];
-
             return (
               <div
                 key={tool.id}
                 onClick={() => handleToggle(tool.id)}
-                className={`
-                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
-                  ${isEnabled
-                    ? 'border-[#4285F4] bg-white ring-1 ring-[#4285F4]/20 shadow-sm'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
-                  }
-                `}
+                className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200 ${isEnabled ? 'border-[#4285F4] bg-[#4285F4]/5 ring-1 ring-[#4285F4]/20 shadow-sm' : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'}`}
               >
-                <div className={`
-                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
-                  ${isEnabled
-                    ? 'border-[#4285F4] bg-[#4285F4]'
-                    : 'border-[#D0C4A8] bg-white group-hover:border-[#4285F4]'
-                  }
-                `}>
+                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isEnabled ? 'border-[#4285F4] bg-[#4285F4]' : 'border-[#D0C4A8] bg-white'}`}>
                   {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                 </div>
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#4285F4]/10' : 'bg-[#FAF6F1]'}`}>
@@ -421,267 +341,129 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
           })}
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
-          >
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors">
             Batal
           </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
-          >
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl">
             Simpan
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
 const SheetsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
   if (!isOpen) return null;
-
   const sheetsTools = [
-    {
-      id: "google_sheets_get_values",
-      label: "Get Values",
-      description: "Baca nilai dari rentang sheet",
-      icon: FileSpreadsheet
-    },
-    {
-      id: "google_sheets_update_values",
-      label: "Update Values",
-      description: "Tulis atau update nilai di sheet",
-      icon: FileSpreadsheet
-    },
-    {
-      id: "google_sheets_create_spreadsheet",
-      label: "Create Spreadsheet",
-      description: "Buat spreadsheet baru",
-      icon: FileSpreadsheet
-    },
-    {
-      id: "google_sheets_list_spreadsheets",
-      label: "List Spreadsheets",
-      description: "Lihat daftar spreadsheet",
-      icon: FileSpreadsheet
-    }
+    { id: "google_sheets_get_values", label: "Get Values", description: "Baca nilai dari rentang sheet", icon: FileSpreadsheet },
+    { id: "google_sheets_update_values", label: "Update Values", description: "Tulis atau update nilai di sheet", icon: FileSpreadsheet },
+    { id: "google_sheets_create_spreadsheet", label: "Create Spreadsheet", description: "Buat spreadsheet baru", icon: FileSpreadsheet },
+    { id: "google_sheets_list_spreadsheets", label: "List Spreadsheets", description: "Lihat daftar spreadsheet", icon: FileSpreadsheet }
   ];
+  const handleToggle = (toolId) => { onSave(toolId, { target: { checked: !values.tools[toolId] } }); };
 
-  const handleToggle = (toolId) => {
-    const event = { target: { checked: !values.tools[toolId] } };
-    onSave(toolId, event);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
-        {/* Header */}
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#34A853]/10 flex items-center justify-center">
-              <FileSpreadsheet className="h-5 w-5 text-[#34A853]" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-[#2D2216]">Sheets Tools</h3>
-              <p className="text-sm text-[#5D4037]">Pilih aksi Google Sheets</p>
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#34A853]/10 flex items-center justify-center"><FileSpreadsheet className="h-5 w-5 text-[#34A853]" /></div>
+            <div><h3 className="text-lg font-bold text-[#2D2216]">Sheets Tools</h3><p className="text-sm text-[#5D4037]">Pilih aksi Google Sheets</p></div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"><X className="h-4 w-4" /></button>
         </div>
-
-        {/* Tools List */}
         <div className="space-y-3 mb-6">
           {sheetsTools.map((tool) => {
-            const Icon = tool.icon;
-            const isEnabled = values.tools[tool.id];
-
+            const Icon = tool.icon; const isEnabled = values.tools[tool.id];
             return (
-              <div
-                key={tool.id}
-                onClick={() => handleToggle(tool.id)}
-                className={`
-                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
-                  ${isEnabled
-                    ? 'border-[#34A853] bg-white ring-1 ring-[#34A853]/20 shadow-sm'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50 hover:bg-[#34A853]/5'
-                  }
-                `}
-              >
-                <div className={`
-                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
-                  ${isEnabled
-                    ? 'border-[#34A853] bg-[#34A853]'
-                    : 'border-[#D0C4A8] bg-white group-hover:border-[#34A853]'
-                  }
-                `}>
-                  {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
-                </div>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#34A853]/10' : 'bg-[#FAF6F1]'}`}>
-                  <Icon className={`h-5 w-5 ${isEnabled ? 'text-[#34A853]' : 'text-[#8D7F71]'}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div>
-                  <div className="text-sm text-[#8D7F71]">{tool.description}</div>
-                </div>
+              <div key={tool.id} onClick={() => handleToggle(tool.id)} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200 ${isEnabled ? 'border-[#34A853] bg-[#34A853]/5 ring-1 ring-[#34A853]/20 shadow-sm' : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50 hover:bg-[#34A853]/5'}`}>
+                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isEnabled ? 'border-[#34A853] bg-[#34A853]' : 'border-[#D0C4A8] bg-white'}`}>{isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}</div>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#34A853]/10' : 'bg-[#FAF6F1]'}`}><Icon className={`h-5 w-5 ${isEnabled ? 'text-[#34A853]' : 'text-[#8D7F71]'}`} /></div>
+                <div className="flex-1 min-w-0"><div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div><div className="text-sm text-[#8D7F71]">{tool.description}</div></div>
               </div>
             );
           })}
         </div>
-
-        {/* Actions */}
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
-          >
-            Batal
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
-          >
-            Simpan
-          </button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors">Batal</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl">Simpan</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
 const DocsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
   if (!isOpen) return null;
-
   const docsTools = [
-    {
-      id: "google_docs_list_documents",
-      label: "List Documents",
-      description: "Lihat daftar dokumen Google Docs",
-      icon: FileText
-    },
-    {
-      id: "google_docs_get_document",
-      label: "Get Document",
-      description: "Ambil konten dokumen",
-      icon: FileText
-    },
-    {
-      id: "google_docs_create_document",
-      label: "Create Document",
-      description: "Buat dokumen baru",
-      icon: FileText
-    },
-    {
-      id: "google_docs_append_text",
-      label: "Append Text",
-      description: "Tambahkan teks ke dokumen",
-      icon: FileText
-    },
-    {
-      id: "google_docs_update_text",
-      label: "Update Text",
-      description: "Perbarui teks di dokumen",
-      icon: FileText
-    },
-    {
-      id: "google_docs_delete_document",
-      label: "Delete Document",
-      description: "Hapus dokumen (drive.file scope)",
-      icon: FileText
-    }
+    { id: "google_docs_list_documents", label: "List Documents", description: "Lihat daftar dokumen Google Docs", icon: FileText },
+    { id: "google_docs_get_document", label: "Get Document", description: "Ambil konten dokumen", icon: FileText },
+    { id: "google_docs_create_document", label: "Create Document", description: "Buat dokumen baru", icon: FileText },
+    { id: "google_docs_append_text", label: "Append Text", description: "Tambahkan teks ke dokumen", icon: FileText },
+    { id: "google_docs_update_text", label: "Update Text", description: "Perbarui teks di dokumen", icon: FileText },
+    { id: "google_docs_delete_document", label: "Delete Document", description: "Hapus dokumen (drive.file scope)", icon: FileText }
   ];
+  const handleToggle = (toolId) => { onSave(toolId, { target: { checked: !values.tools[toolId] } }); };
 
-  const handleToggle = (toolId) => {
-    const event = { target: { checked: !values.tools[toolId] } };
-    onSave(toolId, event);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
-        {/* Header */}
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#4285F4]/10 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-[#4285F4]" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">Docs Tools</h3>
-              <p className="text-sm text-muted">Pilih aksi Google Docs</p>
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#4285F4]/10 flex items-center justify-center"><FileText className="h-5 w-5 text-[#4285F4]" /></div>
+            <div><h3 className="text-lg font-bold text-[#2D2216]">Docs Tools</h3><p className="text-sm text-[#5D4037]">Pilih aksi Google Docs</p></div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface hover:bg-surface-strong/60 flex items-center justify-center transition-colors"
-          >
-            <X className="h-4 w-4 text-muted" />
-          </button>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"><X className="h-4 w-4" /></button>
         </div>
-
-        {/* Tools List */}
         <div className="space-y-3 mb-6">
           {docsTools.map((tool) => {
-            const Icon = tool.icon;
-            const isEnabled = values.tools[tool.id];
-
+            const Icon = tool.icon; const isEnabled = values.tools[tool.id];
             return (
-              <div
-                key={tool.id}
-                onClick={() => handleToggle(tool.id)}
-                className={`
-                  flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
-                  ${isEnabled
-                    ? 'border-accent bg-accent/5'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong'
-                  }
-                `}
-              >
-                <div className={`
-                  w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
-                  ${isEnabled
-                    ? 'border-accent bg-accent'
-                    : 'border-surface-strong/60'
-                  }
-                `}>
-                  {isEnabled && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <div className="w-10 h-10 rounded-lg bg-surface-strong/60 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-muted" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground">{tool.label}</div>
-                  <div className="text-sm text-muted">{tool.description}</div>
-                </div>
+              <div key={tool.id} onClick={() => handleToggle(tool.id)} className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200 ${isEnabled ? 'border-[#4285F4] bg-[#4285F4]/5 ring-1 ring-[#4285F4]/20 shadow-sm' : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'}`}>
+                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isEnabled ? 'border-[#4285F4] bg-[#4285F4]' : 'border-[#D0C4A8] bg-white'}`}>{isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}</div>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#4285F4]/10' : 'bg-[#FAF6F1]'}`}><Icon className={`h-5 w-5 ${isEnabled ? 'text-[#4285F4]' : 'text-[#8D7F71]'}`} /></div>
+                <div className="flex-1 min-w-0"><div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div><div className="text-sm text-[#8D7F71]">{tool.description}</div></div>
               </div>
             );
           })}
         </div>
-
-        {/* Actions */}
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border border-surface-strong/60 text-sm font-medium text-muted hover:bg-surface/70 transition-colors"
-          >
-            Batal
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-semibold transition-colors"
-          >
-            Simpan
-          </button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors">Batal</button>
+          <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl">Simpan</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
+  );
+};
+
+// System Prompt Expanded Modal
+const SystemPromptModal = ({ isOpen, onClose, value, onChange }) => {
+  if (!isOpen) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={onClose}>
+      <div className="w-full max-w-3xl rounded-2xl border border-[#E0D4BC] bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div><h3 className="text-lg font-bold text-[#2D2216]">System Prompt Editor</h3><p className="text-sm text-[#5D4037]">Edit your agent's instructions in full detail</p></div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"><X className="h-4 w-4" /></button>
+        </div>
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={18}
+          placeholder="Describe your agent's behavior, tone, and constraints..."
+          className="w-full rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-[#2D2216] placeholder:text-[#8D7F71] focus:outline-none focus:ring-2 focus:ring-[#E68A44]/20 focus:border-[#E68A44] transition-all shadow-sm resize-y font-mono text-sm"
+        />
+        <div className="flex justify-end mt-4">
+          <button onClick={onClose} className="px-6 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl">Done</button>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 };
 
@@ -835,6 +617,7 @@ export default function AgentForm({
   const [showCalendarPopup, setShowCalendarPopup] = useState(false);
   const [showSheetsPopup, setShowSheetsPopup] = useState(false);
   const [showDocsPopup, setShowDocsPopup] = useState(false);
+  const [showSystemPromptModal, setShowSystemPromptModal] = useState(false);
   const router = useRouter();
 
   const submitLabel = useMemo(() => {
@@ -1143,8 +926,8 @@ export default function AgentForm({
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
-                <div className="absolute bottom-3 right-3 text-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                  Configure <ChevronRight className="h-3 w-3" />
+                <div className="absolute bottom-3 right-3 text-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
 
@@ -1173,8 +956,8 @@ export default function AgentForm({
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
-                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                  Configure <ChevronRight className="h-3 w-3" />
+                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
 
@@ -1203,8 +986,8 @@ export default function AgentForm({
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
-                <div className="absolute bottom-3 right-3 text-[#34A853] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                  Configure <ChevronRight className="h-3 w-3" />
+                <div className="absolute bottom-3 right-3 text-[#34A853] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
 
@@ -1233,8 +1016,8 @@ export default function AgentForm({
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
-                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                  Configure <ChevronRight className="h-3 w-3" />
+                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
             </div>
@@ -1344,11 +1127,7 @@ export default function AgentForm({
                         <Lock className="h-4 w-4 text-[#8D7F71]" />
                       </div>
                     )}
-                    {!isLocked && !isEnabled && (
-                      <div className="absolute bottom-3 right-3 text-[#E68A44] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                        Select <ChevronRight className="h-3 w-3" />
-                      </div>
-                    )}
+                    {/* No hover indicator for MCP cards */}
                     {isLocked && (
                       <div className="mt-2 text-center">
                         <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#8D7F71] bg-[#2D2216]/5 px-2 py-0.5 rounded-full">
@@ -1365,30 +1144,29 @@ export default function AgentForm({
         )}
 
         <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              System Prompt
-            </h2>
-            <p className="text-sm text-muted">
-              Define how your agent should behave, its tone, and any constraints. You can use the template below or provide custom instructions.
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#2D2216] mb-1">System Prompt</h2>
+              <p className="text-sm text-[#5D4037]">Define how your agent should behave, its tone, and any constraints.</p>
+            </div>
+            <button 
+              type="button" 
+              onClick={() => setShowSystemPromptModal(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E0D4BC] bg-white text-sm font-medium text-[#5D4037] hover:bg-[#FAF6F1] hover:border-[#E68A44] transition-all"
+            >
+              <Maximize2 className="h-4 w-4" />
+              Expand
+            </button>
           </div>
           <div data-tour="agent-prompt" className="space-y-2">
             <textarea
               value={values.systemPrompt}
-              onChange={(event) =>
-                setValues((prev) => ({
-                  ...prev,
-                  systemPrompt: event.target.value,
-                }))
-              }
+              onChange={(event) => setValues((prev) => ({ ...prev, systemPrompt: event.target.value }))}
               rows={6}
               placeholder="Describe your agent's behavior, tone, and constraints..."
               className="w-full rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-[#2D2216] placeholder:text-[#8D7F71] focus:outline-none focus:ring-2 focus:ring-[#E68A44]/20 focus:border-[#E68A44] transition-all shadow-sm resize-y"
             />
-            {formErrors.systemPrompt && (
-              <p className="text-sm text-red-600">{formErrors.systemPrompt}</p>
-            )}
+            {formErrors.systemPrompt && <p className="text-sm text-red-600">{formErrors.systemPrompt}</p>}
           </div>
         </section>
 
@@ -1531,6 +1309,14 @@ export default function AgentForm({
           onClose={() => setShowDocsPopup(false)}
           values={values}
           onSave={toggleTool}
+        />
+
+        {/* System Prompt Expanded Modal */}
+        <SystemPromptModal
+          isOpen={showSystemPromptModal}
+          onClose={() => setShowSystemPromptModal(false)}
+          value={values.systemPrompt}
+          onChange={(newValue) => setValues((prev) => ({ ...prev, systemPrompt: newValue }))}
         />
       </form>
     </div>

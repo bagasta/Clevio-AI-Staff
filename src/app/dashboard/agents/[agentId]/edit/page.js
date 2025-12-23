@@ -198,14 +198,14 @@ export default function EditAgentPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[#FAF6F1] flex items-center justify-center px-4">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
-            <Loader2 className="h-8 w-8 text-white animate-spin" />
+          <div className="w-16 h-16 rounded-full bg-[#2D2216] flex items-center justify-center mx-auto shadow-xl shadow-[#2D2216]/20">
+            <Loader2 className="h-8 w-8 text-[#E68A44] animate-spin" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">Loading Agent</h3>
-            <p className="text-sm text-muted-foreground">Please wait while we fetch your agent details...</p>
+            <h3 className="text-lg font-bold text-[#2D2216]">Loading Agent</h3>
+            <p className="text-sm text-[#5D4037]">Please wait while we fetch your agent details...</p>
           </div>
         </div>
       </div>
@@ -214,20 +214,20 @@ export default function EditAgentPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-[#FAF6F1] flex items-center justify-center px-4">
+        <Card className="w-full max-w-md border border-[#E0D4BC] bg-white/80 backdrop-blur-xl shadow-xl">
           <CardContent className="p-6 text-center">
-            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="h-8 w-8 text-destructive" />
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-red-600" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+            <h3 className="text-lg font-bold text-[#2D2216] mb-2">
               Error Loading Agent
             </h3>
-            <p className="text-muted-foreground mb-4">{error}</p>
+            <p className="text-[#5D4037] mb-4">{error}</p>
             <Button
               onClick={() => window.location.reload()}
               variant="outline"
-              className="w-full"
+              className="w-full border-[#E0D4BC] text-[#2D2216] hover:bg-[#FAF6F1]"
             >
               Try Again
             </Button>
@@ -257,50 +257,29 @@ export default function EditAgentPage() {
   const isProMonthlyPlan = normalizedPlanCode === "pro_m";
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-[#FAF6F1]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 ml-16"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
-            <CardContent className="p-6 md:p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <Link
-                  href={`/dashboard/agents/${params.agentId}`}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background hover:bg-card dark:hover:bg-gray-800 transition-smooth text-sm font-medium"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Agent
-                </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/dashboard/agents/${params.agentId}`}
+              className="group flex-shrink-0 w-10 h-10 rounded-xl bg-white border border-[#E0D4BC] flex items-center justify-center shadow-sm hover:shadow-md hover:border-[#E68A44] transition-all duration-300"
+            >
+              <ArrowLeft className="h-5 w-5 text-[#8D7F71] group-hover:text-[#E68A44] transition-colors" />
+            </Link>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D2216] to-[#1A1410] flex items-center justify-center shadow-lg shadow-[#2D2216]/20">
+                <Edit className="h-5 w-5 text-[#E68A44]" />
               </div>
-
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
-                    <Edit className="h-8 w-8 md:h-10 md:w-10 text-white" />
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-                    Edit Agent
-                  </h1>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
-                    <span>Updating configuration for:</span>
-                    <code className="px-2 py-1 rounded-lg bg-card dark:bg-gray-800 text-xs font-mono break-all">
-                      {agent?.name || "Unknown Agent"}
-                    </code>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Update the configuration, tools, and behaviour of this agent. Changes take effect immediately after saving.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <h1 className="text-xl font-bold text-[#2D2216] tracking-tight">Edit Agent</h1>
+            </div>
+          </div>
         </motion.div>
 
         {/* Agent Form */}
@@ -309,24 +288,16 @@ export default function EditAgentPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Agent Configuration
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 md:p-8">
-              <AgentForm
-                mode="edit"
-                initialValues={initialValues}
-                onSubmit={handleUpdate}
-                isSubmitting={isSubmitting}
-                isTrialPlan={isTrialPlan}
-                isProMonthlyPlan={isProMonthlyPlan}
-              />
-            </CardContent>
-          </Card>
+          {/* We removed the outer Card wrapper here to prevent double-bordering. 
+              The AgentForm component has its own internal styling. */}
+          <AgentForm
+            mode="edit"
+            initialValues={initialValues}
+            onSubmit={handleUpdate}
+            isSubmitting={isSubmitting}
+            isTrialPlan={isTrialPlan}
+            isProMonthlyPlan={isProMonthlyPlan}
+          />
         </motion.div>
       </div>
     </div>
