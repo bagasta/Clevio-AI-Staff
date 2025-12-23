@@ -542,262 +542,143 @@ const AIMessageBar = ({
   };
 
   return (
-    <div className="flex h-full flex-col bg-background">
-      {/* Compact Header - Only show if title exists */}
+    <div className="flex flex-col h-full overflow-hidden bg-[#FAF6F1]">
+      {/* Header - Only show if title exists */}
       {title && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex-shrink-0 border-b border-surface-strong/20 bg-gradient-to-r from-surface to-surface-strong/30 backdrop-blur-sm"
-        >
-          <div className="px-4 py-3 sm:px-6 sm:py-4">
-            <div className="flex items-center justify-between max-w-7xl mx-auto">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex-shrink-0">
-                  <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-base sm:text-lg font-bold text-foreground truncate">{title}</h2>
-                  {description && (
-                    <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block line-clamp-1">
-                      {description}
-                    </p>
-                  )}
-                </div>
+        <div className="flex-shrink-0 border-b border-[#E0D4BC] bg-white/80 backdrop-blur-xl px-4 py-3">
+          <div className="flex items-center justify-between max-w-xl mx-auto">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E68A44]/10">
+                <Bot className="h-4 w-4 text-[#E68A44]" />
               </div>
-              <AnimatePresence>
-                {messages.length > 0 && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={clearChat}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-strong/60 transition-colors flex-shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Clear</span>
-                  </motion.button>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-bold text-[#2D2216] truncate">{title}</h2>
+                {description && (
+                  <p className="text-xs text-[#5D4037] hidden sm:block truncate">{description}</p>
                 )}
-              </AnimatePresence>
+              </div>
             </div>
+            {messages.length > 0 && (
+              <button
+                onClick={clearChat}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Clear</span>
+              </button>
+            )}
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Error Banner */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="flex-shrink-0 border-b border-destructive/20 bg-destructive/5"
-          >
-            <div className="px-4 py-3 sm:px-6">
-              <div className="flex items-center gap-2 max-w-7xl mx-auto">
-                <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Responsive Messages Container */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <div className="px-4 py-4 sm:px-6 sm:py-6 h-full">
-            <div className="max-w-4xl mx-auto h-full">
-              <div className="space-y-4 sm:space-y-6 pb-4">
-                {messages.length === 0 && !isTyping && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex justify-center py-12"
-                  >
-                    <div className="text-center max-w-sm">
-                      <div className="flex h-16 w-16 mx-auto mb-4 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10">
-                        <Bot className="h-8 w-8 text-accent" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        Ready to customize your agent
-                      </h3>
-                      <p className="text-muted-foreground text-sm">
-                        I'll help you configure this template through a few questions
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {messages.map((message, index) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex ${
-                      message.sender === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div className={`flex items-end gap-2 sm:gap-3 max-w-[90%] sm:max-w-[80%] ${
-                      message.sender === "user" ? "flex-row-reverse" : "flex-row"
-                    }`}>
-                      {/* Avatar - Hidden on mobile to save space */}
-                      <div className={`hidden sm:flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                        message.sender === "user"
-                          ? "bg-accent text-white ml-2"
-                          : "bg-gradient-to-br from-accent/20 to-accent/10 text-accent mr-2"
-                      }`}>
-                        {message.sender === "user" ? (
-                          <User className="h-4 w-4" />
-                        ) : (
-                          <Bot className="h-4 w-4" />
-                        )}
-                      </div>
-
-                      {/* Message Bubble - Responsive */}
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className={`relative rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-sm ${
-                          message.sender === "user"
-                            ? "bg-gradient-to-r from-accent to-accent-hover text-white rounded-br-sm"
-                            : "bg-surface border border-surface-strong/60 text-foreground rounded-bl-sm"
-                        }`}
-                      >
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                          {message.text}
-                        </p>
-                        <span
-                          className={`mt-1 sm:mt-2 block text-xs ${
-                            message.sender === "user" ? "text-white/70" : "text-muted-foreground"
-                          }`}
-                        >
-                          {message.timestamp}
-                        </span>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
-
-                {/* Enhanced Typing Indicator */}
-                <AnimatePresence>
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="flex justify-start"
-                    >
-                      <div className="flex items-end gap-2 sm:gap-3">
-                        <div className="hidden sm:flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/10 text-accent">
-                          <Bot className="h-4 w-4" />
-                        </div>
-                        <div className="bg-surface border border-surface-strong/60 rounded-2xl rounded-bl-sm px-3 py-2 sm:px-4 sm:py-3 shadow-sm">
-                          <div className="flex space-x-1">
-                            <motion.div
-                              animate={{ scale: [1, 1.2, 1] }}
-                              transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
-                              className="h-2 w-2 rounded-full bg-accent"
-                            />
-                            <motion.div
-                              animate={{ scale: [1, 1.2, 1] }}
-                              transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }}
-                              className="h-2 w-2 rounded-full bg-accent"
-                            />
-                            <motion.div
-                              animate={{ scale: [1, 1.2, 1] }}
-                              transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }}
-                              className="h-2 w-2 rounded-full bg-accent"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div ref={messagesEndRef} />
-              </div>
-            </div>
+      {error && (
+        <div className="flex-shrink-0 border-b border-red-200 bg-red-50 px-4 py-3">
+          <div className="flex items-center gap-2 max-w-xl mx-auto">
+            <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-600">{error}</p>
           </div>
+        </div>
+      )}
+
+      {/* Messages - Scrollable */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-2">
+        <div className="max-w-xl mx-auto space-y-3">
+          {messages.length === 0 && !isTyping && (
+            <div className="flex justify-center py-8">
+              <div className="text-center">
+                <div className="flex h-12 w-12 mx-auto mb-3 items-center justify-center rounded-xl bg-[#E68A44]/10">
+                  <Bot className="h-6 w-6 text-[#E68A44]" />
+                </div>
+                <h3 className="text-base font-bold text-[#2D2216] mb-1">Ready to customize your agent</h3>
+                <p className="text-[#5D4037] text-sm">I'll help you configure this template</p>
+              </div>
+            </div>
+          )}
+
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div className={`flex items-end gap-2 max-w-[85%] ${message.sender === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                <div className={`hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+                  message.sender === "user" ? "bg-[#2D2216] text-white" : "bg-[#E68A44]/10 text-[#E68A44]"
+                }`}>
+                  {message.sender === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                </div>
+                <div className={`rounded-2xl px-4 py-3 ${
+                  message.sender === "user"
+                    ? "bg-[#2D2216] text-white rounded-br-sm"
+                    : "bg-white border border-[#E0D4BC] text-[#2D2216] rounded-bl-sm"
+                }`}>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+                  <span className={`mt-1 block text-xs ${message.sender === "user" ? "text-white/60" : "text-[#5D4037]/60"}`}>
+                    {message.timestamp}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="flex items-end gap-2">
+                <div className="hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E68A44]/10 text-[#E68A44]">
+                  <Bot className="h-3 w-3" />
+                </div>
+                <div className="bg-white border border-[#E0D4BC] rounded-2xl rounded-bl-sm px-4 py-3">
+                  <div className="flex space-x-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#5D4037] animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#5D4037] animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="h-1.5 w-1.5 rounded-full bg-[#5D4037] animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Responsive Input Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex-shrink-0 border-t border-surface-strong/20 bg-gradient-to-r from-surface to-surface-strong/30 backdrop-blur-sm"
-      >
-        <div className="px-4 py-3 sm:px-6 sm:py-4">
-          <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-            <div
-              className={`relative flex items-end gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border bg-background px-3 py-2 sm:px-4 sm:py-3 transition-all shadow-sm ${
-                isFocused
-                  ? "border-accent/60 shadow-lg shadow-accent/20"
-                  : "border-surface-strong/60"
-              }`}
+      {/* Input - Fixed at bottom */}
+      <div className="flex-shrink-0 border-t border-[#E0D4BC] bg-white p-2 sm:p-3">
+        <form onSubmit={handleSubmit} className="max-w-xl mx-auto">
+          <div className={`flex items-end gap-2 rounded-xl border px-3 py-2 transition-all ${
+            isFocused ? "border-[#E68A44] bg-white shadow-sm" : "border-[#E0D4BC] bg-[#FAF6F1]"
+          }`}>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`;
+              }}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (input.trim()) handleSubmit(e);
+                }
+              }}
+              placeholder="Type your message..."
+              rows={1}
+              className="flex-1 resize-none bg-transparent text-sm text-[#2D2216] placeholder-[#5D4037]/50 focus:outline-none"
+              style={{ minHeight: "40px", maxHeight: "100px" }}
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || isTyping}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#2D2216] text-white hover:bg-[#1A1410] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  // Auto-resize textarea
-                  const target = e.target;
-                  target.style.height = 'auto';
-                  target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                }}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    if (input.trim()) {
-                      handleSubmit(e);
-                    }
-                  }
-                  // Auto-resize on Enter for multi-line
-                  if (e.key === "Enter" && e.shiftKey) {
-                    setTimeout(() => {
-                      const target = e.target;
-                      target.style.height = 'auto';
-                      target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                    }, 0);
-                  }
-                }}
-                onInput={(e) => {
-                  // Auto-resize on input
-                  const target = e.target;
-                  target.style.height = 'auto';
-                  target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
-                }}
-                placeholder="Type your message..."
-                rows={1}
-                className="flex-1 resize-none bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none leading-relaxed"
-                style={{
-                  minHeight: "44px",
-                  maxHeight: "120px",
-                  resize: 'none',
-                  overflowY: 'auto'
-                }}
-              />
-
-              <motion.button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-r from-accent to-accent-hover text-white transition-all shadow-lg shadow-accent/25 hover:shadow-accent/40 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Send className="h-3 w-3 sm:h-4 sm:w-4" />
-              </motion.button>
-            </div>
-          </form>
-        </div>
-      </motion.div>
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

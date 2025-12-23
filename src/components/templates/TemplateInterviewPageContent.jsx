@@ -301,12 +301,12 @@ export default function TemplateInterviewPageContent({
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex flex-col bg-[#FAF6F1] overflow-hidden h-[calc(100dvh-11rem)] md:h-[calc(100vh-8rem)]">
       {/* Compact Modern Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex-shrink-0 border-b border-surface-strong/20 bg-gradient-to-r from-surface to-surface-strong/30 backdrop-blur-sm"
+        className="flex-shrink-0 border-b border-[#E0D4BC] bg-white/80 backdrop-blur-xl z-20"
       >
         <div className="px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -316,21 +316,21 @@ export default function TemplateInterviewPageContent({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.back()}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-surface-strong/60 text-muted-foreground hover:bg-surface-strong/80 hover:text-foreground transition-colors flex-shrink-0"
+                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-[#E0D4BC] bg-white text-[#5D4037] hover:bg-[#FAF6F1] transition-colors flex-shrink-0"
               >
                 <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
               </motion.button>
 
               {/* Template Info - Responsive */}
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex-shrink-0">
-                  <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[#E68A44]/10 flex-shrink-0">
+                  <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-[#E68A44]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-base sm:text-lg sm:text-xl font-bold text-foreground truncate">
+                  <h1 className="text-base sm:text-lg sm:text-xl font-bold text-[#2D2216] truncate">
                     {template.name}
                   </h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block line-clamp-1">
+                  <p className="text-xs sm:text-sm text-[#5D4037] hidden sm:block line-clamp-1">
                     {template.description}
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export default function TemplateInterviewPageContent({
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <Badge
                 variant="secondary"
-                className="bg-accent/10 text-accent hover:bg-accent/20 px-2 py-1 text-xs sm:px-3"
+                className="bg-[#E68A44]/10 text-[#E68A44] hover:bg-[#E68A44]/20 border border-[#E68A44]/20 px-2 py-1 text-xs sm:px-3"
               >
                 <span className="hidden sm:inline">{template.category}</span>
                 <span className="sm:hidden">{template.category.slice(0, 3)}</span>
