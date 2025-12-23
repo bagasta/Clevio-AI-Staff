@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiService } from "@/lib/api";
 import AgentForm from "../components/AgentForm";
-import { ArrowLeft, Bot, Sparkles, Info } from "lucide-react";
+import { ArrowLeft, Bot, CheckCircle2, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import GOOGLE_SCOPE_MAP from "@/data/google_scope_tools.json";
 
@@ -431,9 +431,9 @@ export default function NewAgentPage() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         <div
-                          className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E68A44]/10 flex-shrink-0"
+                          className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2D2216]/5 flex-shrink-0"
                         >
-                          <Sparkles className="h-5 w-5 text-[#E68A44]" />
+                          <CheckCircle2 className="h-5 w-5 text-[#2D2216]" />
                         </div>
                       <div>
                         <p className="font-bold text-[#2D2216]">{guidedTourHeading}</p>

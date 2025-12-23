@@ -260,15 +260,15 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
               <Mail className="h-5 w-5 text-[#EA4335]" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Gmail Tools</h3>
-              <p className="text-sm text-muted">Pilih aksi Gmail yang diinginkan</p>
+              <h3 className="text-lg font-bold text-[#2D2216]">Gmail Tools</h3>
+              <p className="text-sm text-[#5D4037]">Pilih aksi Gmail yang diinginkan</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface hover:bg-surface-strong/60 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
           >
-            <X className="h-4 w-4 text-muted" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -283,28 +283,28 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
                 key={tool.id}
                 onClick={() => handleToggle(tool.id)}
                 className={`
-                  flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
+                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
                   ${isEnabled
-                    ? 'border-accent bg-accent/5'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong'
+                    ? 'border-[#EA4335] bg-white ring-1 ring-[#EA4335]/20 shadow-sm'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50 hover:bg-[#EA4335]/5'
                   }
                 `}
               >
                 <div className={`
-                  w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
+                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
                   ${isEnabled
-                    ? 'border-accent bg-accent'
-                    : 'border-surface-strong/60'
+                    ? 'border-[#EA4335] bg-[#EA4335]'
+                    : 'border-[#D0C4A8] bg-white group-hover:border-[#EA4335]'
                   }
                 `}>
-                  {isEnabled && <Check className="h-3 w-3 text-white" />}
+                  {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                 </div>
-                <div className="w-10 h-10 rounded-lg bg-surface-strong/60 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-muted" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#EA4335]/10' : 'bg-[#FAF6F1]'}`}>
+                  <Icon className={`h-5 w-5 ${isEnabled ? 'text-[#EA4335]' : 'text-[#8D7F71]'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground">{tool.label}</div>
-                  <div className="text-sm text-muted">{tool.description}</div>
+                  <div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div>
+                  <div className="text-sm text-[#8D7F71]">{tool.description}</div>
                 </div>
               </div>
             );
@@ -315,13 +315,13 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border border-surface-strong/60 text-sm font-medium text-muted hover:bg-surface/70 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
           >
             Batal
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-semibold transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
           >
             Simpan
           </button>
@@ -370,15 +370,15 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
               <Calendar className="h-5 w-5 text-[#4285F4]" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Calendar Tools</h3>
-              <p className="text-sm text-muted">Pilih aksi Kalender yang diinginkan</p>
+              <h3 className="text-lg font-bold text-[#2D2216]">Calendar Tools</h3>
+              <p className="text-sm text-[#5D4037]">Pilih aksi Kalender yang diinginkan</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface hover:bg-surface-strong/60 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
           >
-            <X className="h-4 w-4 text-muted" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -393,28 +393,28 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
                 key={tool.id}
                 onClick={() => handleToggle(tool.id)}
                 className={`
-                  flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
+                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
                   ${isEnabled
-                    ? 'border-accent bg-accent/5'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong'
+                    ? 'border-[#4285F4] bg-white ring-1 ring-[#4285F4]/20 shadow-sm'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
                   }
                 `}
               >
                 <div className={`
-                  w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
+                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
                   ${isEnabled
-                    ? 'border-accent bg-accent'
-                    : 'border-surface-strong/60'
+                    ? 'border-[#4285F4] bg-[#4285F4]'
+                    : 'border-[#D0C4A8] bg-white group-hover:border-[#4285F4]'
                   }
                 `}>
-                  {isEnabled && <Check className="h-3 w-3 text-white" />}
+                  {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                 </div>
-                <div className="w-10 h-10 rounded-lg bg-surface-strong/60 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-muted" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#4285F4]/10' : 'bg-[#FAF6F1]'}`}>
+                  <Icon className={`h-5 w-5 ${isEnabled ? 'text-[#4285F4]' : 'text-[#8D7F71]'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground">{tool.label}</div>
-                  <div className="text-sm text-muted">{tool.description}</div>
+                  <div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div>
+                  <div className="text-sm text-[#8D7F71]">{tool.description}</div>
                 </div>
               </div>
             );
@@ -425,13 +425,13 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border border-surface-strong/60 text-sm font-medium text-muted hover:bg-surface/70 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
           >
             Batal
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-semibold transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
           >
             Simpan
           </button>
@@ -486,15 +486,15 @@ const SheetsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
               <FileSpreadsheet className="h-5 w-5 text-[#34A853]" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Sheets Tools</h3>
-              <p className="text-sm text-muted">Pilih aksi Google Sheets</p>
+              <h3 className="text-lg font-bold text-[#2D2216]">Sheets Tools</h3>
+              <p className="text-sm text-[#5D4037]">Pilih aksi Google Sheets</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-surface hover:bg-surface-strong/60 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-[#FAF6F1] hover:bg-[#F2E8DA] flex items-center justify-center transition-colors text-[#5D4037]"
           >
-            <X className="h-4 w-4 text-muted" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -509,28 +509,28 @@ const SheetsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
                 key={tool.id}
                 onClick={() => handleToggle(tool.id)}
                 className={`
-                  flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
+                  flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-200
                   ${isEnabled
-                    ? 'border-accent bg-accent/5'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong'
+                    ? 'border-[#34A853] bg-white ring-1 ring-[#34A853]/20 shadow-sm'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50 hover:bg-[#34A853]/5'
                   }
                 `}
               >
                 <div className={`
-                  w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
+                  w-5 h-5 rounded-md border flex items-center justify-center transition-all
                   ${isEnabled
-                    ? 'border-accent bg-accent'
-                    : 'border-surface-strong/60'
+                    ? 'border-[#34A853] bg-[#34A853]'
+                    : 'border-[#D0C4A8] bg-white group-hover:border-[#34A853]'
                   }
                 `}>
-                  {isEnabled && <Check className="h-3 w-3 text-white" />}
+                  {isEnabled && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                 </div>
-                <div className="w-10 h-10 rounded-lg bg-surface-strong/60 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-muted" />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-[#34A853]/10' : 'bg-[#FAF6F1]'}`}>
+                  <Icon className={`h-5 w-5 ${isEnabled ? 'text-[#34A853]' : 'text-[#8D7F71]'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-foreground">{tool.label}</div>
-                  <div className="text-sm text-muted">{tool.description}</div>
+                  <div className={`font-medium ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</div>
+                  <div className="text-sm text-[#8D7F71]">{tool.description}</div>
                 </div>
               </div>
             );
@@ -541,13 +541,13 @@ const SheetsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border border-surface-strong/60 text-sm font-medium text-muted hover:bg-surface/70 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-[#D0C4A8] text-sm font-bold text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
           >
             Batal
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-semibold transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl"
           >
             Simpan
           </button>
@@ -1139,10 +1139,13 @@ export default function AgentForm({
                   </div>
                 </div>
                 {hasGmailTools && (
-                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#EA4335] rounded-full flex items-center justify-center shadow-sm">
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#EA4335] rounded-full flex items-center justify-center shadow-sm z-10">
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
+                <div className="absolute bottom-3 right-3 text-[#EA4335] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  Configure <ChevronRight className="h-3 w-3" />
+                </div>
               </div>
 
               {/* Calendar Card */}
@@ -1166,10 +1169,13 @@ export default function AgentForm({
                   </div>
                 </div>
                 {hasCalendarTools && (
-                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm">
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm z-10">
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
+                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  Configure <ChevronRight className="h-3 w-3" />
+                </div>
               </div>
 
               {/* Sheets Card */}
@@ -1193,10 +1199,13 @@ export default function AgentForm({
                   </div>
                 </div>
                 {hasSheetsTools && (
-                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#34A853] rounded-full flex items-center justify-center shadow-sm">
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#34A853] rounded-full flex items-center justify-center shadow-sm z-10">
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
+                <div className="absolute bottom-3 right-3 text-[#34A853] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  Configure <ChevronRight className="h-3 w-3" />
+                </div>
               </div>
 
               {/* Docs Card */}
@@ -1220,10 +1229,13 @@ export default function AgentForm({
                   </div>
                 </div>
                 {hasDocsTools && (
-                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm">
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm z-10">
                     <Check className="w-3 h-3 text-white" strokeWidth={3} />
                   </div>
                 )}
+                <div className="absolute bottom-3 right-3 text-[#4285F4] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                  Configure <ChevronRight className="h-3 w-3" />
+                </div>
               </div>
             </div>
 
@@ -1333,7 +1345,9 @@ export default function AgentForm({
                       </div>
                     )}
                     {!isLocked && !isEnabled && (
-                      <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute bottom-3 right-3 text-[#E68A44] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+                        Select <ChevronRight className="h-3 w-3" />
+                      </div>
                     )}
                     {isLocked && (
                       <div className="mt-2 text-center">
