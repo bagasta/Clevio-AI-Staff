@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Lock, Search, Sparkles, Users, Target, HeadphonesIcon } from "lucide-react";
+import { Lock, Search, LayoutGrid, Users, Target, HeadphonesIcon, Zap, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import templatesData from "@/data/agent-templates.json";
@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const CATEGORIES = [
-  { id: "all", label: "All", icon: Sparkles },
+  { id: "all", label: "All", icon: LayoutGrid },
   { id: "Customer Services", label: "Customer Services", icon: HeadphonesIcon },
   { id: "Education", label: "Education", icon: Target },
   { id: "Finance", label: "Finance", icon: Target },
@@ -208,7 +208,7 @@ export default function AgentTemplatesView({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container-spacing section-spacing">
+      <div className="container-spacing pt-32 pb-20">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -218,7 +218,7 @@ export default function AgentTemplatesView({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1">
               <motion.h1
-                className="mb-2 text-3xl font-bold text-foreground sm:text-4xl"
+                className="mt-7 mb-2 text-3xl font-bold text-[#2D2216] sm:text-4xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
@@ -226,7 +226,7 @@ export default function AgentTemplatesView({
                 {heading}
               </motion.h1>
               <motion.p
-                className="text-muted-foreground sm:text-lg"
+                className="text-[#5D4037] sm:text-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -242,39 +242,26 @@ export default function AgentTemplatesView({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.1 }}
           className="mb-6"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <CardContent className="p-0">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 p-1">
                 {/* Search Input */}
                 <div className="relative flex-1">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                    <Search className="h-5 w-5 text-muted-foreground" />
+                    <Search className="h-5 w-5 text-[#8D7F71]" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search templates..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-2xl border-0 bg-transparent py-4 pl-12 pr-4 text-foreground placeholder-muted-foreground transition-all focus:outline-none focus:ring-0"
+                    className="w-full rounded-xl border-0 bg-transparent py-3 pl-12 pr-4 text-[#2D2216] placeholder-[#8D7F71] transition-all focus:outline-none focus:ring-0"
                   />
                 </div>
 
-                {/* Customize Agent Button (single entry point) */}
-                {allowCustomStart && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleCreateFromScratch}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-accent to-accent-hover text-white font-medium shadow-lg shadow-accent/25 hover:shadow-accent/40 transition-all flex-shrink-0"
-                  >
-                    <Sparkles className="h-5 w-5" />
-                    <span className="hidden sm:inline">Customize Agent</span>
-                    <span className="sm:hidden">Custom</span>
-                  </motion.button>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -340,7 +327,7 @@ export default function AgentTemplatesView({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.15 }}
           className="mb-8"
         >
           <div className="overflow-x-auto scrollbar-hide pb-2 sm:pb-0 sm:overflow-x-visible">
@@ -359,12 +346,12 @@ export default function AgentTemplatesView({
                   key={category.id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.6 + index * 0.05 }}
+                  transition={{ delay: 0.1 + index * 0.05 }}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`group relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all hover:scale-105 ${
+                  className={`group relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all hover:scale-105 border ${
                     isActive
-                      ? "bg-gradient-to-r from-accent to-accent-hover text-white shadow-lg shadow-accent/25"
-                      : "bg-surface text-muted-foreground hover:bg-surface-strong hover:text-foreground"
+                      ? "bg-[#2D2216] text-[#FAF6F1] border-[#2D2216] shadow-md"
+                      : "bg-white/50 text-[#5D4037] border-[#E0D4BC]/50 hover:bg-[#FAF6F1] hover:text-[#2D2216] hover:border-[#E0D4BC]"
                   }`}
                 >
                   <IconComponent className="h-4 w-4" />
@@ -373,8 +360,8 @@ export default function AgentTemplatesView({
                     variant="secondary"
                     className={`ml-1 px-2 py-0.5 text-xs ${
                       isActive
-                        ? "bg-white/20 text-white hover:bg-white/30"
-                        : "bg-surface-strong/60"
+                        ? "bg-[#E68A44] text-white hover:bg-[#E68A44]"
+                        : "bg-[#E0D4BC]/30 text-[#8D7F71]"
                     }`}
                   >
                     {count}
@@ -389,7 +376,7 @@ export default function AgentTemplatesView({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          transition={{ delay: 0.15 }} // Reduced delay
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           <AnimatePresence mode="wait">
@@ -399,17 +386,18 @@ export default function AgentTemplatesView({
               return (
                 <motion.div
                   key={template.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
                   transition={{
-                    delay: 0.8 + index * 0.1,
-                    duration: 0.3
+                    duration: 0.25,
+                    delay: index * 0.03, // Tighter stagger
+                    ease: "easeOut"
                   }}
-                  layout
+                  className="h-full"
                 >
-                  <Card className="group relative h-full cursor-pointer border-surface-strong/60 bg-surface transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10 card-shadow">
-                    <CardContent className="p-6">
+                  <Card className="group relative h-full flex flex-col cursor-pointer border-[#E0D4BC] bg-white/80 backdrop-blur-xl transition-all hover:border-[#E68A44]/60 hover:shadow-xl hover:shadow-[#E68A44]/10 shadow-[0_4px_20px_rgb(0,0,0,0.04)]">
+                    <CardContent className="p-6 flex flex-col h-full">
                       {/* Lock Overlay */}
                       {locked && (
                         <button
@@ -418,9 +406,9 @@ export default function AgentTemplatesView({
                             e.stopPropagation();
                             handleLockedClick();
                           }}
-                          className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-black/70 text-center text-white backdrop-blur-sm transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-[#2D2216]/80 text-center text-white backdrop-blur-sm transition hover:bg-[#2D2216]/90 focus-visible:outline-none"
                         >
-                          <Lock className="mb-3 h-6 w-6 text-accent" />
+                          <Lock className="mb-3 h-6 w-6 text-[#E68A44]" />
                           <span className="text-sm font-semibold">
                             Trial limit reached
                           </span>
@@ -433,25 +421,19 @@ export default function AgentTemplatesView({
                       {/* Template Content */}
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <Badge variant="secondary" className="mb-3 text-xs">
+                          <Badge variant="secondary" className="mb-3 text-xs bg-[#FAF6F1] text-[#5D4037] border border-[#E0D4BC]/50">
                             {template.category}
                           </Badge>
-                          <h3 className="text-xl font-semibold text-foreground group-hover:text-accent transition-colors">
+                          <h3 className="text-xl font-bold text-[#2D2216] group-hover:text-[#E68A44] transition-colors">
                             {template.name}
                           </h3>
                         </div>
-                        <div className="ml-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 text-accent">
-                          <Image
-                            src="/templates/robot.svg"
-                            alt=""
-                            width={28}
-                            height={28}
-                            className="h-6 w-6"
-                          />
+                        <div className="ml-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#E68A44]/10 text-[#E68A44]">
+                          <Bot className="h-6 w-6 opacity-80" />
                         </div>
                       </div>
 
-                      <p className="mt-4 text-muted-foreground leading-relaxed">
+                      <p className="mt-4 text-[#5D4037] leading-relaxed line-clamp-3">
                         {template.description}
                       </p>
 
@@ -462,7 +444,7 @@ export default function AgentTemplatesView({
                             <Badge
                               key={tag}
                               variant="outline"
-                              className="text-xs border-surface-strong/40 bg-surface/50"
+                              className="text-xs border-[#E0D4BC] bg-[#FAF6F1] text-[#8D7F71]"
                             >
                               {tag}
                             </Badge>
@@ -470,7 +452,7 @@ export default function AgentTemplatesView({
                           {template.tags.length > 3 && (
                             <Badge
                               variant="outline"
-                              className="text-xs border-surface-strong/40 bg-surface/50"
+                              className="text-xs border-[#E0D4BC] bg-[#FAF6F1] text-[#8D7F71]"
                             >
                               +{template.tags.length - 3}
                             </Badge>
@@ -479,17 +461,17 @@ export default function AgentTemplatesView({
                       )}
 
                       {/* Action Button */}
-                      <div className="mt-6">
+                      <div className="mt-auto pt-6">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleUseTemplate(template);
                           }}
                           disabled={locked}
-                          className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
+                          className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all shadow-lg ${
                             locked
-                              ? "cursor-not-allowed bg-surface-strong/60 text-muted-foreground"
-                              : "bg-gradient-to-r from-accent to-accent-hover text-white hover:shadow-lg hover:shadow-accent/25 hover:scale-105"
+                              ? "cursor-not-allowed bg-[#E0D4BC]/30 text-[#8D7F71] shadow-none"
+                              : "bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08] text-white shadow-[0_4px_16px_rgba(45,34,22,0.24)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32)] hover:scale-[1.02]"
                           }`}
                         >
                           {locked ? "Locked" : "Use Template"}
@@ -512,15 +494,15 @@ export default function AgentTemplatesView({
               exit={{ opacity: 0, scale: 0.95 }}
               className="mt-12"
             >
-              <Card className="border-dashed border-surface-strong/40 bg-surface/50">
+              <Card className="border-dashed border-[#E0D4BC] bg-white/50">
                 <CardContent className="py-16 text-center">
-                  <div className="mx-auto mb-6 h-20 w-20 rounded-full bg-surface-strong/30 flex items-center justify-center">
-                    <Search className="h-8 w-8 text-muted-foreground" />
+                  <div className="mx-auto mb-6 h-20 w-20 rounded-full bg-[#FAF6F1] flex items-center justify-center border border-[#E0D4BC]/50">
+                    <Search className="h-8 w-8 text-[#8D7F71]" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">
+                  <h3 className="text-xl font-bold text-[#2D2216] mb-3">
                     No templates found
                   </h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
+                  <p className="text-[#5D4037] max-w-md mx-auto">
                     No templates match "{searchQuery}". Try another keyword or pick a different category.
                   </p>
                 </CardContent>
@@ -557,26 +539,26 @@ export default function AgentTemplatesView({
                 className="relative w-full max-w-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Card className="border-surface-strong/60 bg-surface shadow-2xl">
+                <Card className="border-[#E0D4BC] bg-white/95 backdrop-blur-xl shadow-2xl">
                   <CardContent className="p-6 sm:p-8">
                     <button
                       type="button"
                       onClick={closeUpgradeModal}
-                      className="absolute right-4 top-4 rounded-full bg-surface px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-surface-strong/70 transition-colors"
+                      className="absolute right-4 top-4 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-[#8D7F71] hover:bg-[#FAF6F1] transition-colors border border-[#E0D4BC]/30"
                     >
                       Close
                     </button>
 
                     <div className="mb-6">
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 text-accent">
-                          <Sparkles className="h-6 w-6" />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E68A44]/10 text-[#E68A44]">
+                          <Zap className="h-6 w-6" />
                         </div>
-                        <h3 className="text-2xl font-bold text-foreground">
+                        <h3 className="text-2xl font-bold text-[#2D2216]">
                           Upgrade required
                         </h3>
                       </div>
-                      <p className="text-muted-foreground">
+                      <p className="text-[#5D4037]">
                         Trial plan hanya membuka 2 template pertama. Upgrade untuk
                         memakai semua template dan fitur customize agent.
                       </p>
@@ -594,22 +576,22 @@ export default function AgentTemplatesView({
                             onClick={() => setSelectedUpgradePlan(plan.code)}
                             className={`relative rounded-2xl border p-4 text-left transition-all ${
                               isActive
-                                ? "border-accent bg-gradient-to-br from-accent/5 to-accent/10 shadow-lg shadow-accent/20"
-                                : "border-surface-strong/60 hover:border-accent/40 hover:bg-surface/50"
+                                ? "border-[#E68A44] bg-[#FAF6F1] shadow-lg shadow-[#E68A44]/10"
+                                : "border-[#E0D4BC] hover:border-[#E68A44]/40 hover:bg-white"
                             }`}
                           >
                             {isActive && (
-                              <Badge className="absolute -top-2 -right-2 bg-accent text-white">
+                              <Badge className="absolute -top-2 -right-2 bg-[#E68A44] text-white">
                                 Selected
                               </Badge>
                             )}
-                            <h4 className="font-semibold text-foreground mb-2">
+                            <h4 className="font-bold text-[#2D2216] mb-2">
                               {plan.name}
                             </h4>
-                            <p className="text-sm font-medium text-foreground mb-1">
+                            <p className="text-sm font-medium text-[#2D2216] mb-1">
                               {plan.priceLabel}
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-[#5D4037]">
                               {plan.description}
                             </p>
                           </motion.button>
@@ -621,7 +603,7 @@ export default function AgentTemplatesView({
                       <button
                         type="button"
                         onClick={closeUpgradeModal}
-                        className="w-full rounded-lg border border-surface-strong/60 px-6 py-3 text-sm font-medium text-muted-foreground hover:bg-surface transition-colors sm:w-auto"
+                        className="w-full rounded-xl border border-[#E0D4BC] px-6 py-3 text-sm font-medium text-[#5D4037] hover:bg-[#FAF6F1] transition-colors sm:w-auto"
                       >
                         Maybe later
                       </button>
@@ -629,7 +611,7 @@ export default function AgentTemplatesView({
                         type="button"
                         onClick={handleUpgradeRedirect}
                         disabled={upgradeProcessing}
-                        className="w-full rounded-lg bg-gradient-to-r from-accent to-accent-hover px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 hover:shadow-accent/40 transition-all sm:w-auto disabled:opacity-60"
+                        className="w-full rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[rgba(45,34,22,0.2)] hover:shadow-[rgba(45,34,22,0.3)] transition-all sm:w-auto disabled:opacity-60"
                       >
                         {upgradeProcessing ? "Redirecting..." : "Continue to payment"}
                       </button>
