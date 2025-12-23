@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import { motion } from "framer-motion";
 import {
   Bot,
@@ -159,6 +161,15 @@ export default function AgentDetailPage() {
   const [error, setError] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRagDeleting, setIsRagDeleting] = useState(false);
+  
+  const [deleteDialogState, setDeleteDialogState] = useState({
+    isOpen: false,
+    type: null,
+    data: null, // for RAG doc
+    title: "",
+    description: ""
+  });
 
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
@@ -197,6 +208,7 @@ export default function AgentDetailPage() {
   const pollingIntervalRef = useRef(null);
   const [whatsAppRefreshMap, setWhatsAppRefreshMap] = useState({});
   const [whatsAppErrors, setWhatsAppErrors] = useState({});
+  const [isSystemPromptExpanded, setIsSystemPromptExpanded] = useState(false);
   const autoGooglePromptShownRef = useRef(false);
   const autoGoogleFirstLoadRef = useRef(false);
 
@@ -1199,15 +1211,23 @@ export default function AgentDetailPage() {
   }, [agent?.id, isTrialPlan, handleRefreshWhatsAppStatus]);
 
   // WhatsApp delete handler
-  const handleWhatsAppDelete = useCallback(async () => {
-    if (!agent?.id) {
-      return;
-    }
+  // WhatsApp delete handler (Triggers Modal)
+  const handleWhatsAppDeleteClick = useCallback(() => {
+    setDeleteDialogState({
+      isOpen: true,
+      type: "WHATSAPP",
+      title: "Delete WhatsApp Session?",
+      description: "This will disconnect the agent from WhatsApp. You will need to scan the QR code again to reconnect."
+    });
+  }, []);
 
+  const executeWhatsAppDelete = useCallback(async () => {
+    if (!agent?.id) return;
     setWhatsAppError("");
     setWhatsAppDeleting(true);
     try {
       await apiService.deleteWhatsAppSession(agent.id);
+      toast.success("WhatsApp session deleted successfully");
       setShowWhatsAppQr(false);
       setWhatsAppSessionInfo(EMPTY_WHATSAPP_SESSION);
 
@@ -1223,7 +1243,10 @@ export default function AgentDetailPage() {
       );
 
       await handleRefreshWhatsAppStatus();
+      setDeleteDialogState(prev => ({ ...prev, isOpen: false }));
     } catch (error) {
+      console.error("WhatsApp delete error:", error);
+      toast.error(error?.message || "Unable to delete WhatsApp session right now.");
       setWhatsAppError(
         error?.message || "Unable to delete WhatsApp session right now."
       );
@@ -1441,25 +1464,35 @@ export default function AgentDetailPage() {
   }, [whatsAppQr]);
 
   
-  const handleDelete = async () => {
-    if (!agent) return;
-    const confirmed = window.confirm(
-      "Delete this agent? This action cannot be undone."
-    );
-    if (!confirmed) {
-      return;
-    }
+  // Agent Delete Handler (Triggers Modal)
+  const handleDeleteClick = () => {
+    setDeleteDialogState({
+      isOpen: true,
+      type: "AGENT",
+      title: "Delete Agent?",
+      description: "Are you sure you want to delete this agent? All chat history and configuration will be lost. This action cannot be undone."
+    });
+  };
 
+  const executeAgentDelete = async () => {
+    if (!agent) return;
     setDeleteError("");
     setIsDeleting(true);
     try {
-      await apiService.deleteAgent(agent.id);
+      console.log("🚀 Calling apiService.deleteAgent...");
+      const res = await apiService.deleteAgent(agent.id);
+      console.log("✅ Agent deleted successfully:", res);
+      toast.success("Agent deleted successfully");
       router.push("/dashboard/agents");
     } catch (err) {
-      console.error("Failed to delete agent:", err);
+      console.error("❌ Failed to delete agent:", err);
+      toast.error(err?.message || "Unable to delete this agent. Please try again.");
       setDeleteError(
         err?.message || "Unable to delete this agent. Please try again."
       );
+      // specific error: still open modal? no we want to close it maybe?
+      // Actually usually keep it open or close it. I'll close it.
+      setDeleteDialogState(prev => ({ ...prev, isOpen: false }));
     } finally {
       setIsDeleting(false);
     }
@@ -1500,14 +1533,14 @@ export default function AgentDetailPage() {
   // Loading state
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF6F1] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-primary flex items-center justify-center mx-auto">
-            <Loader2 className="h-8 w-8 text-white animate-spin" />
+          <div className="w-16 h-16 rounded-2xl bg-[#2D2216] flex items-center justify-center mx-auto shadow-lg">
+            <Loader2 className="h-8 w-8 text-[#E68A44] animate-spin" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">Loading Agent</h3>
-            <p className="text-sm text-muted-foreground">Please wait while we fetch your agent details...</p>
+            <h3 className="text-lg font-bold text-[#2D2216]">Loading Agent</h3>
+            <p className="text-sm text-[#5D4037]">Please wait while we fetch your agent details...</p>
           </div>
         </div>
       </div>
@@ -1542,7 +1575,7 @@ export default function AgentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#FAF6F1]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header Section */}
         <motion.div
@@ -1550,13 +1583,13 @@ export default function AgentDetailPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
             <CardContent className="p-6 md:p-8">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg">
-                      <Bot className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#2D2216] flex items-center justify-center shadow-lg">
+                      <Bot className="h-8 w-8 md:h-10 md:w-10 text-[#E68A44]" />
                     </div>
                     {/* Status Indicator */}
                     <div className={cn(
@@ -1566,13 +1599,13 @@ export default function AgentDetailPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-2xl md:text-3xl font-bold text-foreground break-words mb-2">
+                    <h1 className="text-2xl md:text-3xl font-bold text-[#2D2216] break-words mb-2">
                       {agent.name}
                     </h1>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-[#5D4037]">
                       <div className="flex items-center gap-1">
-                        <span className="text-xs uppercase tracking-wide font-medium">ID:</span>
-                        <code className="px-2 py-1 rounded-lg bg-card dark:bg-gray-800 text-xs font-mono break-all">
+                        <span className="text-xs uppercase tracking-wide font-bold opacity-70">ID:</span>
+                        <code className="px-2 py-1 rounded-lg bg-[#FAF6F1] border border-[#E0D4BC] text-xs font-mono break-all text-[#2D2216]">
                           {agent.id}
                         </code>
                       </div>
@@ -1588,16 +1621,18 @@ export default function AgentDetailPage() {
                 <div className="flex flex-wrap items-center gap-3 flex-shrink-0">
                   <Link
                     href={`/dashboard/agents/${agent.id}/edit`}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background hover:bg-card dark:bg-gray-800 transition-smooth text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2D2216] hover:bg-[#1A1410] text-white transition-all text-sm font-semibold shadow-lg hover:shadow-xl"
                   >
                     <Settings className="h-4 w-4" />
                     Edit
                   </Link>
                   <Button
-                    onClick={handleDelete}
+                    type="button"
+                    onClick={handleDeleteClick}
                     disabled={isDeleting}
-                    variant="destructive"
                     size="sm"
+                    style={{ background: '#DC2626' }}
+                    className="text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:bg-red-700"
                   >
                     {isDeleting ? (
                       <>
@@ -1612,8 +1647,13 @@ export default function AgentDetailPage() {
                     )}
                   </Button>
                   <Badge
-                    variant={agent.status === "ACTIVE" ? "success" : "muted"}
-                    className="px-3 py-1 text-xs font-semibold"
+                    variant={agent.status === "ACTIVE" ? "success" : "secondary"}
+                    className={cn(
+                      "px-3 py-1 text-xs font-semibold rounded-full",
+                      agent.status === "ACTIVE"
+                        ? "bg-[#E6F4EA] text-[#1E8E3E] border border-[#CEEAD6]"
+                        : "bg-[#FAF6F1] text-[#5D4037] border border-[#E0D4BC]"
+                    )}
                   >
                     {agent.status || "UNKNOWN"}
                   </Badge>
@@ -1623,6 +1663,10 @@ export default function AgentDetailPage() {
           </Card>
         </motion.div>
 
+        {/* 2-Column Layout: Info (Left) | Test Chat (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Agent Information */}
+          <div className="lg:col-span-2 space-y-8">
         {/* Google Auth Section */}
         {showGoogleIntegrationCard && (
           <motion.div
@@ -1631,22 +1675,24 @@ export default function AgentDetailPage() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <Card className="border border-border bg-card shadow-lg">
+            <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-blue-600" />
-                    <CardTitle className="text-lg">Google Integration</CardTitle>
+                    <div className="w-8 h-8 rounded-lg bg-[#2D2216]/5 flex items-center justify-center">
+                         <Shield className="h-5 w-5 text-[#2D2216]" />
+                    </div>
+                    <CardTitle className="text-lg font-bold text-[#2D2216]">Google Integration</CardTitle>
                   </div>
                   <Badge
-                    variant={googleAuthConnected ? "success" : googleAuthPending ? "warning" : "muted"}
+                    variant={googleAuthConnected ? "success" : googleAuthPending ? "warning" : "secondary"}
                     className={cn(
-                      "px-3 py-1 text-xs font-semibold",
+                      "px-3 py-1 text-xs font-semibold rounded-full border shadow-sm",
                       googleAuthConnected
-                        ? "bg-emerald-100 text-emerald-700"
+                        ? "bg-[#E6F4EA] text-[#1E8E3E] border-[#CEEAD6]"
                         : googleAuthPending
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-slate-200 text-slate-700"
+                        ? "bg-[#FEF7E0] text-[#B06000] border-[#FCE8B2]"
+                        : "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]"
                     )}
                   >
                     {googleAuthConnected
@@ -1729,12 +1775,8 @@ export default function AgentDetailPage() {
                   <Button
                     onClick={openGoogleConnectModal}
                     disabled={googleAuthChecking || googleAuthStarting}
-                    className={cn(
-                      "text-white shadow-lg",
-                      googleAuthConnected
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                        : "bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700"
-                    )}
+                    style={{ background: '#2D2216' }}
+                    className="text-white shadow-lg rounded-xl font-medium transition-all duration-200 hover:opacity-90"
                   >
                     {googleAuthStarting ? (
                       <>
@@ -1794,10 +1836,10 @@ export default function AgentDetailPage() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-[#2D2216]">
+                <Settings className="h-5 w-5 text-[#E68A44]" />
                 Configuration
               </CardTitle>
             </CardHeader>
@@ -1805,19 +1847,19 @@ export default function AgentDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4 text-primary" />
+                    <Smartphone className="h-4 w-4 text-[#E68A44]" />
                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Channel</span>
                   </div>
-                  <p className="text-sm bg-card dark:bg-gray-800 rounded-lg px-3 py-2 border border-border">
+                  <p className="text-sm bg-[#FAF6F1] rounded-xl px-3 py-2 border border-[#E0D4BC] text-[#2D2216]">
                     {agentDescription?.includes('WhatsApp') ? 'WhatsApp' : 'Default'}
                   </p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
+                    <FileText className="h-4 w-4 text-[#E68A44]" />
                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Created</span>
                   </div>
-                  <p className="text-sm bg-card dark:bg-gray-800 rounded-lg px-3 py-2 border border-border">
+                  <p className="text-sm bg-[#FAF6F1] rounded-xl px-3 py-2 border border-[#E0D4BC] text-[#2D2216]">
                     {agent.created_at ? formatDateTime(agent.created_at) : "Unknown"}
                   </p>
                 </div>
@@ -1826,13 +1868,28 @@ export default function AgentDetailPage() {
               {(agent.config?.system_message || agent.config?.system_prompt) && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
+                    <FileText className="h-4 w-4 text-[#E68A44]" />
                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">System Prompt</span>
                   </div>
                   <div className="relative">
-                    <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground bg-card dark:bg-gray-800 rounded-xl p-4 border border-border overflow-x-auto font-mono">
+                    <pre className={cn(
+                      "whitespace-pre-wrap text-sm leading-relaxed text-[#2D2216] bg-[#FAF6F1] rounded-2xl p-4 border border-[#E0D4BC] font-mono overflow-hidden transition-all duration-300",
+                      isSystemPromptExpanded ? "max-h-none" : "max-h-32"
+                    )}>
                       {agent.config.system_message || agent.config.system_prompt}
                     </pre>
+                    {/* Read More Toggle */}
+                    <div className={cn(
+                      "flex justify-center",
+                      !isSystemPromptExpanded && "absolute bottom-0 left-0 right-0 pt-8 bg-gradient-to-t from-[#FAF6F1] to-transparent pb-2 rounded-b-2xl"
+                    )}>
+                      <button
+                        onClick={() => setIsSystemPromptExpanded(!isSystemPromptExpanded)}
+                        className="text-xs font-semibold text-[#E68A44] hover:text-[#D5793B] bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full border border-[#E0D4BC] hover:bg-white transition-all shadow-sm"
+                      >
+                        {isSystemPromptExpanded ? "Read Less" : "Read More"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1842,7 +1899,7 @@ export default function AgentDetailPage() {
                 <div className="border-t border-border pt-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-gradient-to-br from-red-500 to-blue-500 flex items-center justify-center">
+                      <div className="w-5 h-5 rounded bg-gradient-to-br from-[#EA4335] to-[#4285F4] flex items-center justify-center">
                         <div className="w-3 h-3 bg-white rounded-sm"></div>
                       </div>
                       <CardTitle className="text-lg">Google Integration</CardTitle>
@@ -1855,7 +1912,7 @@ export default function AgentDetailPage() {
                     </Badge>
                   </div>
 
-                  <div className="bg-card dark:bg-gray-800 rounded-xl p-4 border border-border">
+                  <div className="bg-[#FAF6F1]/50 rounded-2xl p-5 border border-[#E0D4BC]">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
                         {googleAuthInfo.status === 'connected' ? (
@@ -1866,13 +1923,13 @@ export default function AgentDetailPage() {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-foreground mb-1">
+                        <h4 className="text-sm font-bold text-[#2D2216] mb-1">
                           {googleAuthInfo.status === 'connected'
                             ? 'Google Workspace Connected'
                             : 'Google Workspace Required'}
                         </h4>
 
-                        <p className="text-xs text-muted-foreground mb-3">
+                        <p className="text-xs text-[#5D4037] mb-3 leading-relaxed">
                           {googleAuthInfo.status === 'connected'
                             ? 'Your agent can access Gmail and Calendar to perform automated tasks.'
                             : 'Connect your Google account to enable Gmail and Calendar automation for this agent.'}
@@ -1893,13 +1950,13 @@ export default function AgentDetailPage() {
                             }
 
                             return (
-                              <div key={index} className="flex items-center gap-1 px-2 py-1 bg-surface dark:bg-gray-700 rounded-lg border border-surface-strong dark:border-gray-600">
+                              <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg border border-[#E0D4BC] shadow-sm">
                                 {icon === Mail ? (
-                                  <Mail className="h-3 w-3 text-red-500" />
+                                  <Mail className="h-3.5 w-3.5 text-[#EA4335]" />
                                 ) : (
-                                  <Calendar className="h-3 w-3 text-blue-500" />
+                                  <Calendar className="h-3.5 w-3.5 text-[#4285F4]" />
                                 )}
-                                <span className="text-xs font-medium text-foreground">{label}</span>
+                                <span className="text-xs font-semibold text-[#2D2216]">{label}</span>
                               </div>
                             );
                           })}
@@ -1921,164 +1978,7 @@ export default function AgentDetailPage() {
                 </div>
               )}
 
-              {/* WhatsApp Section - Apple Style */}
-              <div className="border-t border-border/50 pt-6 space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-                      <Smartphone className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg font-semibold">WhatsApp Integration</CardTitle>
-                      <p className="text-sm text-muted-foreground">Connect your agent to WhatsApp messaging</p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={agent?.whatsapp_connected ? "success" : "muted"}
-                    className={cn(
-                      "px-3 py-1 text-xs font-full rounded-full",
-                      agent?.whatsapp_connected
-                        ? "bg-green-100 text-green-700 border-green-200"
-                        : "bg-gray-100 text-gray-700 border-gray-200"
-                    )}
-                  >
-                    {agent?.whatsapp_connected
-                      ? "Connected"
-                      : agent?.whatsapp_status === 'not_connected'
-                      ? "No Session"
-                      : "Not Connected"}
-                  </Badge>
-                </div>
 
-                {whatsAppErrors[agent?.id] && !showWhatsAppQr && (
-                  <div className="p-4 rounded-xl bg-red-50/80 border border-red-200/80 backdrop-blur-sm">
-                    <p className="text-sm text-red-700">{whatsAppErrors[agent.id]}</p>
-                  </div>
-                )}
-
-                <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
-                        agent?.whatsapp_connected
-                          ? "bg-green-100"
-                          : "bg-gray-100"
-                      )}>
-                        {agent?.whatsapp_connected ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <AlertCircle className="h-4 w-4 text-gray-500" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {agent?.whatsapp_connected
-                            ? "WhatsApp is connected and ready"
-                            : agent?.whatsapp_status === 'not_connected'
-                            ? "No WhatsApp session created yet"
-                            : "Connect WhatsApp to enable messaging"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {agent?.last_message_at
-                            ? `Last active: ${new Date(agent.last_message_at).toLocaleDateString()}`
-                            : agent?.whatsapp_status === 'not_connected'
-                            ? "Create a session to start using WhatsApp"
-                            : "No recent activity"
-                          }
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        onClick={handleRefreshWhatsAppStatus}
-                        disabled={Boolean(whatsAppRefreshMap[agent?.id])}
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 px-3 rounded-full border border-border/50 hover:bg-background/80"
-                      >
-                        <RefreshCw className={cn("h-3 w-3", whatsAppRefreshMap[agent?.id] && "animate-spin")} />
-                        <span className="ml-1 text-xs">
-                          {whatsAppRefreshMap[agent?.id] ? "Refreshing..." : "Refresh"}
-                        </span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 pt-2">
-                    {!agent?.whatsapp_connected ? (
-                      <Button
-                        onClick={handleConnectWhatsApp}
-                        disabled={Boolean(whatsAppRefreshMap[agent?.id])}
-                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-full px-6"
-                      >
-                        <MessageCircle className="h-4 w-4 mr-2" />
-                        Connect WhatsApp
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          onClick={handleConnectWhatsApp}
-                          disabled={Boolean(whatsAppRefreshMap[agent?.id])}
-                          variant="outline"
-                          className="border-green-200 text-green-700 hover:bg-green-50 rounded-full px-6"
-                        >
-                          <QrCode className="h-4 w-4 mr-2" />
-                          Re-link Device
-                        </Button>
-
-                        <Button
-                          onClick={handleDisconnectWhatsApp}
-                          disabled={Boolean(whatsAppRefreshMap[agent?.id])}
-                          variant="outline"
-                          className="border-red-200 text-red-700 hover:bg-red-50 rounded-full px-6"
-                        >
-                          <WifiOff className="h-4 w-4 mr-2" />
-                          Disconnect
-                        </Button>
-
-                        <Button
-                          onClick={handleWhatsAppDelete}
-                          disabled={whatsAppDeleting || Boolean(whatsAppRefreshMap[agent?.id])}
-                          variant="outline"
-                          className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full px-4"
-                          title="Delete WhatsApp Session"
-                        >
-                          {whatsAppDeleting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              <Trash2 className="h-4 w-4" />
-                              <span className="ml-2 hidden sm:inline">Delete Session</span>
-                            </>
-                          )}
-                        </Button>
-                      </>
-                    )}
-
-                    {/* Show delete session button even when not connected but session exists */}
-                    {(!agent?.whatsapp_connected && agent?.whatsapp_status !== 'not_connected') && (
-                      <Button
-                        onClick={handleWhatsAppDelete}
-                        disabled={whatsAppDeleting || Boolean(whatsAppRefreshMap[agent?.id])}
-                        variant="outline"
-                        className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 rounded-full px-4"
-                        title="Delete WhatsApp Session"
-                      >
-                        {whatsAppDeleting ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Trash2 className="h-4 w-4" />
-                            <span className="ml-2 hidden sm:inline">Delete Session</span>
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -2090,7 +1990,7 @@ export default function AgentDetailPage() {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="h-5 w-5" />
@@ -2098,7 +1998,7 @@ export default function AgentDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-[#5D4037] leading-relaxed">
                 Upload up to 10 documents (PDF, PPTX, DOCX, TXT), 20 MB per file, to enrich this agent&apos;s context.
               </div>
 
@@ -2150,7 +2050,7 @@ export default function AgentDetailPage() {
 
                       setSelectedKnowledgeFiles(files);
                     }}
-                    className="w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/80"
+                    className="w-full text-sm text-[#5D4037] cursor-pointer file:mr-4 file:rounded-xl file:border-0 file:bg-[#2D2216] file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white file:cursor-pointer hover:file:bg-[#1A1410] file:transition-all"
                     disabled={knowledgeUploading}
                   />
                   <Button
@@ -2176,9 +2076,11 @@ export default function AgentDetailPage() {
                           : [];
                         setKnowledge(items);
                         setKnowledgeSuccess("Knowledge uploaded successfully.");
+                        toast.success("Knowledge uploaded successfully");
                         setSelectedKnowledgeFiles([]);
                         setKnowledgeInputKey(Date.now());
                       } catch (err) {
+                        toast.error(err?.message || "Failed to upload knowledge. Please try again.");
                         setKnowledgeError(
                           err?.message || "Failed to upload knowledge. Please try again."
                         );
@@ -2189,7 +2091,8 @@ export default function AgentDetailPage() {
                     disabled={
                       knowledgeUploading || selectedKnowledgeFiles.length === 0
                     }
-                    className="w-full"
+                    style={{ background: '#2D2216' }}
+                    className="w-full text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all hover:opacity-90"
                   >
                     {knowledgeUploading ? (
                       <>
@@ -2206,16 +2109,16 @@ export default function AgentDetailPage() {
                 </div>
 
                 {selectedKnowledgeFiles.length > 0 && (
-                  <div className="rounded-lg border border-dashed border-border bg-card dark:bg-gray-800 p-3">
-                    <p className="text-sm font-medium text-foreground mb-2">
+                  <div className="rounded-xl border border-dashed border-[#E0D4BC] bg-[#FAF6F1]/50 p-4">
+                    <p className="text-sm font-medium text-[#2D2216] mb-2">
                       Files ready to upload:
                     </p>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
+                    <ul className="space-y-2 text-sm text-[#5D4037]">
                       {selectedKnowledgeFiles.map((file) => (
                         <li key={file.name} className="break-all flex items-center gap-2">
-                          <FileText className="h-3 w-3" />
+                          <FileText className="h-4 w-4 text-[#E68A44]" />
                           <span>{file.name}</span>
-                          <span className="text-xs">
+                          <span className="text-xs opacity-70">
                             ({formatBytes(file.size)})
                           </span>
                         </li>
@@ -2231,7 +2134,7 @@ export default function AgentDetailPage() {
                 </h3>
                 {knowledgeLoading ? (
                   <div className="flex items-center justify-center py-6">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[#E68A44]" />
                   </div>
                 ) : knowledge.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
@@ -2242,7 +2145,7 @@ export default function AgentDetailPage() {
                     {knowledge.map((doc) => (
                       <div
                         key={doc.id}
-                        className="rounded-lg border border-border bg-card dark:bg-gray-800 p-3 sm:p-4"
+                        className="rounded-xl border border-[#E0D4BC] bg-white p-4 shadow-sm"
                       >
                         <div className="flex flex-col gap-3 text-sm">
                           <div className="flex items-start justify-between gap-2">
@@ -2257,41 +2160,22 @@ export default function AgentDetailPage() {
                               </p>
                             </div>
                             <Button
-                              onClick={async () => {
-                                if (!agent) return;
-                                const documentId =
-                                  doc?.id || doc?.upload_id || doc?.uploadId || null;
+                              type="button"
+                              onClick={() => {
+                                const documentId = doc?.id || doc?.upload_id || doc?.uploadId;
                                 if (!documentId) {
-                                  setKnowledgeError("Unable to determine document identifier.");
-                                  return;
+                                   toast.error("Invalid document ID");
+                                   return;
                                 }
-
-                                const confirmed = window.confirm(
-                                  `Remove "${doc?.filename || "this document"}" from this agent?`
-                                );
-                                if (!confirmed) return;
-
-                                try {
-                                  setKnowledgeError("");
-                                  setKnowledgeSuccess("");
-                                  await apiService.deleteAgentDocument(agent.id, documentId);
-                                  setKnowledgeSuccess("Knowledge document deleted.");
-                                  // Refresh knowledge list
-                                  const docs = await apiService.getAgentDocuments(agent.id);
-                                  const items = Array.isArray(docs)
-                                    ? docs
-                                    : Array.isArray(docs?.items)
-                                    ? docs.items
-                                    : Array.isArray(docs?.data)
-                                    ? docs.data
-                                    : [];
-                                  setKnowledge(items);
-                                } catch (err) {
-                                  setKnowledgeError(
-                                    err?.message || "Failed to delete knowledge document. Please try again."
-                                  );
-                                }
+                                setDeleteDialogState({
+                                  isOpen: true,
+                                  type: "RAG",
+                                  data: { documentId, filename: doc.filename },
+                                  title: "Remove Document?",
+                                  description: `Are you sure you want to remove "${doc.filename}"? This will delete all associated knowledge embeddings.`
+                                });
                               }}
+
                               variant="outline"
                               size="sm"
                               className="text-destructive hover:text-destructive flex-shrink-0"
@@ -2322,15 +2206,17 @@ export default function AgentDetailPage() {
             </CardContent>
           </Card>
         </motion.div>
+          </div>
 
+          {/* Right Column - Test Agent Chat (Sticky) */}
+          <div className="lg:col-span-1 space-y-8">
         {/* Test Agent Section */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-8"
         >
-          <Card className="card-shadow border-0 bg-gradient-to-br from-background to-muted/50 dark:from-gray-900 dark:to-gray-800/50">
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
@@ -2343,13 +2229,13 @@ export default function AgentDetailPage() {
               </p>
 
               <div className="space-y-4">
-                <div className="h-64 sm:h-72 overflow-y-auto rounded-lg border border-border bg-card dark:bg-gray-800 p-3 sm:p-4 flex flex-col space-y-3 sm:space-y-4">
+                <div className="h-80 lg:h-[400px] overflow-y-auto rounded-2xl border border-[#E0D4BC] bg-[#FAF6F1] p-4 flex flex-col space-y-4">
                   {chatMessages.length === 0 ? (
                     <div className="m-auto text-center text-sm text-muted-foreground px-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center mx-auto mb-4">
-                        <MessageSquare className="h-6 w-6 text-white" />
+                      <div className="w-12 h-12 rounded-2xl bg-[#2D2216]/5 flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="h-6 w-6 text-[#2D2216]" />
                       </div>
-                      <p className="font-medium">No messages yet</p>
+                      <p className="font-semibold text-[#2D2216]">No messages yet</p>
                       <p className="mt-1">
                         Ask your agent something, for example:{" "}
                         <span className="italic">
@@ -2361,10 +2247,10 @@ export default function AgentDetailPage() {
                     chatMessages.map((message) => {
                       const isUser = message.role === "user";
                       const bubbleClasses = isUser
-                        ? "ml-auto bg-primary text-primary-foreground"
+                        ? "ml-auto bg-[#2D2216] text-[#FAF6F1] shadow-md"
                         : message.error
-                        ? "mr-auto bg-destructive text-destructive-foreground"
-                        : "mr-auto bg-card dark:bg-gray-800 text-foreground";
+                        ? "mr-auto bg-red-50 text-red-900 border border-red-200"
+                        : "mr-auto bg-white text-[#2D2216] border border-[#E0D4BC] shadow-sm";
 
                       return (
                         <div key={message.id} className="max-w-[85%] sm:max-w-[80%]">
@@ -2467,19 +2353,22 @@ export default function AgentDetailPage() {
                   }}
                   className="flex items-center gap-2 sm:gap-3"
                 >
-                  <input
-                    type="text"
-                    value={chatInput}
-                    onChange={(event) => setChatInput(event.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1 rounded-full border border-border bg-card dark:bg-gray-800 px-3 py-2 sm:px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    disabled={isSending}
-                  />
+                  <div className="relative flex-1 min-w-0">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(event) => setChatInput(event.target.value)}
+                      placeholder="Type a message..."
+                      className="w-full rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-sm text-[#2D2216] placeholder:text-[#5D4037]/50 focus:outline-none focus:ring-2 focus:ring-[#E68A44]/20 focus:border-[#E68A44] transition-all pr-4"
+                      disabled={isSending}
+                    />
+                  </div>
                   <Button
                     type="submit"
                     disabled={isSending || !chatInput.trim()}
                     size="sm"
-                    className="rounded-full"
+                    style={{ background: '#2D2216' }}
+                    className="rounded-xl text-white shadow-lg hover:shadow-xl transition-all hover:opacity-90 px-4"
                   >
                     {isSending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -2493,7 +2382,100 @@ export default function AgentDetailPage() {
           </Card>
         </motion.div>
 
+        {/* WhatsApp Integration (Moved to Right Column) */}
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+        >
+          <Card className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-[#2D2216] flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#25D366] flex items-center justify-center shadow-md">
+                    <Smartphone className="h-5 w-5 text-white" />
+                  </div>
+                  WhatsApp
+                </CardTitle>
+                <Badge
+                    variant={agent?.whatsapp_connected ? "success" : "secondary"}
+                    className={cn(
+                      "px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md",
+                      agent?.whatsapp_connected
+                        ? "bg-[#E6F4EA] text-[#1E8E3E] border border-[#CEEAD6]"
+                        : "bg-[#FAF6F1] text-[#5D4037] border border-[#E0D4BC]"
+                    )}
+                  >
+                    {agent?.whatsapp_connected ? "Active" : "Offline"}
+                  </Badge>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {whatsAppErrors[agent?.id] && !showWhatsAppQr && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-xs text-red-600">
+                    {whatsAppErrors[agent.id]}
+                  </div>
+                )}
+
+                <div className="bg-[#FAF6F1] rounded-xl border border-[#E0D4BC] p-4 text-center space-y-3 min-h-[200px] flex flex-col justify-center">
+                    <p className="text-xs text-[#5D4037] leading-relaxed">
+                        {agent?.whatsapp_connected
+                            ? "Agent is actively responding to messages on WhatsApp."
+                            : (whatsAppErrors[agent?.id] || "").includes("session already exists") 
+                                ? "A session already exists. Please delete it before connecting again."
+                                : "Connect your agent to enable WhatsApp messaging capabilities."}
+                    </p>
+
+                    {(whatsAppErrors[agent?.id] || "").includes("session already exists") ? (
+                        <Button
+                            type="button"
+                            onClick={handleWhatsAppDeleteClick}
+                            disabled={whatsAppDeleting || Boolean(whatsAppRefreshMap[agent?.id])}
+                            style={{ background: '#DC2626' }}
+                            className="w-full text-white shadow-md hover:shadow-lg transition-all rounded-xl font-medium"
+                        >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Existing Session
+                        </Button>
+                    ) : !agent?.whatsapp_connected ? (
+                      <Button
+                        onClick={handleConnectWhatsApp}
+                        disabled={Boolean(whatsAppRefreshMap[agent?.id])}
+                        style={{ background: '#25D366' }}
+                        className="w-full text-white shadow-md hover:shadow-lg transition-all rounded-xl font-medium"
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Connect WhatsApp
+                      </Button>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          onClick={handleConnectWhatsApp}
+                          disabled={Boolean(whatsAppRefreshMap[agent?.id])}
+                          variant="outline"
+                          className="w-full border-green-200 text-green-700 hover:bg-green-50 rounded-xl"
+                        >
+                          <QrCode className="h-4 w-4 mr-2" />
+                          Re-scan QR
+                        </Button>
+                        <Button
+                          onClick={handleDisconnectWhatsApp}
+                          disabled={Boolean(whatsAppRefreshMap[agent?.id])}
+                          variant="outline"
+                          className="w-full border-red-200 text-red-700 hover:bg-red-50 rounded-xl"
+                        >
+                          <WifiOff className="h-4 w-4 mr-2" />
+                          Disconnect
+                        </Button>
+                      </div>
+                    )}
+                </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+          </div>
+        </div>
+      </div>
 
       {/* WhatsApp QR Modal - Apple Style */}
       {showWhatsAppQr && (
@@ -2646,7 +2628,7 @@ export default function AgentDetailPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-2xl rounded-3xl bg-card border border-border p-6 max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-2xl rounded-3xl bg-white/95 backdrop-blur-xl border border-[#E0D4BC] p-6 max-h-[90vh] overflow-y-auto shadow-2xl"
           >
             <Button
               onClick={() => {
@@ -2743,7 +2725,7 @@ export default function AgentDetailPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-lg rounded-3xl bg-card border border-border p-6 max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-lg rounded-3xl bg-white/95 backdrop-blur-xl border border-[#E0D4BC] p-6 max-h-[90vh] overflow-y-auto shadow-2xl"
           >
             <Button
               onClick={closeGoogleConnectModal}
@@ -2820,6 +2802,39 @@ export default function AgentDetailPage() {
           </motion.div>
         </div>
       )}
+
+      <Toaster position="top-center" />
+      <DeleteConfirmationDialog 
+        isOpen={deleteDialogState.isOpen}
+        title={deleteDialogState.title}
+        description={deleteDialogState.description}
+        isDeleting={isDeleting || whatsAppDeleting || isRagDeleting}
+        onCancel={() => setDeleteDialogState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={async () => {
+          if (deleteDialogState.type === "AGENT") {
+            await executeAgentDelete();
+          } else if (deleteDialogState.type === "WHATSAPP") {
+            await executeWhatsAppDelete();
+          } else if (deleteDialogState.type === "RAG") {
+             // RAG Execute Inline
+             if (!agent?.id || !deleteDialogState.data?.documentId) return;
+             setIsRagDeleting(true);
+             try {
+                await apiService.deleteAgentDocument(agent.id, deleteDialogState.data.documentId);
+                toast.success("Knowledge document deleted");
+                // Refresh
+                const docs = await apiService.getAgentDocuments(agent.id);
+                const items = Array.isArray(docs) ? docs : (docs?.items || docs?.data || []);
+                setKnowledge(items);
+                setDeleteDialogState(prev => ({ ...prev, isOpen: false }));
+             } catch(err) {
+                toast.error(err?.message || "Failed to delete document");
+             } finally {
+                setIsRagDeleting(false);
+             }
+          }
+        }}
+      />
     </div>
   );
 }
