@@ -1124,24 +1124,25 @@ export default function AgentForm({
                 className={`
                   relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasGmailTools
-                    ? 'border-[#EA4335]/50 bg-[#EA4335]/5 shadow-lg shadow-[#EA4335]/10'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50 hover:bg-[#EA4335]/5'
+                    ? 'border-[#EA4335] bg-white ring-1 ring-[#EA4335]/20'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#EA4335]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <Mail className="h-7 w-7 text-[#EA4335]" />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${hasGmailTools ? 'bg-[#EA4335]/10 scale-110' : 'bg-[#FAF6F1] group-hover:scale-110'}`}>
+                    <Mail className={`h-7 w-7 transition-colors ${hasGmailTools ? 'text-[#EA4335]' : 'text-[#8D7F71] group-hover:text-[#EA4335]'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2D2216] text-sm">Gmail</h3>
+                    <h3 className={`font-bold text-sm transition-colors ${hasGmailTools ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>Gmail</h3>
                     <p className="text-xs text-[#8D7F71]">Email automation</p>
                   </div>
                 </div>
                 {hasGmailTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#EA4335] rounded-full shadow-sm ring-2 ring-white"></div>
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#EA4335] rounded-full flex items-center justify-center shadow-sm">
+                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                  </div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Calendar Card */}
@@ -1150,24 +1151,25 @@ export default function AgentForm({
                 className={`
                   relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasCalendarTools
-                    ? 'border-[#4285F4]/50 bg-[#4285F4]/5 shadow-lg shadow-[#4285F4]/10'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
+                    ? 'border-[#4285F4] bg-white ring-1 ring-[#4285F4]/20'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#4285F4]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <Calendar className="h-7 w-7 text-[#4285F4]" />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${hasCalendarTools ? 'bg-[#4285F4]/10 scale-110' : 'bg-[#FAF6F1] group-hover:scale-110'}`}>
+                    <Calendar className={`h-7 w-7 transition-colors ${hasCalendarTools ? 'text-[#4285F4]' : 'text-[#8D7F71] group-hover:text-[#4285F4]'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2D2216] text-sm">Calendar</h3>
+                    <h3 className={`font-bold text-sm transition-colors ${hasCalendarTools ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>Calendar</h3>
                     <p className="text-xs text-[#8D7F71]">Event management</p>
                   </div>
                 </div>
                 {hasCalendarTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#4285F4] rounded-full shadow-sm ring-2 ring-white"></div>
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm">
+                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                  </div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Sheets Card */}
@@ -1176,24 +1178,25 @@ export default function AgentForm({
                 className={`
                   relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasSheetsTools
-                    ? 'border-[#34A853]/50 bg-[#34A853]/5 shadow-lg shadow-[#34A853]/10'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50 hover:bg-[#34A853]/5'
+                    ? 'border-[#34A853] bg-white ring-1 ring-[#34A853]/20'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#34A853]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <FileSpreadsheet className="h-7 w-7 text-[#34A853]" />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${hasSheetsTools ? 'bg-[#34A853]/10 scale-110' : 'bg-[#FAF6F1] group-hover:scale-110'}`}>
+                    <FileSpreadsheet className={`h-7 w-7 transition-colors ${hasSheetsTools ? 'text-[#34A853]' : 'text-[#8D7F71] group-hover:text-[#34A853]'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2D2216] text-sm">Sheets</h3>
+                    <h3 className={`font-bold text-sm transition-colors ${hasSheetsTools ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>Sheets</h3>
                     <p className="text-xs text-[#8D7F71]">Spreadsheets</p>
                   </div>
                 </div>
                 {hasSheetsTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#34A853] rounded-full shadow-sm ring-2 ring-white"></div>
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#34A853] rounded-full flex items-center justify-center shadow-sm">
+                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                  </div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Docs Card */}
@@ -1202,24 +1205,25 @@ export default function AgentForm({
                 className={`
                   relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasDocsTools
-                    ? 'border-[#4285F4]/50 bg-[#4285F4]/5 shadow-lg shadow-[#4285F4]/10'
-                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
+                    ? 'border-[#4285F4] bg-white ring-1 ring-[#4285F4]/20'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#4285F4]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <FileText className="h-7 w-7 text-[#4285F4]" />
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${hasDocsTools ? 'bg-[#4285F4]/10 scale-110' : 'bg-[#FAF6F1] group-hover:scale-110'}`}>
+                    <FileText className={`h-7 w-7 transition-colors ${hasDocsTools ? 'text-[#4285F4]' : 'text-[#8D7F71] group-hover:text-[#4285F4]'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2D2216] text-sm">Docs</h3>
+                    <h3 className={`font-bold text-sm transition-colors ${hasDocsTools ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>Docs</h3>
                     <p className="text-xs text-[#8D7F71]">Documents</p>
                   </div>
                 </div>
                 {hasDocsTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#4285F4] rounded-full shadow-sm ring-2 ring-white"></div>
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-[#4285F4] rounded-full flex items-center justify-center shadow-sm">
+                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                  </div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
 
@@ -1299,34 +1303,36 @@ export default function AgentForm({
                     className={`
                       relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                       ${isEnabled
-                        ? 'border-[#E68A44]/50 bg-[#E68A44]/5 shadow-lg shadow-[#E68A44]/10'
+                        ? 'border-[#E68A44] bg-white ring-1 ring-[#E68A44]/20'
                         : isLocked
                         ? 'border-[#E0D4BC] bg-[#FAF6F1] cursor-not-allowed opacity-70'
-                        : 'border-[#E0D4BC] bg-white hover:border-[#E68A44]/50 hover:bg-[#E68A44]/5'
+                        : 'border-[#E0D4BC] bg-white hover:border-[#E68A44]/50'
                       }
                     `}
                   >
                     <div className="flex flex-col items-center text-center space-y-3">
                       <div className={`
-                        w-14 h-14 rounded-2xl bg-[#E68A44]/10 flex items-center justify-center shadow-sm
-                        ${!isLocked && 'group-hover:scale-110 transition-transform duration-300'}
+                        w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300
+                        ${isEnabled ? 'bg-[#E68A44]/10 scale-110' : isLocked ? 'bg-[#E0D4BC]/20' : 'bg-[#FAF6F1] group-hover:scale-110'}
                       `}>
-                        <span className="text-2xl opacity-90 grayscale-0">{getIcon(tool.id)}</span>
+                        <span className={`text-2xl transition-all ${isLocked ? 'grayscale opacity-50' : 'grayscale-0'}`}>{getIcon(tool.id)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-[#2D2216] text-sm">{tool.label}</h3>
+                        <h3 className={`font-bold text-sm transition-colors ${isEnabled ? 'text-[#2D2216]' : 'text-[#5D4037]'}`}>{tool.label}</h3>
                         <p className="text-xs text-[#8D7F71] line-clamp-2">{tool.description}</p>
                       </div>
                     </div>
                     {isEnabled && (
-                      <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#E68A44] rounded-full shadow-sm ring-2 ring-white"></div>
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[#E68A44] rounded-full flex items-center justify-center shadow-sm">
+                        <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                      </div>
                     )}
                     {isLocked && (
                       <div className="absolute top-3 right-3">
                         <Lock className="h-4 w-4 text-[#8D7F71]" />
                       </div>
                     )}
-                    {!isLocked && (
+                    {!isLocked && !isEnabled && (
                       <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                     {isLocked && (

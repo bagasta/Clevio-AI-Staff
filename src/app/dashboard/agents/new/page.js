@@ -427,16 +427,14 @@ export default function NewAgentPage() {
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 className="mb-8"
               >
-                <div className="rounded-2xl border border-[#E0D4BC] bg-white/90 backdrop-blur-xl shadow-lg p-4 sm:p-6">
+                <div className="rounded-2xl border border-[#E0D4BC] bg-white/90 backdrop-blur-sm shadow-lg p-4 sm:p-6">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E68A44]/10 flex-shrink-0"
-                      >
-                        <Sparkles className="h-5 w-5 text-[#E68A44]" />
-                      </motion.div>
+                        <div
+                          className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E68A44]/10 flex-shrink-0"
+                        >
+                          <Sparkles className="h-5 w-5 text-[#E68A44]" />
+                        </div>
                       <div>
                         <p className="font-bold text-[#2D2216]">{guidedTourHeading}</p>
                         <p className="text-[#5D4037] text-sm">{guidedTourDescription}</p>
