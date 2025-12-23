@@ -23,9 +23,14 @@ import {
   Globe,
   FileText,
   Calculator,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Play,
+  Pause,
+  StopCircle,
+  AlertTriangle
 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "react-hot-toast"
 
 import { useAuth } from "@/contexts/AuthContext"
 import { apiService } from "@/lib/api"
@@ -61,68 +66,43 @@ const AgentsPageSkeleton = () => (
     {/* Header Skeleton */}
     <div className="flex items-center justify-between">
       <div>
-        <div className="h-8 w-32 bg-muted rounded mb-2" />
-        <div className="h-4 w-64 bg-muted rounded" />
+        <div className="h-8 w-32 bg-[#E0D4BC] rounded mb-2" />
+        <div className="h-4 w-64 bg-[#E0D4BC]/60 rounded" />
       </div>
-      <div className="h-10 w-32 bg-muted rounded" />
+      <div className="h-10 w-32 bg-[#E0D4BC] rounded-xl" />
     </div>
 
     {/* Search Skeleton */}
-    <div className="flex-1 h-10 bg-muted rounded" />
+    <div className="flex-1 h-12 bg-white/50 backdrop-blur-sm rounded-xl border border-[#E0D4BC] shadow-sm" />
 
     {/* Agents Grid Skeleton */}
     <div className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 lg:grid-cols-2">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <Card key={i} className="card-shadow overflow-hidden bg-gradient-to-br from-background to-muted/50 ">
-          {/* Card Header Skeleton */}
-          <div className="h-1 sm:h-2 bg-gradient-to-r from-[#E68A44] via-[#D87A36] to-[#C86A26]"></div>
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-start justify-between mb-4 sm:mb-6">
-              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-muted flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="h-4 sm:h-5 w-3/4 bg-muted rounded mb-1" />
-                  <div className="h-3 sm:h-4 w-1/2 bg-muted rounded" />
-                </div>
-              </div>
-              <div className="h-6 w-16 bg-muted rounded-full flex-shrink-0 ml-2" />
-            </div>
-
-            {/* Description Skeleton */}
-            <div className="space-y-1 mb-3 sm:mb-6">
-              <div className="h-3 sm:h-4 w-full bg-muted rounded" />
-              <div className="h-3 sm:h-4 w-2/3 bg-muted rounded" />
-            </div>
-
-            {/* Capabilities Skeleton */}
-            <div className="mb-3 sm:mb-6">
-              <div className="h-3 w-20 bg-muted rounded mb-2" />
-              <div className="flex flex-wrap gap-2">
-                <div className="h-5 w-16 bg-muted rounded-full" />
-                <div className="h-5 w-20 bg-muted rounded-full" />
-                <div className="h-5 w-18 bg-muted rounded-full" />
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+           {/* Card Header Skeleton */}
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-[#E0D4BC] flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-5 w-3/4 bg-[#E0D4BC] rounded" />
+                <div className="h-4 w-1/2 bg-[#E0D4BC]/60 rounded" />
               </div>
             </div>
+            <div className="h-6 w-16 bg-[#E0D4BC] rounded-full" />
+          </div>
 
-            {/* WhatsApp Status Skeleton */}
-            <div className="bg-muted/30 rounded-lg border p-3 sm:p-4 mb-3 sm:mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className="w-4 h-4 bg-muted rounded-full flex-shrink-0" />
-                <div className="h-3 w-1/2 bg-muted rounded" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-7 w-16 bg-muted rounded" />
-                <div className="h-8 w-20 bg-muted rounded" />
-              </div>
-            </div>
+          {/* Description Skeleton */}
+          <div className="space-y-2 mb-6">
+            <div className="h-4 w-full bg-[#E0D4BC]/40 rounded" />
+            <div className="h-4 w-2/3 bg-[#E0D4BC]/40 rounded" />
+          </div>
 
-            {/* Action Button Skeleton */}
-            <div className="flex items-center justify-between">
-              <div className="h-4 w-20 bg-muted rounded" />
-              <div className="h-8 w-24 bg-muted rounded" />
-            </div>
-          </CardContent>
-        </Card>
+          {/* Footer Skeleton */}
+          <div className="flex items-center justify-between pt-4 border-t border-[#E0D4BC]/30">
+            <div className="h-4 w-20 bg-[#E0D4BC] rounded" />
+            <div className="h-8 w-24 bg-[#E0D4BC] rounded-lg" />
+          </div>
+        </div>
       ))}
     </div>
   </div>
@@ -132,17 +112,17 @@ const EmptyState = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="rounded-xl border border-dashed border-border p-6 sm:p-10 text-center bg-card "
+      className="rounded-2xl border border-[#E0D4BC] p-8 sm:p-12 text-center bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
   >
-    <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto mb-8">
-      <Bot className="h-8 w-8 text-white" />
+    <div className="w-20 h-20 rounded-2xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-[#2D2216]/10">
+      <Bot className="h-10 w-10 text-white" />
     </div>
 
-    <h3 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
+    <h3 className="text-2xl font-bold text-[#2D2216] mb-4">
       You haven&apos;t created any agents yet
     </h3>
 
-    <p className="text-muted-foreground text-base max-w-md mx-auto mb-8">
+    <p className="text-[#5D4037] text-lg max-w-md mx-auto mb-8">
       Build your first agent to automate workflows across Gmail, WhatsApp, and more.
     </p>
 
@@ -361,11 +341,9 @@ const AgentCard = ({
       className="hover-lift cursor-pointer group w-full h-full"
       onClick={() => onView(agent)}
     >
-      <Card className="card-shadow hover:shadow-2xl transition-all duration-300 overflow-hidden border-0 bg-gradient-to-br from-background to-muted/50 h-full rounded-2xl sm:rounded-3xl ">
-        {/* Card Header with Gradient */}
-        <div className="h-1 sm:h-2 bg-gradient-to-r from-[#E68A44] via-[#D87A36] to-[#C86A26]"></div>
-
-        <CardContent className="p-4 sm:p-6 flex flex-col h-full">
+      <div className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col relative group">
+        
+        <div className="p-6 flex flex-col h-full">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
@@ -539,13 +517,92 @@ const AgentCard = ({
               </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+          </div>
+      </div>
     </motion.div>
   )
 
 }
 
+
+const ConfirmModal = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  title, 
+  message, 
+  isLoading,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  variant = "danger"
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onConfirm: () => void; 
+  title: string; 
+  message: string; 
+  isLoading?: boolean;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: "danger" | "primary";
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative w-full max-w-md rounded-2xl bg-white/90 backdrop-blur-xl border border-[#E0D4BC] shadow-2xl overflow-hidden"
+      >
+        <div className="p-6 text-center">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 ${variant === 'danger' ? 'bg-red-100' : 'bg-[#E68A44]/10'}`}>
+            {variant === 'danger' ? (
+              <AlertTriangle className="h-6 w-6 text-red-600" />
+            ) : (
+              <Bot className="h-6 w-6 text-[#E68A44]" />
+            )}
+          </div>
+
+          <h3 className="text-xl font-bold text-[#2D2216] mb-2">{title}</h3>
+          <p className="text-[#5D4037] mb-6 leading-relaxed">
+            {message}
+          </p>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+              className="flex-1 rounded-xl border-[#E0D4BC] text-[#5D4037] hover:bg-[#FAF6F1]"
+            >
+              {cancelLabel}
+            </Button>
+            <Button
+              variant={variant === "danger" ? "destructive" : "default"}
+              onClick={onConfirm}
+              disabled={isLoading}
+              className={`flex-1 rounded-xl shadow-lg border-0 ${
+                variant === 'danger' 
+                  ? 'bg-red-600 hover:bg-red-700' 
+                  : 'bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08]'
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                confirmLabel
+              )}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 export default function AgentsPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
@@ -562,6 +619,23 @@ export default function AgentsPage() {
     agent: null,
     qrCode: null
   })
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isLoading?: boolean;
+    variant?: "danger" | "primary";
+    confirmLabel?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    isLoading: false
+  })
+  
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const closeQrModal = useCallback(() => {
@@ -811,6 +885,17 @@ export default function AgentsPage() {
                   : a
               )
             )
+            toast.success("WhatsApp connected successfully!", {
+                style: {
+                  background: '#F6FBF9',
+                  color: '#2D3A3A',
+                  border: '1px solid #E0F2F1',
+                },
+                iconTheme: {
+                  primary: '#0F766E',
+                  secondary: '#F0FDF4',
+                },
+            })
           }
         } catch (error) {
           console.error('Error polling WhatsApp status:', error)
@@ -862,6 +947,9 @@ export default function AgentsPage() {
       )
 
       console.log(`Successfully disconnected WhatsApp for agent: ${agent.id}`)
+      toast.success("WhatsApp disconnected", {
+        icon: '🔌'
+      })
 
       // Optional: Refresh status after a short delay to ensure backend is updated
       setTimeout(async () => {
@@ -890,56 +978,64 @@ export default function AgentsPage() {
   const handleDeleteWhatsAppSession = async (agent: Agent) => {
     const agentId = agent.id
 
-    const confirmed = typeof window !== "undefined"
-      ? window.confirm("Delete WhatsApp session for this agent?")
-      : true
-    if (!confirmed) {
-      return
-    }
+    setConfirmModal({
+        isOpen: true,
+        title: "Disconnect & Delete Session?",
+        message: "This will disconnect WhatsApp and remove the session permanently. You will need to scan the QR code again to reconnect.",
+        variant: "danger",
+        confirmLabel: "Delete Session",
+        onConfirm: async () => {
+             // Clear error for this agent
+            setWhatsAppErrors((prev) => {
+            const next = { ...prev }
+            delete next[agentId]
+            return next
+            })
 
-    // Clear error for this agent
-    setWhatsAppErrors((prev) => {
-      const next = { ...prev }
-      delete next[agentId]
-      return next
+            setWhatsAppDeleteMap((prev) => ({ ...prev, [agentId]: true }))
+            setConfirmModal(prev => ({ ...prev, isLoading: true }))
+
+            try {
+            await apiService.ensureApiKey()
+            await apiService.deleteWhatsAppSession(agentId)
+
+            // Update local state to reflect deletion
+            setAgents((prevAgents) =>
+                prevAgents.map((a) =>
+                a.id === agentId
+                    ? {
+                        ...a,
+                        whatsapp_connected: false,
+                        whatsapp_status: 'disconnected'
+                    }
+                    : a
+                )
+            )
+
+            // Close QR modal if it belongs to the deleted agent
+            if (qrModal.isOpen && qrModal.agent?.id === agentId) {
+                closeQrModal()
+            }
+            
+            toast.success("Session deleted successfully")
+            setConfirmModal(prev => ({ ...prev, isOpen: false, isLoading: false }))
+            } catch (error: any) {
+            console.error('Error deleting WhatsApp session:', error)
+            setWhatsAppErrors((prev) => ({
+                ...prev,
+                [agentId]: error?.message || "Unable to delete WhatsApp session. Please try again."
+            }))
+             setConfirmModal(prev => ({ ...prev, isLoading: false, isOpen: false }))
+             toast.error("Failed to delete session")
+            } finally {
+            setWhatsAppDeleteMap((prev) => {
+                const next = { ...prev }
+                delete next[agentId]
+                return next
+            })
+            }
+        }
     })
-
-    setWhatsAppDeleteMap((prev) => ({ ...prev, [agentId]: true }))
-
-    try {
-      await apiService.ensureApiKey()
-      await apiService.deleteWhatsAppSession(agentId)
-
-      // Update local state to reflect deletion
-      setAgents((prevAgents) =>
-        prevAgents.map((a) =>
-          a.id === agentId
-            ? {
-                ...a,
-                whatsapp_connected: false,
-                whatsapp_status: 'disconnected'
-              }
-            : a
-        )
-      )
-
-      // Close QR modal if it belongs to the deleted agent
-      if (qrModal.isOpen && qrModal.agent?.id === agentId) {
-        closeQrModal()
-      }
-    } catch (error: any) {
-      console.error('Error deleting WhatsApp session:', error)
-      setWhatsAppErrors((prev) => ({
-        ...prev,
-        [agentId]: error?.message || "Unable to delete WhatsApp session. Please try again."
-      }))
-    } finally {
-      setWhatsAppDeleteMap((prev) => {
-        const next = { ...prev }
-        delete next[agentId]
-        return next
-      })
-    }
   }
 
   // Filter agents based on search
@@ -1184,6 +1280,18 @@ export default function AgentsPage() {
           </motion.div>
         </div>
       )}
+
+      
+       <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        isLoading={Boolean(confirmModal.isLoading)}
+        variant={confirmModal.variant || "danger"}
+        confirmLabel={confirmModal.confirmLabel || "Confirm"}
+      />
     </div>
   )
 }

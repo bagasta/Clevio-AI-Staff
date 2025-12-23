@@ -36,26 +36,26 @@ const DashboardSkeleton = () => (
     </div>
 
     {/* Recent Agents Skeleton */}
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-[#E0D4BC] shadow-sm animate-pulse">
-      <div className="p-5 border-b border-[#E0D4BC] flex justify-between items-center">
-        <div className="h-6 w-32 bg-[#E0D4BC] rounded" />
-        <div className="h-10 w-20 bg-[#2D2216]/20 rounded-xl" />
-      </div>
-      <div className="p-5 space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#FAF6F1] rounded-xl p-4">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-[#E0D4BC] rounded-xl" />
-              <div className="flex-1 space-y-2">
-                <div className="h-5 w-40 bg-[#E0D4BC] rounded" />
-                <div className="h-3 w-24 bg-[#E0D4BC]/60 rounded" />
+      <div className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <div className="p-5 border-b border-[#E0D4BC] flex justify-between items-center">
+          <div className="h-6 w-32 bg-[#E0D4BC] rounded" />
+          <div className="h-10 w-20 bg-[#2D2216]/10 rounded-xl" />
+        </div>
+        <div className="p-5 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-[#FAF6F1]/50 rounded-xl p-4 border border-[#E0D4BC]/30">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-[#E0D4BC] rounded-xl" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-5 w-40 bg-[#E0D4BC] rounded" />
+                  <div className="h-3 w-24 bg-[#E0D4BC]/60 rounded" />
+                </div>
+                <div className="h-6 w-16 bg-[#E0D4BC] rounded-full" />
               </div>
-              <div className="h-6 w-16 bg-[#E0D4BC] rounded-full" />
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
   </div>
 );
 
