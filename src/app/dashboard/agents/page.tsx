@@ -394,24 +394,24 @@ const AgentCard = ({
 
           {/* Capabilities */}
           <div className="mb-4 sm:mb-6 flex-shrink-0">
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-[13px] text-muted">
-              <span className="font-medium text-muted">Capabilities</span>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-[13px]">
+              <span className="font-medium text-[#8D7F71]">Capabilities</span>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {capabilityList.slice(0, 5).map((capability) => {
                   const Icon = capability.icon;
                   return (
                     <div
                       key={capability.id}
-                      className="w-8 h-8 rounded-lg border border-surface-strong/60 bg-surface flex items-center justify-center group-hover:border-accent transition-colors"
+                      className="w-8 h-8 rounded-lg border border-[#E0D4BC] bg-white flex items-center justify-center group-hover:border-[#E68A44] transition-colors"
                       title={capability.name}
                     >
-                      <Icon className="h-4 w-4 text-muted" />
+                      <Icon className="h-4 w-4 text-[#8D7F71]" />
                     </div>
                   );
                 })}
                 {capabilityList.length > 5 && (
-                  <div className="w-8 h-8 rounded-lg border border-surface-strong/60 bg-surface flex items-center justify-center">
-                    <span className="text-xs font-medium text-muted">
+                  <div className="w-8 h-8 rounded-lg border border-[#E0D4BC] bg-white flex items-center justify-center">
+                    <span className="text-xs font-medium text-[#8D7F71]">
                       +{capabilityList.length - 5}
                     </span>
                   </div>
@@ -421,76 +421,65 @@ const AgentCard = ({
           </div>
 
           {/* WhatsApp Status Section */}
-          <div className={cn(
-            "rounded-lg border p-3 sm:p-4 mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 flex-shrink-0",
-            whatsappConfig.bgColor
-          )}>
-            <div className="flex items-center gap-2 min-w-0">
-              <whatsappConfig.icon className={cn("h-4 w-4 flex-shrink-0", whatsappConfig.color, refreshLoading && "animate-spin")} />
-              <div className="min-w-0">
-                <p className={cn("text-xs font-semibold", whatsappConfig.color)}>
-                  WhatsApp {whatsappConfig.label}
-                </p>
-                {agent.last_message_at && (
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(agent.last_message_at).toLocaleDateString()}
+          <div className="rounded-xl border border-[#E0D4BC] bg-[#FAF6F1] p-3 sm:p-4 mb-4 sm:mb-6 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center",
+                  agent.whatsapp_connected ? "bg-green-100" : "bg-red-100"
+                )}>
+                  <whatsappConfig.icon className={cn("h-4 w-4", agent.whatsapp_connected ? "text-green-600" : "text-red-500", refreshLoading && "animate-spin")} />
+                </div>
+                <div className="min-w-0">
+                  <p className={cn("text-xs font-bold", agent.whatsapp_connected ? "text-green-700" : "text-red-600")}>
+                    WhatsApp {whatsappConfig.label}
                   </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                <button
+                  className="h-8 px-3 text-xs font-semibold rounded-lg border border-[#E0D4BC] bg-white text-[#5D4037] hover:bg-[#FAF6F1] hover:border-[#E68A44] transition-all flex items-center gap-1"
+                  onClick={handleRefreshStatus}
+                  disabled={refreshLoading}
+                >
+                  <RefreshCw className={cn("h-3 w-3", refreshLoading && "animate-spin")} />
+                  <span className="hidden sm:inline">Refresh</span>
+                </button>
+
+                {!agent.whatsapp_connected ? (
+                  <button
+                    className="h-8 px-4 text-xs font-bold rounded-lg bg-gradient-to-b from-[#2D2216] to-[#1A1410] text-white hover:translate-y-[-1px] transition-all shadow-lg flex items-center gap-1"
+                    onClick={handleConnectWhatsApp}
+                  >
+                    <MessageCircle className="h-3 w-3" />
+                    Connect
+                  </button>
+                ) : (
+                  <button
+                    className="h-8 px-4 text-xs font-bold rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-all flex items-center gap-1"
+                    onClick={handleDisconnectWhatsApp}
+                  >
+                    <WifiOff className="h-3 w-3" />
+                    <span className="hidden sm:inline">Disconnect</span>
+                  </button>
                 )}
+
+                <button
+                  className="h-8 px-3 text-xs font-semibold rounded-lg text-red-600 hover:bg-red-50 transition-all flex items-center gap-1"
+                  onClick={handleDeleteWhatsApp}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
               </div>
             </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 sm:h-8 px-2 sm:px-3 text-xs font-semibold rounded-full border border-surface-storng hover:border-accent hover:text-foreground transition-colors"
-                onClick={handleRefreshStatus}
-                disabled={refreshLoading}
-              >
-                <RefreshCw className={cn("h-3 w-3", refreshLoading && "animate-spin")} />
-                <span className="ml-1 hidden sm:inline">{refreshLoading ? "Refreshing..." : "Refresh"}</span>
-              </Button>
-
-              {!agent.whatsapp_connected ? (
-                <Button
-                  variant="default"
-                  size="sm"
-                  style={{ backgroundColor: '#25D366' }}
-                  className="h-7 sm:h-8 px-3 sm:px-4 text-xs font-semibold text-white hover:bg-[#128c7e] rounded-full transition-colors shadow-sm"
-                  onClick={handleConnectWhatsApp}
-                >
-                  <MessageCircle className="h-3 w-3" />
-                  <span className="ml-1 hidden sm:inline">Connect</span>
-                  <span className="ml-1 sm:hidden">Connect</span>
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 sm:h-8 px-3 sm:px-4 text-xs font-semibold text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 rounded-full transition-colors shadow-sm"
-                  onClick={handleDisconnectWhatsApp}
-                >
-                  <WifiOff className="h-3 w-3" />
-                  <span className="ml-1 hidden sm:inline">Disconnect</span>
-                  <span className="ml-1 sm:hidden">Disconnect</span>
-                </Button>
-              )}
-
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 sm:h-8 px-2 sm:px-3 text-xs font-semibold rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                onClick={handleDeleteWhatsApp}
-                disabled={deleteLoading}
-              >
-                {deleteLoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3 w-3" />
-                )}
-                <span className="ml-1 hidden sm:inline">Delete</span>
-              </Button>
-            </div>
+            <p className="text-[10px] text-[#8D7F71] mt-2">{whatsappConfig.helper}</p>
           </div>
 
           {/* Error Message */}
@@ -503,19 +492,13 @@ const AgentCard = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between mt-auto">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#E0D4BC]/50">
             <Link href={`/dashboard/agents/${agent.id}`}
-                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-accent hover:text-accent/80 transition-colors"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#E68A44] hover:text-[#2D2216] transition-colors"
                   onClick={(e: any) => e.stopPropagation()}>
               View details
               <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Link>
-
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] sm:text-[11px] text-muted">
-                {whatsappConfig.helper}
-              </span>
-            </div>
           </div>
           </div>
       </div>
