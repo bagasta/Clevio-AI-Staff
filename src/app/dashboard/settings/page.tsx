@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import {
   User,
   Shield,
-  LogOut,
+
   Eye,
   EyeOff,
   CheckCircle2,
@@ -48,7 +48,7 @@ const SettingsSection = ({ title, description, children }: SettingsSectionProps)
 
 export default function SettingsPage() {
   const router = useRouter()
-  const { user, loading: authLoading, logout } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
 
@@ -152,26 +152,7 @@ export default function SettingsPage() {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      router.push("/login")
-      toast.success("Signed out successfully", {
-        style: {
-          background: '#F6FBF9',
-          color: '#2D3A3A',
-          border: '1px solid #E0F2F1',
-        },
-        iconTheme: {
-          primary: '#0F766E',
-          secondary: '#F0FDF4',
-        },
-      })
-    } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to sign out")
-    }
-  }
+
 
   if (authLoading) {
     return (
@@ -311,34 +292,7 @@ export default function SettingsPage() {
 
   
   
-        {/* Account Management */}
-        <SettingsSection
-          title="Account Management"
-          description="Manage your account access and sessions."
-        >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 sm:p-5 border border-red-100 bg-red-50/30 rounded-xl">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                    <LogOut className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-[#2D2216]">Sign Out</h4>
-                  <p className="text-sm text-[#5D4037]">
-                    Sign out of your account on this device
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 rounded-xl"
-              >
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        </SettingsSection>
+
       </div>
     </div>
   )
