@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Menu, Send, BatteryMedium, Wifi, Signal, Check, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, ArrowLeft, ArrowRight, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Gift, Star, Rocket } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -570,6 +571,24 @@ export default function MobileLanding() {
                                     {item.name}
                                 </motion.a>
                             ))}
+                            
+                            {/* Auth Buttons */}
+                            <div className="flex gap-4 mt-4 pt-4 border-t border-white/20 w-full justify-center">
+                                <Link
+                                    href="/login"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="px-6 py-2.5 text-white font-semibold text-base border border-white/50 rounded-full hover:bg-white/10 transition-all"
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="px-6 py-2.5 bg-white text-black font-semibold text-base rounded-full hover:bg-gray-100 transition-all"
+                                >
+                                    Register
+                                </Link>
+                            </div>
                         </nav>
                     </motion.div>
                 </>
@@ -1824,6 +1843,23 @@ function FooterSection() {
                 height={60}
                 className="w-[180px] h-auto object-contain"
             />
+         </div>
+
+         {/* Legal Links */}
+         <div className="flex justify-center gap-6 mb-6">
+            <Link 
+                href="/privacy-policy" 
+                className="text-[#4E342E] text-[13px] font-bold opacity-80 hover:opacity-100 transition-opacity"
+            >
+                Kebijakan Privasi
+            </Link>
+            <span className="text-[#4E342E] opacity-40">|</span>
+            <Link 
+                href="/terms-of-service" 
+                className="text-[#4E342E] text-[13px] font-bold opacity-80 hover:opacity-100 transition-opacity"
+            >
+                Syarat & Ketentuan
+            </Link>
          </div>
 
          <div className="text-center">

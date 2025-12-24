@@ -303,7 +303,7 @@ export default function ClevioLandingPage() {
                         <motion.div 
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="absolute top-8 left-4 md:left-12 lg:left-16 hidden md:block z-30"
+                            className="absolute top-8 left-4 md:left-12 lg:left-16 right-4 md:right-12 lg:right-16 hidden md:flex items-center justify-between z-30"
                         >
                             <Image 
                                 src="/ClevioLogoLandingP.webp" 
@@ -312,6 +312,22 @@ export default function ClevioLandingPage() {
                                 height={166}
                                 className="h-32 w-auto object-contain"
                             />
+                            
+                            {/* Auth Buttons */}
+                            <div className="flex items-center gap-4">
+                                <a
+                                    href="/login"
+                                    className="px-6 py-2.5 text-white font-semibold text-base border-2 border-white/60 rounded-full hover:bg-white/10 transition-all backdrop-blur-sm"
+                                >
+                                    Login
+                                </a>
+                                <a
+                                    href="/register"
+                                    className="px-6 py-2.5 bg-white text-black font-semibold text-base rounded-full hover:bg-gray-100 transition-all shadow-lg"
+                                >
+                                    Register
+                                </a>
+                            </div>
                         </motion.div>
 
                         <h1 className="text-3xl font-bold leading-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl mb-8">
@@ -1510,6 +1526,23 @@ function FooterSection() {
                     height={80}
                     className="w-[240px] h-auto object-contain"
                 />
+             </div>
+
+             {/* Legal Links */}
+             <div className="flex justify-center gap-8 mb-6">
+                <a 
+                    href="/privacy-policy" 
+                    className="text-[#4E342E] text-sm font-bold opacity-80 hover:opacity-100 transition-opacity"
+                >
+                    Kebijakan Privasi
+                </a>
+                <span className="text-[#4E342E] opacity-40">|</span>
+                <a 
+                    href="/terms-of-service" 
+                    className="text-[#4E342E] text-sm font-bold opacity-80 hover:opacity-100 transition-opacity"
+                >
+                    Syarat & Ketentuan
+                </a>
              </div>
 
              <div className="text-center">
