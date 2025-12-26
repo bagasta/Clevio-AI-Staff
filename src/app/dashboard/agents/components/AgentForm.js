@@ -536,6 +536,7 @@ function mapInitialValues(input) {
       ? input.mcp_tools
       : {};
 
+  // Collect MCP tool IDs from multiple sources
   const normalizedMcpArraySource = Array.isArray(input.mcp_tools)
     ? input.mcp_tools
     : Array.isArray(input.mcpTools)
@@ -544,6 +545,14 @@ function mapInitialValues(input) {
 
   const normalizedMcpArray = normalizedMcpArraySource
     .filter((item) => typeof item === "string")
+    .map((item) => item.trim());
+
+  // Also check google_tools for MCP tools (n8n sometimes puts web_search, deep_research there)
+  const googleToolsArray = Array.isArray(input.google_tools)
+    ? input.google_tools
+    : [];
+  const mcpToolsFromGoogleTools = googleToolsArray
+    .filter((item) => typeof item === "string" && MCP_TOOL_IDS.includes(item.trim()))
     .map((item) => item.trim());
 
   const mcpState = createDefaultMcpToolState();
@@ -557,6 +566,13 @@ function mapInitialValues(input) {
       mcpState[toolId] = true;
     }
   });
+  // Apply MCP tools found in google_tools
+  mcpToolsFromGoogleTools.forEach((toolId) => {
+    if (MCP_TOOL_IDS.includes(toolId)) {
+      mcpState[toolId] = true;
+    }
+  });
+
 
   return {
     name: input.name ?? DEFAULT_VALUES.name,

@@ -282,14 +282,15 @@ export default function ClevioLandingPage() {
             {/* Remove Absolute Floating Logo - Moving it inside the grid for better structure */}
             {/* 1. Mobile Logo Fallback (keep specific absolute for mobile if needed, or unify) */}
              <div className="absolute top-6 left-6 md:hidden z-50">
-                 <div className="flex items-center justify-center rounded-full bg-white px-6 py-2 shadow-lg">
+                 <div className="flex items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg">
                     <Image 
                         src="/ClevioLogoLandingP.webp" 
                         alt="Clevio AI Staff"
-                        width={100}
-                        height={35}
-                        className="h-auto w-[100px]"
+                        width={80}
+                        height={28}
+                        className="h-auto w-[80px]"
                     />
+                    <span className="text-[#2D2216] text-sm font-bold">Clevio AI Staff</span>
                  </div>
              </div>
 
@@ -305,13 +306,18 @@ export default function ClevioLandingPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="absolute top-8 left-4 md:left-12 lg:left-16 right-4 md:right-12 lg:right-16 hidden md:flex items-center justify-between z-30"
                         >
-                            <Image 
-                                src="/ClevioLogoLandingP.webp" 
-                                alt="Clevio AI Staff"
-                                width={500}
-                                height={166}
-                                className="h-32 w-auto object-contain"
-                            />
+                            <div className="flex items-center gap-4">
+                                <Image 
+                                    src="/ClevioLogoLandingP.webp" 
+                                    alt="Clevio AI Staff"
+                                    width={500}
+                                    height={166}
+                                    className="h-32 w-auto object-contain"
+                                />
+                                <h1 className="text-white text-2xl font-bold tracking-tight drop-shadow-lg whitespace-nowrap">
+                                    Clevio AI Staff
+                                </h1>
+                            </div>
                             
                             {/* Auth Buttons */}
                             <div className="flex items-center gap-4">

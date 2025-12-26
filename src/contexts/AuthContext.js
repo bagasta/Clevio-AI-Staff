@@ -839,6 +839,33 @@ const startTrialSession = useCallback(
       }
 
       loginSucceeded = true;
+
+      // Check for pending trial agent payload and create if present
+      if (typeof window !== "undefined" && apiService.hasApiKey()) {
+        try {
+          const pendingPayloadRaw = window.localStorage.getItem("trialPendingAgentPayload");
+          if (pendingPayloadRaw) {
+            const pendingData = JSON.parse(pendingPayloadRaw);
+            if (pendingData?.agentPayload) {
+              console.log("[Auth] Found pending trial agent, creating...");
+              try {
+                await apiService.createAgent(pendingData.agentPayload);
+                console.log("[Auth] Successfully created pending trial agent");
+                window.localStorage.removeItem("trialPendingAgentPayload");
+              } catch (createError) {
+                console.warn("[Auth] Failed to create pending trial agent", createError);
+                // Keep the payload for next login attempt
+              }
+            }
+          }
+        } catch (parseError) {
+          console.warn("[Auth] Failed to parse pending trial agent payload", parseError);
+          try {
+            window.localStorage.removeItem("trialPendingAgentPayload");
+          } catch (_) {}
+        }
+      }
+
       return {
         success: true,
         is_active: isActive,

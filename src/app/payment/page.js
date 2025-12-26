@@ -192,9 +192,46 @@ function PaymentContent() {
         agentPayload.plan_code = "TRIAL";
       }
 
-      await apiService.createAgent(agentPayload);
-      setTrialAgentDraft(null);
-      clearTrialCredentials();
+      // Check if we have an API key before attempting to create agent
+      const hasApiKey = apiService.hasApiKey();
+      if (!hasApiKey) {
+        // No API key available - preserve payload for creation after login
+        console.warn("[Trial] No API key available for agent creation. Payload will be created after login.");
+        try {
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(
+              "trialPendingAgentPayload",
+              JSON.stringify({ agentPayload, email: activeEmail, createdAt: new Date().toISOString() })
+            );
+          }
+        } catch (err) {
+          console.warn("[Trial] Failed to preserve agent payload for later", err);
+        }
+        setTrialAgentDraft(null);
+        clearTrialCredentials();
+        return;
+      }
+
+      try {
+        await apiService.createAgent(agentPayload);
+        setTrialAgentDraft(null);
+        clearTrialCredentials();
+      } catch (createError) {
+        console.error("[Trial] Failed to create agent during trial provisioning", createError);
+        // Preserve payload for later creation
+        try {
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(
+              "trialPendingAgentPayload",
+              JSON.stringify({ agentPayload, email: activeEmail, createdAt: new Date().toISOString() })
+            );
+          }
+        } catch (err) {
+          console.warn("[Trial] Failed to preserve agent payload for later", err);
+        }
+        setTrialAgentDraft(null);
+        clearTrialCredentials();
+      }
     },
     [trialAgentDraft, clearTrialCredentials]
   );
@@ -713,11 +750,79 @@ function PaymentContent() {
         if (webhookApiKey) {
           apiService.setApiKey(webhookApiKey);
         } else {
-          await apiService.generateApiKey({
-            username: activeEmail,
-            password: trialCredentials.password,
-            planCode: "TRIAL",
-          });
+          // n8n webhook succeeded but didn't return API key
+          // Wait a moment for backend to activate the account, then retry with backoff
+          const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          const maxRetries = 3;
+          let apiKeyGenerated = false;
+          
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            // Wait before each attempt (500ms, 1000ms, 1500ms)
+            await delay(attempt * 500);
+            
+            try {
+              await apiService.generateApiKey({
+                username: activeEmail,
+                password: trialCredentials.password,
+                planCode: "TRIAL",
+              });
+              apiKeyGenerated = true;
+              break;
+            } catch (keyError) {
+              const errorMessage = String(keyError?.message || "").toLowerCase();
+              const isInactiveError = errorMessage.includes("inactive");
+              
+              console.warn(`[Trial] API key generation attempt ${attempt}/${maxRetries} failed`, {
+                error: keyError?.message,
+                isInactiveError,
+              });
+              
+              // If it's not an inactive error, throw immediately
+              if (!isInactiveError) {
+                throw keyError;
+              }
+              
+              // If this is the last attempt with credentials, try the trial endpoint
+              if (attempt === maxRetries) {
+                console.warn("[Trial] Account still inactive. Trying /auth/api-key/trial endpoint...");
+                try {
+                  // Fallback: use trial endpoint which doesn't require active account
+                  const trialKeyResponse = await fetch(
+                    `${apiService.baseUrl}/auth/api-key/trial`,
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        ip_user: "frontend-trial",
+                        email: activeEmail,
+                        user_id: activeUserId,
+                      }),
+                    }
+                  );
+                  
+                  if (trialKeyResponse.ok) {
+                    const trialKeyData = await trialKeyResponse.json().catch(() => ({}));
+                    const trialKey =
+                      trialKeyData?.access_token ||
+                      trialKeyData?.token ||
+                      trialKeyData?.api_key ||
+                      null;
+                    if (trialKey) {
+                      apiService.setApiKey(trialKey);
+                      apiKeyGenerated = true;
+                      console.log("[Trial] Successfully obtained API key via trial endpoint");
+                    }
+                  }
+                } catch (trialEndpointError) {
+                  console.warn("[Trial] Trial endpoint fallback failed", trialEndpointError);
+                }
+                
+                if (!apiKeyGenerated) {
+                  console.warn("[Trial] All API key generation methods failed. Login flow will handle activation.");
+                }
+              }
+            }
+          }
         }
 
         apiService.setPlanCode("TRIAL");

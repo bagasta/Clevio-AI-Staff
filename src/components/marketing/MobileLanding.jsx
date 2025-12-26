@@ -486,14 +486,19 @@ export default function MobileLanding() {
             isScrolled || isMenuOpen ? "bg-black/40 backdrop-blur-md" : ""
           }`}
         >
-          <div className="relative h-20 w-20">
-            <Image
-              src="/clevioAISTAFF-Logo-White.png"
-              alt="Clevio AI Staff"
-              fill
-              className="object-contain object-left"
-              priority
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative h-16 w-16">
+              <Image
+                src="/clevioAISTAFF-Logo-White.png"
+                alt="Clevio AI Staff"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
+            <h1 className="text-white text-lg font-bold tracking-tight">
+              Clevio AI Staff
+            </h1>
           </div>
           
           {/* Animated Hamburger Icon */}
