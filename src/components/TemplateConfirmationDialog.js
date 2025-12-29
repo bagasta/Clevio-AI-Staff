@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function TemplateConfirmationDialog({
   isOpen,
@@ -45,6 +46,15 @@ export default function TemplateConfirmationDialog({
     };
   }, [isOpen]);
 
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // Reset expansion state when dialog opens/closes or template changes
+  useEffect(() => {
+    if (isOpen) {
+        setIsDescriptionExpanded(false);
+    }
+  }, [isOpen, template]);
+
   const preventScroll = useCallback((event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -86,9 +96,23 @@ export default function TemplateConfirmationDialog({
               <span className="mt-1 inline-block rounded-full bg-[#E68A44]/10 px-2.5 py-0.5 text-xs font-medium text-[#E68A44]">
                 {template.category}
               </span>
-              <p className="mt-2 text-sm text-[#5D4037] line-clamp-2">
-                {template.description}
-              </p>
+              <div className="mt-2 text-sm text-[#5D4037]">
+                <p className={`${isDescriptionExpanded ? '' : 'line-clamp-2'}`}>
+                    {template.description}
+                </p>
+                {template.description && template.description.length > 100 && (
+                    <button 
+                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        className="flex items-center gap-1 mt-1 text-[#E68A44] hover:text-[#D57B3B] font-bold text-xs transition-colors focus:outline-none"
+                    >
+                        {isDescriptionExpanded ? (
+                            <>Show less <ChevronUp className="w-3 h-3" /></>
+                        ) : (
+                            <>Read more <ChevronDown className="w-3 h-3" /></>
+                        )}
+                    </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
