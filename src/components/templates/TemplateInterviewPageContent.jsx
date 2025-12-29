@@ -396,7 +396,7 @@ export default function TemplateInterviewPageContent({
         <AiAssistat
           title={""}
           description=""
-          webhookUrl="https://n8n.srv651498.hstgr.cloud/webhook/templateAgent"
+          webhookUrl={process.env.NEXT_PUBLIC_N8N_TEMPLATE_AGENT}
           sessionId={sessionId}
           metadata={metadata}
           onMessageReceived={(data) => {

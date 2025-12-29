@@ -17,8 +17,94 @@
 - `/api/proxy/[...path]` – transparent proxy to `SC_BACKEND`, preserves method/headers and injects CORS-safe `Origin`.
 - `/api/v1/payment/status` – in-memory store for Midtrans status payloads; accepts writes from n8n (`POST`) and readbacks from the payment page (`POST`/`GET`).
 - `/api/webhook/n8n-template` – scratchpad for template interview results; supports `PUT` (register session), `POST` (n8n completion payload), `GET` (frontend poll).
+- `/api/interview/finish` – new endpoint for storing interview completion data per `chatSessionId`; supports `POST` (n8n sends `{chatSessionId, agentId, agentName, systemMessage}`) and `GET` (frontend polls `?chatSessionId=…`).
 - `/api/n8n-webhook` – generic passthrough for template chat (legacy; the new UI uses `AiAssistat` directly).
 - `/api/whatsapp-sessions` – proxy to Go WhatsApp service (`/sessions/create` for POST, `/sessions/detail` for GET), caches the last QR/status per agent for UI polling.
+- `/api/whatsapp-sessions/status` – polls WhatsApp session status for a given agent.
+- `/api/whatsapp-sessions/qr` – fetches fresh QR code for WhatsApp session.
+- `/api/whatsapp-sessions/[agentId]` – DELETE for disconnect, POST for reconnect.
+- `/api/whatsapp-status` – alternative status endpoint used for dashboard polling.
+- `/api/trial` – issues trial API keys for guest users starting the free trial flow.
+- `/api/ip` – utility endpoint for IP detection.
+
+## Directory Structure
+
+```
+src/
+├── app/
+│   ├── api/                        # Next.js API routes
+│   │   ├── interview/finish/       # Interview completion webhook
+│   │   ├── proxy/                  # Backend proxy
+│   │   ├── v1/payment/             # Payment status storage
+│   │   ├── webhook/                # n8n template webhook
+│   │   ├── whatsapp-sessions/      # WhatsApp proxy routes
+│   │   ├── whatsapp-status/        # WhatsApp status polling
+│   │   └── trial/                  # Trial API key generation
+│   ├── dashboard/
+│   │   ├── agents/                 # Agent management
+│   │   │   ├── [agentId]/          # Agent detail page (edit subdirectory)
+│   │   │   ├── new/                # New agent form
+│   │   │   ├── templates/          # Template gallery & chat
+│   │   │   │   ├── chat/           # Interview chat page
+│   │   │   │   └── page.js         # Template gallery
+│   │   │   ├── components/         # Agent-specific components
+│   │   │   └── page.tsx            # Agent list page
+│   │   ├── settings/               # User settings page
+│   │   ├── hooks/                  # Dashboard hooks
+│   │   ├── components/             # Dashboard components
+│   │   ├── layout.tsx              # Dashboard layout
+│   │   └── page.tsx                # Dashboard home
+│   ├── trial/                      # Trial flow pages
+│   │   ├── agent-form/             # Trial agent form
+│   │   └── templates/              # Trial template gallery
+│   ├── login/                      # Login page
+│   ├── register/                   # Registration page
+│   ├── payment/                    # Payment/plan selection
+│   ├── coming-soon/                # Coming soon page
+│   ├── under-development/          # Under development page
+│   ├── privacy-policy/             # Privacy policy
+│   └── terms-of-service/           # Terms of service
+├── components/
+│   ├── ui/                         # UI primitives
+│   │   ├── AgentFormTour.jsx       # Guided tour for agent form
+│   │   ├── ai-assistat.jsx         # AI chat widget (AIMessageBar)
+│   │   ├── animated-ai-chat.tsx    # Animated chat component
+│   │   ├── button.jsx/tsx          # Button components
+│   │   ├── card.jsx/tsx            # Card components
+│   │   ├── badge.jsx/tsx           # Badge components
+│   │   ├── fab.tsx                 # Floating action button
+│   │   └── skeleton.tsx            # Loading skeleton
+│   ├── templates/
+│   │   ├── AgentTemplatesView.jsx  # Template gallery component
+│   │   └── TemplateInterviewPageContent.jsx  # Interview page wrapper
+│   ├── marketing/
+│   │   ├── ClevioLandingPage.jsx   # Desktop landing page
+│   │   └── MobileLanding.jsx       # Mobile landing page
+│   ├── DashboardNav.jsx            # Navigation component
+│   ├── TemplateChat.js             # Legacy chat (deprecated)
+│   ├── TemplateConfirmationDialog.js  # Template selection dialog
+│   ├── DeleteConfirmationDialog.jsx   # Delete confirmation modal
+│   └── ...
+├── contexts/
+│   └── AuthContext.js              # Authentication context
+├── lib/
+│   ├── api.js                      # API service (2127 lines, 81 methods)
+│   ├── agentInterviewUtils.js      # Interview utilities
+│   ├── googleToolsNormalizer.js    # Google tools normalization
+│   ├── triggerGoogleOAuth.js       # Google OAuth utilities
+│   ├── whatsappQr.js               # WhatsApp QR utilities
+│   ├── whatsappStatus.js           # WhatsApp status utilities
+│   ├── trialGuard.js               # Trial access guard
+│   ├── trialStorage.js             # Trial session storage
+│   ├── navigation.js               # Navigation utilities
+│   └── utils.js                    # General utilities
+├── data/
+│   ├── agent-templates.json        # 9 agent templates
+│   ├── google_scope_tools.json     # Google OAuth scopes mapping
+│   └── mcp-tools.json              # MCP tool definitions
+└── config/
+    └── ...
+```
 
 # Authentication & Subscription Lifecycle
 
@@ -116,23 +202,47 @@ flowchart LR
     n8nReply -->|status == completed| webhookPost[POST /api/webhook/n8n-template]
     webhookPost --> store[(session store)]
     chat --> poll[GET /api/webhook/n8n-template?session=…]
-    poll -->|found| stash[sessionStorage.pendingAgentData]
+    poll -->|found| loading[Simulated Loading Animation]
+    loading --> stash[sessionStorage.pendingAgentData]
     stash --> form[/dashboard/agents/new?fromInterview=true/]
-    form --> payload[AgentForm builds payload (prefilled)]
+    form --> tour[AgentFormTour (optional guided tour)]
+    tour --> payload[AgentForm builds payload (prefilled)]
     payload --> submit[POST /api/proxy/agents/ (apiKey auth)]
     submit --> response{auth_required?}
     response -->|yes| redirect[/push("/dashboard/agents/{id}?authUrl=…")/]
     response -->|no| redirectNo[/push("/dashboard/agents/{id}")/]
 ```
 
-1. Tombol/CTA “Create agent” **selalu** membuka galeri template (`/dashboard/agents/templates`); tidak langsung ke form kosong. Tombol “Customize Agent” di galeri memulai wawancara dengan template khusus “Custom Agent”, bukan lompat ke form.
+1. Tombol/CTA "Create agent" **selalu** membuka galeri template (`/dashboard/agents/templates`); tidak langsung ke form kosong. Tombol "Customize Agent" di galeri memulai wawancara dengan template khusus "Custom Agent", bukan lompat ke form.
 2. Setelah memilih template, dialog konfirmasi membuat `sessionId` deterministik lalu mendaftarkan sesi ke `/api/webhook/n8n-template`; router lanjut ke halaman chat.
 3. Halaman chat menjalankan wawancara via `AiAssistat` yang POST ke `N8N_MAIN/webhook/templateAgent` dengan metadata template.
 4. Ketika n8n mengembalikan `status: "completed"` + `agent_data`, payload itu disimpan oleh `/api/webhook/n8n-template`.
-5. Chat mem-poll `GET /api/webhook/n8n-template?session=…`, menaruh hasilnya ke `sessionStorage.pendingAgentData`, lalu redirect ke `/dashboard/agents/new?fromInterview=true`.
-6. `AgentForm` memanfaatkan `pendingAgentData` untuk prefill, memvalidasi tools (minimal Gmail/Calendar), dan menambahkan metadata MCP bila ada. Jika halaman `/dashboard/agents/new` dibuka tanpa hasil wawancara, UI memblokir akses dan memaksa user kembali ke galeri template.
-7. Submit memanggil `apiService.createAgent` melalui `/api/proxy/agents/`; setelah sukses, frontend wajib memicu OAuth per agent lewat `POST /auth/google` dengan body `{ scopes, agent_id }` (diturunkan dari agent yang baru dibuat). Respons `auth_url`/`auth_state` diteruskan di redirect detail page.
-8. Untuk akun berbayar (PRO_M/PRO_Y), ketika redirect ke `/dashboard/agents/{id}` selesai dan agent memiliki `google_tools`, halaman detail otomatis memunculkan modal “Connect Google”. Modal ini menjalankan `/auth/google` dengan `agent_id` tersebut; CTA “Connect” membuka OAuth, sedangkan “Lanjut tanpa Google” membutuhkan konfirmasi dan menampilkan peringatan bahwa Gmail/Calendar tidak akan berfungsi sampai koneksi diselesaikan.
+5. **Simulated Loading Animation**: Chat mem-poll `GET /api/webhook/n8n-template?session=…`, lalu menampilkan animasi loading dengan pesan bertahap:
+   - "Menganalisa jawaban interview..."
+   - "Menyusun instruksi agent..."
+   - "Mengkonfigurasi tools..."
+   - "Selesai! Mengarahkan ke form..."
+6. Setelah animasi selesai (~5 detik), hasilnya ditaruh ke `sessionStorage.pendingAgentData`, lalu redirect ke `/dashboard/agents/new?fromInterview=true`.
+7. `AgentForm` memanfaatkan `pendingAgentData` untuk prefill, memvalidasi tools (minimal Gmail/Calendar), dan menambahkan metadata MCP bila ada. Jika halaman `/dashboard/agents/new` dibuka tanpa hasil wawancara, UI memblokir akses dan memaksa user kembali ke galeri template.
+8. **Guided Tour (AgentFormTour)**: Untuk pengguna baru, form agent dapat menampilkan tour interaktif yang menjelaskan setiap bagian form secara bertahap dengan spotlight dan popover.
+9. Submit memanggil `apiService.createAgent` melalui `/api/proxy/agents/`; setelah sukses, frontend wajib memicu OAuth per agent lewat `POST /auth/google` dengan body `{ scopes, agent_id }` (diturunkan dari agent yang baru dibuat). Respons `auth_url`/`auth_state` diteruskan di redirect detail page.
+10. Untuk akun berbayar (PRO_M/PRO_Y), ketika redirect ke `/dashboard/agents/{id}` selesai dan agent memiliki `google_tools`, halaman detail otomatis memunculkan modal "Connect Google". Modal ini menjalankan `/auth/google` dengan `agent_id` tersebut; CTA "Connect" membuka OAuth, sedangkan "Lanjut tanpa Google" membutuhkan konfirmasi dan menampilkan peringatan bahwa Gmail/Calendar tidak akan berfungsi sampai koneksi diselesaikan.
+
+### Agent Templates
+
+9 template tersedia di `/src/data/agent-templates.json`:
+
+| ID | Name | Category | Description |
+|---|---|---|---|
+| `custom-agent` | Custom Agent | Custom | Blank starting point, interview-driven |
+| `asdos-bot` | Asdos Bot | Education | Academic assistant for students |
+| `teacher-planner` | Agent Teacher Planner | Education | Lesson planning for educators |
+| `schedule-assistant` | Agent Schedule | Project | Calendar & scheduling management |
+| `study-planner` | Agent Study Planner | Education | Personalized study schedules |
+| `customer-support` | Customer Support Agent | Customer Services | Customer inquiry handling |
+| `finance-advisor` | Finance Advisor Agent | Finance | Budgeting & financial planning |
+| `hr-assistant` | HR Management Agent | HR | Recruitment & HR operations |
+| `research-assistant` | Research Assistant Agent | Research | Academic research support |
 
 ### Payload Create Agent (frontend → backend)
 - `google_tools`: daftar aksi Google/Gmail yang dipilih (dipisah dari `mcp_tools`).
@@ -141,13 +251,13 @@ flowchart LR
 - `mcp_tools`: hanya berisi pilihan MCP (mis. `web_search`), **tidak** otomatis memasukkan `google_tools`.
 
 ### Catatan bypass manual
-- Form kosong `/dashboard/agents/new` diblokir ketika tidak membawa hasil wawancara (kecuali flag darurat `allowDirect=1`). Urutan wajib: Create → Template → Interview → Form → Create. CTA “Customize Agent” sudah otomatis lewat wawancara, jadi jangan lagi arahkan ke form langsung.
+- Form kosong `/dashboard/agents/new` diblokir ketika tidak membawa hasil wawancara (kecuali flag darurat `allowDirect=1`). Urutan wajib: Create → Template → Interview → Form → Create. CTA "Customize Agent" sudah otomatis lewat wawancara, jadi jangan lagi arahkan ke form langsung.
 
 ### Trial onboarding & sandbox
 
-1. Clicking “Start Free Trial” still calls `/api/trial`, but the CTA now routes visitors to `/trial/templates` after `AuthContext.startTrialSession` records the returned `TRIAL` API key inside `sessionStorage.trialSession`.
+1. Clicking "Start Free Trial" still calls `/api/trial`, but the CTA now routes visitors to `/trial/templates` after `AuthContext.startTrialSession` records the returned `TRIAL` API key inside `sessionStorage.trialSession`.
 2. The guest-only template gallery + interview chat mirrors the authenticated version. When n8n finishes the interview, the payload is cached as `sessionStorage.pendingAgentData`, `/trial/agent-form?fromInterview=true` auto-prefills `AgentForm`, and submitting that form serialises the create-agent payload into `localStorage.trialPendingAgentPayload` before sending the browser to `/register?trial=1`.
-3. Successful registration pushes to `/payment?plan=TRIAL&source=trial-flow`. Selecting the “Free Trial” plan skips Midtrans: the payment page POSTS the zero-charge payload to `notifyPaymentWebhook`, reads the staged agent config from `localStorage`, forces `plan_code: "TRIAL"`, and calls `apiService.createAgent`. A 200 response clears `localStorage.trialPendingAgentPayload` and redirects the visitor to `/login?trial=1`.
+3. Successful registration pushes to `/payment?plan=TRIAL&source=trial-flow`. Selecting the "Free Trial" plan skips Midtrans: the payment page POSTS the zero-charge payload to `notifyPaymentWebhook`, reads the staged agent config from `localStorage`, forces `plan_code: "TRIAL"`, and calls `apiService.createAgent`. A 200 response clears `localStorage.trialPendingAgentPayload` and redirects the visitor to `/login?trial=1`.
 4. After login the standard dashboard layout loads; subscription refreshes pick up the `TRIAL` plan that was activated via n8n. The legacy `/trial/chat` route remains for authenticated trial accounts who already created an agent and want a sandboxed console.
 5. Every time a trial account is activated, the browser stores the normalised email in `localStorage.trialUsedEmails`. The register form checks this list before attempting another trial signup, showing a modal that explains the trial has already been consumed on this device.
 
@@ -161,6 +271,19 @@ flowchart LR
 - **WhatsApp connectivity** – polls `apiService.getWhatsAppSession(agentId)` and triggers new sessions through `createWhatsAppSession({ userId, agentId, apiKey })`.
 - **Google Workspace auth (per agent)** – detects Gmail/Calendar tooling and repeatedly calls `apiService.checkGoogleAuthStatus` (POST `/auth/refresh-status-google`). OAuth is now scoped per agent: setiap agent baru harus dijalankan `/auth/google` dengan `agent_id`. Ketika `auth_url` dikembalikan, UI memandu user untuk authorize dan polling berjalan sampai token masuk.
 - **API key discovery** – multiple helper methods (`getCurrentApiKey`, `ensureApiKey`) are reused to power both integrations without exposing secrets to the DOM.
+- **Delete agent** – triggers `DeleteConfirmationDialog` modal, then calls `apiService.deleteAgent(agentId)`.
+- **Edit agent** – navigates to `/dashboard/agents/{agentId}/edit` for full configuration editing.
+
+## Agents List Page (`/dashboard/agents`)
+
+The agents list page (`page.tsx`, 1281 lines) includes:
+
+- **AgentCard component** – displays agent info with capability badges, WhatsApp status, and action buttons
+- **ConfirmModal component** – reusable confirmation dialog for destructive actions
+- **Empty state** – prompts user to create first agent
+- **Search & filter** – allows searching agents by name
+- **WhatsApp operations** – refresh status, connect, disconnect, delete session per agent
+- **Skeleton loader** – loading state with animated placeholders
 
 ## Knowledge upload flow
 
@@ -195,7 +318,7 @@ flowchart LR
     normalize -->|waiting_scan| refetchQr[/api/whatsapp-sessions/qr → /sessions/detail]
 ```
 
-1. Clicking “Connect WhatsApp” calls `createWhatsAppSession`, passing `agentId`, optional `agentName`, and the Langchain `apiKey`.
+1. Clicking "Connect WhatsApp" calls `createWhatsAppSession`, passing `agentId`, optional `agentName`, and the Langchain `apiKey`.
 2. The proxy posts to the Go service `/sessions/create`; the response already carries `qrCodeBase64` so the UI can display QR without a delay.
 3. Polling uses `/api/whatsapp-sessions/status?agentId=…` (→ `/sessions/status`) every few seconds until `status === "connected"`; if status returns `waiting_scan`/`qr_timeout`, the UI can refetch `/api/whatsapp-sessions/qr` (→ `/sessions/detail`) to get a fresh QR.
 4. Disconnects use `DELETE /api/whatsapp-sessions/{agentId}` (→ `/sessions/delete`); reconnect uses `POST /api/whatsapp-sessions/{agentId}/reconnect` (→ `/sessions/reconnect`).
@@ -243,6 +366,95 @@ flowchart LR
    - `POST /auth/refresh-status-google` dengan body `{ agent_id: "..." }`
    - Kedua endpoint wajib menyertakan `agent_id` karena auth terikat per agent, bukan per user
 
+# UI Components
+
+## AgentFormTour (`src/components/ui/AgentFormTour.jsx`)
+
+Interactive guided tour component for the agent creation form:
+
+- **Step-based navigation** with previous/next buttons
+- **Spotlight effect** highlights the target element
+- **Popover positioning** with intelligent clamping to viewport
+- **Keyboard navigation** (Escape to close, Arrow keys to navigate)
+- **Responsive design** adapts to mobile screens
+- **Portal rendering** ensures proper z-index stacking
+
+## AIMessageBar / AiAssistat (`src/components/ui/ai-assistat.jsx`)
+
+AI chat widget for template interviews:
+
+- **Initial greeting** sent automatically when webhook responds
+- **Session caching** prevents duplicate greetings on remount
+- **Message normalization** extracts readable text from various n8n payload formats
+- **Completion detection** identifies when `status: "completed"` and `agent_data` are present
+- **Markdown rendering** with ReactMarkdown for formatted responses
+- **Error handling** with retry capability
+
+## TemplateInterviewPageContent (`src/components/templates/TemplateInterviewPageContent.jsx`)
+
+Wrapper component for interview pages:
+
+- **Google tools normalization** via `normalizeGoogleTools` utility
+- **Session registration** with `/api/webhook/n8n-template`
+- **Polling mechanism** for completion status
+- **Loading animation** with staged messages:
+  1. "Menganalisa jawaban interview..."
+  2. "Menyusun instruksi agent..."
+  3. "Mengkonfigurasi tools..."
+  4. "Selesai! Mengarahkan ke form..."
+- **Configurable paths** for fallback and next navigation
+
+## AgentTemplatesView (`src/components/templates/AgentTemplatesView.jsx`)
+
+Template gallery component:
+
+- **Category filtering** by Education, Customer Services, Finance, Project, HR, Research
+- **Template locking** for trial users (TRIAL_TEMPLATE_LIMIT = 2)
+- **Upgrade modal** for locked templates
+- **Confirmation dialog** before starting interview
+- **Search functionality** within templates
+- **Responsive grid layout**
+
+# Dashboard Pages
+
+## Dashboard Home (`/dashboard`)
+
+Main dashboard overview showing:
+- User subscription status
+- Quick actions for agent management
+- Recent activity summary
+
+## Dashboard Settings (`/dashboard/settings`)
+
+User settings page with:
+- Profile information display
+- Password change functionality
+- Subscription status badge
+- Security settings section
+
+## Dashboard Layout (`/dashboard/layout.tsx`)
+
+Common layout wrapper including:
+- Navigation sidebar (`DashboardNav`)
+- Auth protection
+- Responsive design hooks
+
+# Marketing Pages
+
+## Landing Pages
+
+Two landing page variants optimized for different devices:
+
+- **ClevioLandingPage.jsx** (81KB) – Desktop-optimized landing
+- **MobileLanding.jsx** (83KB) – Mobile-optimized landing
+
+Both include:
+- Hero section with Login/Register CTAs
+- Feature comparison (AI Staff vs Traditional Staff)
+- Testimonials carousel
+- Pricing section
+- Footer with Privacy Policy and Terms of Service links
+
 # Security defaults
 
 - `apiService` only emits verbose request/response logging when `NEXT_PUBLIC_API_DEBUG=1` (the flag defaults to enabled in development and disabled in production) so bearer/session tokens never show up in customer consoles by accident.
@@ -251,7 +463,7 @@ flowchart LR
 
 # TypeScript build settings
 
-- The root `tsconfig.json` enables `strictNullChecks` and `exactOptionalPropertyTypes` (while leaving other `strict` flags opt-in) so Next.js 15’s default type checking pipeline runs without the `TS5053` error that occurs when exact optional properties are used without null checking. Keep these flags in place whenever adding new configs or extending the project.
+- The root `tsconfig.json` enables `strictNullChecks` and `exactOptionalPropertyTypes` (while leaving other `strict` flags opt-in) so Next.js 15's default type checking pipeline runs without the `TS5053` error that occurs when exact optional properties are used without null checking. Keep these flags in place whenever adding new configs or extending the project.
 
 # Templates & interview chat
 
@@ -272,11 +484,36 @@ flowchart LR
 | `N8N_WEBHOOK_URL`, `NEXT_PUBLIC_N8N_WEBHOOK_URL` | Chat/interview webhook defaults (used by `AiAssistat` and legacy chat). |
 | `WHATSAPP_BACKEND_BASE_URL` (optional) | Base URL for the WhatsApp backend (`https://lfzlwlbz-3000.asse.devtunnels.ms`), used for both session creation and forced QR generation. |
 | `WHATSAPP_SESSIONS_URL` (optional) | Remote WhatsApp session manager; defaults to the dev tunnel when unset. |
+| `NEXT_PUBLIC_PAYMENT_WEBHOOK_URL` | Midtrans payment webhook URL (defaults to N8N). |
 
 # Key files
 
-- `src/lib/api.js` – exhaustive request helper, including payment polling, agent CRUD, knowledge management, WhatsApp tooling, and Google Auth utilities.
-- `src/contexts/AuthContext.js` – memoised auth store, exposes imperative methods to react components.
+- `src/lib/api.js` – exhaustive request helper (2127 lines, 81 methods), including payment polling, agent CRUD, knowledge management, WhatsApp tooling, and Google Auth utilities.
+- `src/contexts/AuthContext.js` – memoised auth store (992 lines), exposes imperative methods to react components.
 - `src/app/payment/page.js` – orchestrates plan selection, n8n notify, settlement polling, and routing decisions.
 - `src/app/dashboard/agents/templates/chat/page.js` – glue code between template selection, n8n interviews, and the standard agent creation flow.
-- `src/app/dashboard/agents/[agentId]/page.js` – the most feature-rich screen; centralises chat, knowledge upload, WhatsApp linking, and Google OAuth.
+- `src/app/dashboard/agents/[agentId]/page.js` – the most feature-rich screen (2875 lines); centralises chat, knowledge upload, WhatsApp linking, and Google OAuth.
+- `src/app/dashboard/agents/page.tsx` – agents list page (1281 lines) with AgentCard, ConfirmModal, and WhatsApp management.
+- `src/app/dashboard/agents/new/page.js` – new agent form (516 lines) with guided tour integration.
+- `src/components/ui/AgentFormTour.jsx` – guided tour component (419 lines) for agent form onboarding.
+- `src/components/ui/ai-assistat.jsx` – AI chat widget (700 lines) for template interviews.
+- `src/components/templates/AgentTemplatesView.jsx` – template gallery (629 lines) with category filtering and upgrade modals.
+- `src/components/templates/TemplateInterviewPageContent.jsx` – interview page wrapper (411 lines) with loading animation.
+
+# Changelog (Latest Updates)
+
+## December 2024
+
+### New Features
+- **Simulated Loading Animation**: Interview completion now shows a 5-second loading sequence with staged messages before redirecting to the agent form (`TemplateInterviewPageContent.jsx`).
+- **Interview Finish Endpoint**: New `/api/interview/finish` route for storing interview completion data keyed by `chatSessionId`.
+- **AgentFormTour**: Interactive guided tour component for new users on the agent creation form.
+
+### Improvements
+- **Google Auth Double Refresh Fix**: Implemented debounce mechanism to prevent duplicate API calls for Google authentication status checks.
+- **WhatsApp Polling Consistency**: Unified polling behavior across agents list and agent detail pages.
+- **Landing Page Enhancements**: Added Privacy Policy and Terms of Service links to footer, Login/Register buttons to hero section.
+
+### Technical
+- **Component Organization**: Clear separation between UI primitives (`src/components/ui/`), templates (`src/components/templates/`), and marketing (`src/components/marketing/`).
+- **Data Files**: Centralized configuration in `/src/data/` for agent templates, Google scopes, and MCP tools.
