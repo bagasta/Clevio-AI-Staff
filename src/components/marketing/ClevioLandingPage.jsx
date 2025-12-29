@@ -7,6 +7,7 @@ import Script from "next/script";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import ReactMarkdown from 'react-markdown';
 
 const SOFTWARE_APP_SCHEMA = {
   "@context": "https://schema.org",
@@ -79,13 +80,17 @@ export default function ClevioLandingPage() {
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  
+  // Phone Chat State (Moved up for useEffect dependency)
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneMessages, setPhoneMessages] = useState([]);
 
-  // Auto-scroll chat
+  // Auto-scroll chat (Works for both Interview and Phone modes since they share the ref and are mutually exclusive)
   useEffect(() => {
     if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, phoneMessages]);
 
   const [chatSessionId, setChatSessionId] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -105,17 +110,13 @@ export default function ClevioLandingPage() {
     setChatSessionId(storedSessionId);
   }, []);
 
-  // Phone Chat State
-  const [phoneInput, setPhoneInput] = useState("");
-  const [phoneMessages, setPhoneMessages] = useState([]);
+  // Phone Chat State declared above for hoisting
 
   // Initialize Phone Chat Greeting when finished
   useEffect(() => {
     if (status === 'finished') {
        setPhoneMessages([
-           { role: 'assistant', text: `Halo James 👋, saya ${agentName}. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.` },
-           { role: 'assistant', text: "Dari follow-up pelanggan, mencatat order, sampai menagih invoice—semua bisa saya kerjakan 24/7 tanpa lelah." },
-           { role: 'assistant', text: "Ada yang bisa saya bantu mulai sekarang?" }
+           { role: 'assistant', text: `Halo, saya **${agentName}**. Ada yang bisa saya bantu hari ini?` },
        ]);
     }
   }, [status, agentName]);
@@ -522,11 +523,15 @@ export default function ClevioLandingPage() {
                                                             ? 'bg-[#5D4037] text-white rounded-br-none'
                                                             : 'bg-white text-[#2D2216] rounded-tl-none border border-[#E0D4BC]'
                                                         }`}>
-                                                            {msg.role === 'assistant' && idx === 0 ? (
-                                                                <>Halo James 👋, saya <span className="font-semibold text-[#5D4037]">{agentName}</span>. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.</>
-                                                            ) : (
-                                                                msg.text
-                                                            )}
+                                                            <ReactMarkdown 
+                                                                className="prose prose-sm max-w-none prose-p:my-0 prose-headings:my-1 prose-ul:my-1 prose-ol:my-1 text-[10px]"
+                                                                components={{
+                                                                    p: ({node, ...props}) => <p className="mb-1 last:mb-0" {...props} />,
+                                                                    a: ({node, ...props}) => <a className="text-blue-500 underline" target="_blank" {...props} />
+                                                                }}
+                                                            >
+                                                                {msg.text}
+                                                            </ReactMarkdown>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -536,12 +541,22 @@ export default function ClevioLandingPage() {
                                             {/* Fake Input Footer -> Interative Input */}
                                             <div className="p-3 bg-white border-t border-[#E0D4BC] absolute bottom-0 left-0 right-0 z-20">
                                                 <div className="relative flex items-center">
-                                                    <input 
+                                                    <textarea 
                                                         value={phoneInput}
                                                         onChange={(e) => setPhoneInput(e.target.value)}
-                                                        onKeyDown={(e) => e.key === "Enter" && handlePhoneSend()}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter" && !e.shiftKey) {
+                                                                e.preventDefault();
+                                                                handlePhoneSend();
+                                                            }
+                                                        }}
+                                                        onInput={(e) => {
+                                                            e.target.style.height = 'auto';
+                                                            e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+                                                        }}
                                                         placeholder="Tulis pesan..."
-                                                        className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-[10px] rounded-full py-3.5 pl-4 pr-10 outline-none placeholder:text-[#8D7F71] focus:ring-1 focus:ring-[#5D4037]"
+                                                        rows={1}
+                                                        className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-[10px] rounded-2xl py-3 pl-4 pr-10 outline-none placeholder:text-[#8D7F71] focus:ring-1 focus:ring-[#5D4037] resize-none overflow-y-auto min-h-[40px]"
                                                     />
                                                     <button 
                                                         onClick={handlePhoneSend}
