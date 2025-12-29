@@ -385,7 +385,7 @@ export default function AgentDetailPage() {
   );
 
   const requiresGoogleAuth = googleToolIds.length > 0;
-  const showGoogleIntegrationCard = !isTrialPlan || googleAuthInfo.status === "connected";
+  const showGoogleIntegrationCard = true; // Google tools should be visible for all plans if selected
 
   const googleAuthStatus = googleAuthInfo.status;
   const googleAuthPending = googleAuthStatus === "pending";
@@ -715,13 +715,12 @@ export default function AgentDetailPage() {
   ]);
 
   const openGoogleConnectModal = useCallback(() => {
-    if (isTrialPlan) return;
     // Always allow manual open; we'll show error message inside if truly not needed
     setConfirmSkipGoogleConnect(false);
     setShowGoogleConnectModal(true);
     // Don't trigger checkGoogleAuthStatus here - it causes double refresh
     // Status check is handled by polling effect or manual Refresh button
-  }, [isTrialPlan]);
+  }, []);
 
 
   const closeGoogleConnectModal = useCallback(() => {
@@ -740,6 +739,24 @@ export default function AgentDetailPage() {
       setGoogleAuthPollingEnabled(false);
     }
   }, [googleAuthConnected, showGoogleConnectModal, closeGoogleConnectModal]);
+
+  // Check for pending Google Auth trigger from Trial creation
+  useEffect(() => {
+    if (typeof window !== "undefined" && agentIdParam) {
+      const pendingAgentId = window.localStorage.getItem("trialPendingGoogleAuthAgentId");
+      if (pendingAgentId && pendingAgentId === agentIdParam) {
+        // Clear it so it doesn't trigger again on reload
+        window.localStorage.removeItem("trialPendingGoogleAuthAgentId");
+        
+        // Open the modal to prompt user to connect
+        // We delay slightly to ensure UI is ready
+        const timer = setTimeout(() => {
+            setShowGoogleConnectModal(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [agentIdParam]);
 
   const fetchRequiredGoogleScopes = useCallback(async () => {
     const uniqueTools = Array.from(new Set(googleToolIds));

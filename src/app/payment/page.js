@@ -886,7 +886,14 @@ function PaymentContent() {
         markTrialEmailUsed(activeEmail);
         setStoredPlan("TRIAL");
 
-        await completeTrialProvisioning(activeEmail);
+        const { agent, googleTools } = await completeTrialProvisioning(activeEmail);
+
+        if (agent?.id && googleTools?.length > 0) {
+           // Persist intent to connect Google tools after login
+           if (typeof window !== "undefined") {
+             window.localStorage.setItem("trialPendingGoogleAuthAgentId", agent.id);
+           }
+        }
 
         setStatusState({
           state: "success",
@@ -894,8 +901,15 @@ function PaymentContent() {
         });
         toast.success("Trial activated! Redirecting to login...", { style: toastStyle });
         hasRedirectedRef.current = true;
+        
         const loginParams = new URLSearchParams({ trial: "1" });
         loginParams.set("email", activeEmail);
+        
+        // If agent was created, redirect to the agent detail page after login
+        if (agent?.id) {
+           loginParams.set("next", `/dashboard/agents/${agent.id}`);
+        }
+        
         router.replace(`/login?${loginParams.toString()}`);
       } catch (error) {
         console.error("Trial activation failed", error);
