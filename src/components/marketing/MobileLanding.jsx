@@ -1554,7 +1554,7 @@ function PricingSection({ onStartTrial, onScrollToEarlyAccess }) {
     {
       name: "Pro",
       desc: "Untuk bisnis yang sedang berkembang",
-      price: "Rp. 750.000",
+      price: "Rp. 880.000",
       period: "/Bulan",
       features: [
         "5 Staff AI",

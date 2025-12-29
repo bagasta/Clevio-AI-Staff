@@ -60,7 +60,7 @@ const UPGRADE_PLAN_OPTIONS = [
   {
     code: "PRO_M",
     name: "Pro Monthly",
-    priceLabel: "Rp 100.000 / bulan",
+    priceLabel: "Rp 880.000 / bulan",
     description: "30 hari akses penuh ke semua konektor termasuk WhatsApp.",
   },
   {
