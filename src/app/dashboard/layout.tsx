@@ -31,7 +31,6 @@ const DashboardLogo = ({ width = 120, height = 120, priority = false }) => (
 const NAV_ITEMS = [
   { key: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { key: 'AGENTS', label: 'Agents', icon: Bot, path: '/dashboard/agents' },
-  { key: 'SETTINGS', label: 'Settings', icon: Settings, path: '/dashboard/settings' },
   { key: 'ADD_ONS', label: 'Add-ons', icon: Package, path: '/coming-soon' },
 ]
 
@@ -240,8 +239,19 @@ export default function DashboardLayout({
                       <div className="my-2 border-t border-[#E0D4BC]"></div>
                     </div>
 
-                    {/* Sign Out */}
+                    {/* Settings & Sign Out */}
                     <div className="p-2">
+                      <button
+                        onClick={() => handleNavClick('/dashboard/settings')}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-colors ${
+                          pathname === '/dashboard/settings'
+                            ? "bg-[#FAF6F1] text-[#E68A44]"
+                            : "text-[#5D4037] hover:bg-[#FAF6F1]"
+                        }`}
+                      >
+                        <Settings className="h-4 w-4" />
+                        Settings
+                      </button>
                       <button
                         onClick={handleSignOut}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm text-red-500 hover:bg-red-50 transition-colors"
