@@ -86,11 +86,33 @@ export default function ClevioLandingPage() {
   const [phoneMessages, setPhoneMessages] = useState([]);
 
   // Auto-scroll chat (Works for both Interview and Phone modes since they share the ref and are mutually exclusive)
+  // Auto-scroll chat (Smart Logic)
   useEffect(() => {
+    // 1. Phone Mode Handling (Smart Scroll)
+    if (status === 'finished' && phoneMessages.length > 0) {
+        const lastMsg = phoneMessages[phoneMessages.length - 1];
+        // Timeout to allow render
+        setTimeout(() => {
+            const el = document.getElementById("last-phone-msg");
+            if (el) {
+                if (lastMsg.role === 'assistant') {
+                    // AI Message: Scroll to TOP (Start) so user reads from beginning
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                } else {
+                    // User Message: Scroll to BOTTOM (End) to see what was sent
+                    el.scrollIntoView({ behavior: "smooth", block: "end" });
+                }
+            }
+        }, 100);
+        return;
+    }
+
+    // 2. Interview Mode / Fallback (Stick to Bottom)
+    // Reverted to 'nearest' as per user preference ("kaya yang di Clevio Assistant")
     if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
-  }, [messages, isTyping, phoneMessages]);
+  }, [messages, isTyping, phoneMessages, status]);
 
   const [chatSessionId, setChatSessionId] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -517,7 +539,11 @@ export default function ClevioLandingPage() {
                                                 <div className="text-[10px] text-center text-[#8D7F71] mb-4 font-medium">Hari ini</div>
                                                 
                                                 {phoneMessages.map((msg, idx) => (
-                                                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                    <div 
+                                                        key={idx} 
+                                                        id={idx === phoneMessages.length - 1 ? "last-phone-msg" : undefined}
+                                                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} scroll-mt-24`}
+                                                    >
                                                         <div className={`p-3 px-3.5 rounded-2xl max-w-[90%] leading-relaxed shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
                                                             msg.role === 'user'
                                                             ? 'bg-[#5D4037] text-white rounded-br-none'
