@@ -231,6 +231,7 @@ export default function AgentDetailPage() {
   const googleAuthPollRef = useRef(null);
   const googleAuthCheckingRef = useRef(false);
   const initialGoogleAuthCheckDoneRef = useRef(false);
+  const googleStatusLastCheckRef = useRef(0);
 
   const normalizedUserPlan = useMemo(() => {
     const planCode =
@@ -469,21 +470,17 @@ export default function AgentDetailPage() {
       return { status: "idle", authUrl: null };
     }
     if (googleAuthCheckingRef.current) {
-      console.log("[GoogleAuth] Skipping - already checking");
       return { status: "idle", authUrl: null };
     }
 
     // Debounce: prevent duplicate calls within 2 seconds (handles React Strict Mode)
+    // using ref instead of sessionStorage so it DOES reset on page reload/navigation
     const now = Date.now();
-    const lastCheckKey = `googleAuthLastCheck_${agentIdParam}`;
-    const lastCheck = typeof window !== "undefined" ? Number(window.sessionStorage.getItem(lastCheckKey) || 0) : 0;
-    if (now - lastCheck < 2000) {
+    if (now - googleStatusLastCheckRef.current < 2000) {
       console.log("[GoogleAuth] Skipping - debounced (called within 2 seconds)");
       return { status: "idle", authUrl: null };
     }
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(lastCheckKey, String(now));
-    }
+    googleStatusLastCheckRef.current = now;
 
     googleAuthCheckingRef.current = true;
     setGoogleAuthChecking(true);
