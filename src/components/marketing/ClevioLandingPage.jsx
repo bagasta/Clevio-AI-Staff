@@ -80,6 +80,7 @@ export default function ClevioLandingPage() {
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const phoneChatContainerRef = useRef(null);
   
   // Phone Chat State (Moved up for useEffect dependency)
   const [phoneInput, setPhoneInput] = useState("");
@@ -88,28 +89,30 @@ export default function ClevioLandingPage() {
   // Auto-scroll chat (Works for both Interview and Phone modes since they share the ref and are mutually exclusive)
   // Auto-scroll chat (Smart Logic)
   useEffect(() => {
-    // 1. Phone Mode Handling (Smart Scroll)
-    if (status === 'finished' && phoneMessages.length > 0) {
+    // 1. Phone Mode Handling (Smart Scroll - Container Only)
+    if (status === 'finished' && phoneMessages.length > 0 && phoneChatContainerRef.current) {
         const lastMsg = phoneMessages[phoneMessages.length - 1];
+        const container = phoneChatContainerRef.current;
+
         // Timeout to allow render
         setTimeout(() => {
-            const el = document.getElementById("last-phone-msg");
-            if (el) {
-                if (lastMsg.role === 'assistant') {
-                    // AI Message: Scroll to TOP (Start) so user reads from beginning
-                    el.scrollIntoView({ behavior: "smooth", block: "start" });
-                } else {
-                    // User Message: Scroll to BOTTOM (End) to see what was sent
-                    el.scrollIntoView({ behavior: "smooth", block: "end" });
+            if (lastMsg.role === 'assistant') {
+                // AI Message: Scroll to Top of the message
+                const lastEl = document.getElementById("last-phone-msg");
+                if (lastEl) {
+                     // offsetTop relative to the container (since we adding 'relative' to container)
+                     container.scrollTo({ top: lastEl.offsetTop - 10, behavior: 'smooth' });
                 }
+            } else {
+                // User Message: Scroll to Bottom of container
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
             }
         }, 100);
         return;
     }
 
     // 2. Interview Mode / Fallback (Stick to Bottom)
-    // Reverted to 'nearest' as per user preference ("kaya yang di Clevio Assistant")
-    if (messagesEndRef.current) {
+    if (status !== 'finished' && messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [messages, isTyping, phoneMessages, status]);
@@ -535,7 +538,7 @@ export default function ClevioLandingPage() {
                                             </div>
 
                                             {/* Chat Content Body */}
-                                            <div className="bg-[#FAF6F1] h-[380px] p-4 space-y-4 overflow-y-auto font-sans text-xs">
+                                            <div ref={phoneChatContainerRef} className="bg-[#FAF6F1] h-[380px] p-4 space-y-4 overflow-y-auto font-sans text-xs relative">
                                                 <div className="text-[10px] text-center text-[#8D7F71] mb-4 font-medium">Hari ini</div>
                                                 
                                                 {phoneMessages.map((msg, idx) => (
