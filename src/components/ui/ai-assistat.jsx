@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bot, Send, Trash2, AlertCircle, User } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const INITIAL_GREETING =
   "Hai! Mohon bantu saya menyesuaikan template ini dengan kebutuhan saya.";
@@ -612,7 +613,19 @@ const AIMessageBar = ({
                     ? "bg-[#2D2216] text-white rounded-br-sm"
                     : "bg-white border border-[#E0D4BC] text-[#2D2216] rounded-bl-sm"
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+                  {message.sender === "ai" ? (
+                      <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:text-[#2D2216] prose-strong:text-[#2D2216] prose-ul:my-1 prose-li:my-0 text-sm leading-relaxed">
+                          <ReactMarkdown 
+                            components={{
+                                 a: ({node, ...props}) => <a className="text-[#E68A44] underline font-medium" target="_blank" {...props} />
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                      </div>
+                  ) : (
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.text}</p>
+                  )}
                   <span className={`mt-1 block text-xs ${message.sender === "user" ? "text-white/60" : "text-[#5D4037]/60"}`}>
                     {message.timestamp}
                   </span>
