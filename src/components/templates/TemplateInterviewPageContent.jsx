@@ -11,6 +11,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { normalizeGoogleTools } from "@/lib/googleToolsNormalizer";
 
+const LOADING_STEPS = [
+  "Menganalisa jawaban interview...",
+  "Menyusun instruksi agent...",
+  "Mengkonfigurasi tools...",
+  "Selesai! Mengarahkan ke form...",
+];
+
 export default function TemplateInterviewPageContent({
   fallbackPath,
   nextPath,
@@ -23,10 +30,13 @@ export default function TemplateInterviewPageContent({
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const completionHandledRef = useRef(false);
 
   const templateQuery =
     searchParams.get("template") ?? searchParams.get("templateId");
+  // ... (rest of template/session logic remains same until handleInterviewComplete)
+
   const template = useMemo(
     () =>
       templateQuery
@@ -153,6 +163,7 @@ export default function TemplateInterviewPageContent({
 
       completionHandledRef.current = true;
       setIsRedirecting(true);
+      setLoadingStepIndex(0);
 
       sessionStorage.setItem(
         "pendingAgentData",
@@ -174,14 +185,34 @@ export default function TemplateInterviewPageContent({
         keys: Object.keys(agentData || {}),
       });
 
-      if (nextPath) {
-        const url = new URL(nextPath, window.location.origin);
-        if (!url.searchParams.has("session")) {
-          url.searchParams.set("session", sessionId);
+      // Simulated loading sequence (5 seconds total)
+      // We have 4 steps. 
+      // Step 0: 0s -> 1.5s
+      // Step 1: 1.5s -> 3.0s
+      // Step 2: 3.0s -> 4.5s
+      // Step 3: 4.5s -> 5.0s (Quick finish)
+      
+      const stepDuration = 1500; // 1.5s per step roughly
+      
+      let step = 0;
+      const interval = setInterval(() => {
+        step++;
+        if (step < LOADING_STEPS.length) {
+          setLoadingStepIndex(step);
+        } else {
+           clearInterval(interval);
+           // Completed, execute redirect
+           if (nextPath) {
+            const url = new URL(nextPath, window.location.origin);
+            if (!url.searchParams.has("session")) {
+              url.searchParams.set("session", sessionId);
+            }
+            console.log("[TemplateInterview] Redirecting to", url.toString());
+            router.push(url.pathname + url.search);
+           }
         }
-        console.log("[TemplateInterview] Redirecting to", url.toString());
-        router.push(url.pathname + url.search);
-      }
+      }, stepDuration);
+      
     },
     [nextPath, router, sessionId, template?.id],
   );
@@ -255,48 +286,49 @@ export default function TemplateInterviewPageContent({
 
   if (isRedirecting) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex min-h-screen items-center justify-center bg-background"
-      >
-        <Card className="w-full max-w-sm sm:max-w-md mx-4 border-surface-strong/60 shadow-2xl">
-          <CardContent className="p-6 sm:p-8 text-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="mx-auto mb-6 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent/10"
-            >
-              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-accent" />
-            </motion.div>
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-lg sm:text-xl font-bold text-foreground mb-3"
-            >
-              {redirectingCopy?.heading}
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-muted-foreground text-sm"
-            >
-              {redirectingCopy?.description}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6 flex items-center justify-center gap-2"
-            >
-              <Loader2 className="h-4 w-4 animate-spin text-accent" />
-              <span className="text-xs sm:text-sm text-muted-foreground">Preparing your agent...</span>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#FAF6F1] px-4 font-sans text-[#2D2216]">
+          <div className="w-full max-w-md space-y-8 text-center">
+             {/* Logo/Icon (Optional - keeping it minimal as requested) */}
+             
+             <div className="space-y-2">
+                 <motion.h3 
+                    key={loadingStepIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-2xl font-bold tracking-tight text-[#2D2216]"
+                 >
+                    {LOADING_STEPS[loadingStepIndex]}
+                 </motion.h3>
+                 <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-sm text-[#8D7F71]"
+                 >
+                    Building your personalized {template.name} agent...
+                 </motion.p>
+             </div>
+
+             {/* Premium Progress Bar */}
+             <div className="relative mx-auto h-2 w-full overflow-hidden rounded-full bg-[#E0D4BC]/30">
+                 <motion.div 
+                    className="h-full rounded-full bg-[#E68A44] shadow-[0_0_10px_rgba(230,138,68,0.4)]"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${Math.min((loadingStepIndex + 1) * 25, 100)}%` }}
+                    transition={{ type: "spring", bounce: 0, duration: 0.8 }}
+                 />
+             </div>
+             
+             {/* Percentage Indicator */}
+             <motion.div 
+                className="text-xs font-medium text-[#E68A44] tracking-widest uppercase"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+             >
+                 {Math.min((loadingStepIndex + 1) * 25, 100)}% Completed
+             </motion.div>
+          </div>
+      </div>
     );
   }
 
