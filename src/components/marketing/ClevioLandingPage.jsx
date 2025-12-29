@@ -100,8 +100,10 @@ export default function ClevioLandingPage() {
                 // AI Message: Scroll to Top of the message
                 const lastEl = document.getElementById("last-phone-msg");
                 if (lastEl) {
-                     // offsetTop relative to the container (since we adding 'relative' to container)
-                     container.scrollTo({ top: lastEl.offsetTop - 10, behavior: 'smooth' });
+                     // offsetTop relative to the container.
+                     // IMPORTANT: Subtract 80px to account for the Sticky Header height so the message isn't hidden.
+                     const targetTop = Math.max(0, lastEl.offsetTop - 80);
+                     container.scrollTo({ top: targetTop, behavior: 'smooth' });
                 }
             } else {
                 // User Message: Scroll to Bottom of container
@@ -545,7 +547,7 @@ export default function ClevioLandingPage() {
                                                     <div 
                                                         key={idx} 
                                                         id={idx === phoneMessages.length - 1 ? "last-phone-msg" : undefined}
-                                                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} scroll-mt-24`}
+                                                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                                     >
                                                         <div className={`p-3 px-3.5 rounded-2xl max-w-[90%] leading-relaxed shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
                                                             msg.role === 'user'
@@ -564,7 +566,7 @@ export default function ClevioLandingPage() {
                                                         </div>
                                                     </div>
                                                 ))}
-                                                <div ref={messagesEndRef} />
+                                                {/* REMOVED messagesEndRef to prevent fallback scrollIntoView triggering main window scroll */}
                                             </div>
 
                                             {/* Fake Input Footer -> Interative Input */}
