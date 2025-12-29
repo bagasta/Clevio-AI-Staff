@@ -1293,7 +1293,7 @@ export default function AgentDetailPage() {
       return;
     }
     
-    if (agent?.id && !authLoading && user && requiresGoogleAuth && !isTrialPlan) {
+    if (agent?.id && !authLoading && user && requiresGoogleAuth) {
       // Mark as done BEFORE calling to prevent race conditions
       initialGoogleAuthCheckDoneRef.current = true;
       console.log("[GoogleAuth] Initial load - checking status for agent:", agent.id);
