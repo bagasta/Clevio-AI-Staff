@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, ChevronLeft } from "lucide-react";
 
-const DEFAULT_SPACING = 18;
+const DEFAULT_SPACING = 32;
+const POPOVER_WIDTH = 300;
 
 function resolveElement(selector) {
   if (typeof selector === "function") {
@@ -45,28 +46,45 @@ function computePopoverPosition(
     },
     "bottom-end": {
       top: rect.bottom + spacing,
-      left: rect.right,
-      transform: "translateX(-100%)",
+      left: rect.right - POPOVER_WIDTH,
     },
     "top-start": {
-      top: rect.top - spacing,
+      top: rect.top - spacing, // Removed translateY(-100%) reliance to simplify clamping
       left: rect.left,
-      transform: "translateY(-100%)",
+      transform: "translateY(-100%)"
     },
     "top-center": {
       top: rect.top - spacing,
       left: rect.left + rect.width / 2,
       transform: "translate(-50%, -100%)",
     },
+    "top-end": {
+       top: rect.top - spacing,
+       left: rect.right - POPOVER_WIDTH,
+       transform: "translateY(-100%)"
+    },
+    "right-start": {
+      top: rect.top,
+      left: rect.right + spacing,
+    },
     "right-center": {
       top: rect.top + rect.height / 2,
       left: rect.right + spacing,
       transform: "translateY(-50%)",
     },
+    "right-end": {
+      top: rect.bottom - 200, // Lift it up slightly so it doesn't hug the bottom edge
+      left: rect.right + spacing,
+      transform: "translateY(-100%)",
+    },
+    "left-start": {
+      top: rect.top,
+      left: rect.left - spacing - POPOVER_WIDTH,
+    },
     "left-center": {
       top: rect.top + rect.height / 2,
-      left: rect.left - spacing,
-      transform: "translate(-100%, -50%)",
+      left: rect.left - spacing - POPOVER_WIDTH,
+      transform: "translateY(-50%)",
     },
   };
 
@@ -79,31 +97,64 @@ function clampPopover(style, rect, placement) {
   const width = window.innerWidth;
   const height = window.innerHeight;
 
+  // Horizontal Clamping
   if (typeof next.left === "number") {
+    // If popover goes off left edge
     if (next.left < 16) {
-      next.left = 16;
-      next.transform = undefined;
+       // Only clamp if not explicitly 'left' placement OR if it's REALLY off screen.
+       // For 'left-*' placements, we prefer it to be placed left, but if no space, we might need flip logic.
+       // For now, strict 'left' is requested. If it goes offscreen, clamp to 16px.
+       // This might overlap target if target is at left edge, but better than invisible.
+       next.left = 16;
+       // If we forced it right (clamping to 16), and it had translateX(-50%) for center, we need to be careful? 
+       // No, because left-center uses translateY(-50%) only (vertical).
+       // However, bottom-center uses translateX(-50%).
+       if (placement?.includes("-center") && !placement?.startsWith("left") && !placement?.startsWith("right") && !placement?.startsWith("top") && !placement?.startsWith("bottom")) {
+          // This check is confusing. bottom-center has translateX.
+          // If we clamp left, the translateX will still shift it left by 50%.
+          // So next.left shouldn't be 16. It should be 16 + width/2.
+          // For now let's just minimal clamp.
+       }
+        
+       if (placement?.includes("bottom-center") || placement?.includes("top-center")) {
+           next.transform = next.transform?.replace("translateX(-50%)", "");
+       }
     }
-    if (next.left > width - 360) { // Adjusted width for wider card
-      next.left = width - 360;
-      if (placement?.includes("center")) {
-        next.transform = undefined;
-      }
+    
+    // If popover goes off right edge
+    if (next.left + POPOVER_WIDTH > width - 16) {
+      next.left = width - POPOVER_WIDTH - 16;
+       if (placement?.includes("bottom-center") || placement?.includes("top-center")) {
+           next.transform = next.transform?.replace("translateX(-50%)", "");
+       }
     }
   }
 
+  // Vertical Clamping
   if (typeof next.top === "number") {
     if (next.top < 16) {
       next.top = 16;
-      if (placement?.startsWith("top")) {
-        next.transform = undefined;
+      if (placement?.startsWith("top") || placement === "right-end") {
+          // If we forced it down (clamping to 16), we must remove translateY(-100%) so it aligns top-down
+          next.transform = next.transform?.replace("translateY(-100%)", "");
       }
     }
-    if (next.top > height - 300) {
-      next.top = height - 300;
-      if (!placement?.startsWith("top")) {
-        next.transform = undefined;
-      }
+    
+    // Bottom alignment clamping
+    if (placement?.includes("end") || placement?.startsWith("top")) {
+        // Alignment is bottom-up (translateY(-100%)), so 'top' is the BOTTOM edge.
+        if (next.top > height - 16) {
+            next.top = height - 16;
+        }
+    } else {
+        // Standard alignment (top-down)
+        const estHeight = 250; 
+        if (next.top + estHeight > height - 16) {
+             // If flows off bottom, pull it up
+             if (next.top > height - 150) {
+                 next.top = height - estHeight - 16;
+             }
+        }
     }
   }
 
@@ -154,19 +205,14 @@ export default function AgentFormTour({
       if (!element.style.position || element.style.position === "static") {
         element.style.position = "relative";
       }
-      element.style.zIndex = "100"; // Lower than popover's 110 (z-50 + child)
-      // Add subtle highlight to target
-      element.style.boxShadow = "0 0 0 4px rgba(230, 138, 68, 0.2)"; // Brand highlight
-      element.style.backgroundColor = "white"; // Ensure visibility
-      element.style.borderRadius = "0.75rem"; // Match rounded-xl
-
       setCurrentRect(element.getBoundingClientRect());
       setCurrentElement(element);
 
+      // Scroll target into view
       element.scrollIntoView({
         behavior: "smooth",
         block: "center",
-        inline: "nearest",
+        inline: "center",
       });
 
       const tm = setTimeout(() => {
@@ -187,12 +233,8 @@ export default function AgentFormTour({
         window.removeEventListener("resize", updateRect);
         window.removeEventListener("scroll", updateRect, true);
         if (element) {
-          element.classList.remove("tour-highlight");
-          element.style.removeProperty("z-index");
-          element.style.removeProperty("position");
-          element.style.removeProperty("box-shadow");
-          element.style.removeProperty("background-color");
-          element.style.removeProperty("border-radius");
+           element.classList.remove("tour-highlight");
+           element.style.removeProperty("position");
         }
       };
     } else {
@@ -255,91 +297,121 @@ export default function AgentFormTour({
     return clampPopover(base, currentRect, activeStep.placement);
   }, [activeStep, currentRect]);
 
-  if (!mounted || !isOpen || !activeStep) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return createPortal(
-    <AnimatePresence>
-      <div className="fixed inset-0 z-[100] overflow-hidden">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/20"
-          onClick={() => onClose?.()}
-        />
+    <AnimatePresence mode="sync">
+      {isOpen && activeStep && (
+        <>
+           {/* Spotlight Overlay & Cutout */}
+            {currentRect && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ 
+                        opacity: 1,
+                        top: currentRect.top,
+                        left: currentRect.left,
+                        width: currentRect.width,
+                        height: currentRect.height,
+                    }}
+                    exit={{ opacity: 0 }}
+                    transition={{ 
+                        duration: 0.4, 
+                        ease: [0.25, 1, 0.5, 1], // Cubic bezier for smooth catch-up
+                        opacity: { duration: 0.2 } 
+                    }}
+                    className="fixed z-[100] rounded-xl pointer-events-none"
+                    style={{
+                        // 1. Giant shadow for backdrop (no blur, just dark)
+                        // 2. Focused ring (#E68A44)
+                        boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 0 4px #E68A44, 0 0 30px rgba(230, 138, 68, 0.4)"
+                    }}
+                />
+            )}
+            
+            {/* Click Blocker (Transparent, below Spotlight hole but above page) 
+                Actually, giant shadow doesn't block clicks. 
+                If we want to block interactions outside, we need a refined strategy.
+                But for now, visual clarity is priority #1. 
+            */}
 
-        {/* Popover */}
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="absolute z-[110] w-[340px] rounded-2xl border border-[#E0D4BC] bg-white/95 p-6 shadow-2xl backdrop-blur-xl"
-          style={popoverStyle}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <span className="inline-flex items-center rounded-full bg-[#E68A44]/10 px-2.5 py-0.5 text-xs font-bold text-[#E68A44]">
-              Step {activeIndex + 1} of {steps.length}
-            </span>
-            <button
-              onClick={() => onClose?.()}
-              className="rounded-full p-1 text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
+            {/* Popover (Z-102) */}
+            <motion.div
+                key={`tour-popover-${activeIndex}`}
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="fixed z-[102] w-[300px] rounded-xl border border-[#E0D4BC] bg-white shadow-2xl overflow-hidden"
+                style={popoverStyle}
             >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+                {/* Header Bar */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#FAF6F1] bg-[#FAF6F1]/50">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E68A44]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#E68A44] uppercase tracking-wider">
+                         Step {activeIndex + 1} / {steps.length}
+                    </span>
+                    <button
+                        onClick={() => onClose?.()}
+                        className="rounded-full p-1 text-[#8D7F71] hover:bg-[#E68A44]/10 hover:text-[#E68A44] transition-colors"
+                    >
+                        <X className="h-3.5 w-3.5" />
+                    </button>
+                </div>
 
-          <h3 className="mb-2 text-lg font-bold text-[#2D2216]">
-            {activeStep.title}
-          </h3>
-          <p className="mb-4 text-sm text-[#5D4037] leading-relaxed">
-            {activeStep.description}
-          </p>
-          {activeStep.hint && (
-            <div className="mb-6 rounded-lg bg-[#FAF6F1] p-3 text-xs text-[#8D7F71] italic border border-[#E0D4BC]/50">
-              Tip: {activeStep.hint}
-            </div>
-          )}
+                <div className="p-5">
+                    <h3 className="mb-2 text-lg font-bold text-[#2D2216] leading-tight">
+                        {activeStep.title}
+                    </h3>
+                    <p className="mb-4 text-sm leading-snug text-[#5D4037]">
+                        {activeStep.description}
+                    </p>
+                    
+                    {activeStep.hint && (
+                        <div className="mb-5 rounded-lg bg-[#FAF6F1] p-3 text-xs text-[#5D4037] border border-[#E0D4BC] flex gap-2">
+                             <div className="shrink-0 mt-0.5 w-[2px] h-full bg-[#E68A44] rounded-full"></div>
+                             <p className="italic">{activeStep.hint}</p>
+                        </div>
+                    )}
 
-          <div className="flex items-center justify-between pt-2">
-            <button
-              type="button"
-              className="text-sm font-medium text-[#8D7F71] hover:text-[#5D4037] transition-colors"
-              onClick={() => onClose?.()}
-            >
-              Skip
-            </button>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleBack}
-                disabled={activeIndex === 0}
-                className={`flex items-center justify-center rounded-xl p-2.5 transition-colors ${
-                  activeIndex === 0
-                    ? "cursor-not-allowed text-[#E0D4BC]"
-                    : "text-[#5D4037] hover:bg-[#FAF6F1] hover:text-[#2D2216]"
-                }`}
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#2D2216]/20 transition-all hover:translate-y-[-1px] hover:shadow-xl active:translate-y-[1px]"
-                onClick={handleNext}
-              >
-                {activeIndex + 1 === steps.length
-                  ? activeStep.finishLabel || "Finish"
-                  : activeStep.nextLabel || "Next"}
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+                    <div className="flex items-center justify-between pt-1">
+                        <button
+                            type="button"
+                            className="text-xs font-semibold text-[#8D7F71] hover:text-[#2D2216] transition-colors px-1"
+                            onClick={() => onClose?.()}
+                        >
+                            Skip
+                        </button>
+                        
+                        <div className="flex items-center gap-2">
+                             <button
+                                type="button"
+                                onClick={handleBack}
+                                disabled={activeIndex === 0}
+                                className={`flex items-center justify-center rounded-lg p-2 transition-colors border ${
+                                    activeIndex === 0
+                                    ? "border-transparent text-[#E0D4BC] cursor-not-allowed"
+                                    : "border-[#E0D4BC] text-[#5D4037] hover:bg-[#FAF6F1] hover:text-[#2D2216]"
+                                }`}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </button>
+
+                            <button
+                                type="button"
+                                className="group flex items-center gap-1.5 rounded-lg bg-gradient-to-br from-[#2D2216] to-[#000000] px-4 py-2 text-xs font-bold text-white shadow-md shadow-[#2D2216]/20 transition-all hover:scale-[1.02] hover:shadow-[#E68A44]/30"
+                                onClick={handleNext}
+                            >
+                                {activeIndex + 1 === steps.length
+                                ? activeStep.finishLabel || "Finish"
+                                : activeStep.nextLabel || "Next"}
+                                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        </>
+      )}
     </AnimatePresence>,
     document.body
   );

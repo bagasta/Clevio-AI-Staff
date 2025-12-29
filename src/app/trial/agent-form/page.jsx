@@ -6,7 +6,7 @@ import AgentForm from "@/app/dashboard/agents/components/AgentForm";
 import { buildPrefilledFormValues } from "@/lib/agentInterviewUtils";
 import { saveTrialAgentPayload } from "@/lib/trialStorage";
 
-const TRIAL_TOUR_STORAGE_KEY = "trialAgentTourSeen";
+
 
 function TrialAgentFormContent() {
   const router = useRouter();
@@ -78,21 +78,14 @@ function TrialAgentFormContent() {
       return;
     }
 
-    const hasSeenTour = window.localStorage.getItem(TRIAL_TOUR_STORAGE_KEY);
-    if (!hasSeenTour) {
+    if (prefilledData) {
       setShouldShowGuidedTour(true);
     }
   }, [prefilledData]);
 
   const handleGuidedTourClose = useCallback(() => {
     setShouldShowGuidedTour(false);
-    if (typeof window !== "undefined") {
-      try {
-        window.localStorage.setItem(TRIAL_TOUR_STORAGE_KEY, "1");
-      } catch (error) {
-        console.warn("Failed to persist trial guided tour state", error);
-      }
-    }
+    setShouldShowGuidedTour(false);
   }, []);
 
   if (!isReady) {

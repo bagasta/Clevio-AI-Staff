@@ -666,7 +666,7 @@ export default function AgentForm({
         description:
           "Toggle which integrations this agent should control. You can add or remove tools later in the agent settings.",
         hint: "Only grant access to the systems this agent truly needs.",
-        placement: "bottom-start",
+        placement: "right-center",
       },
       {
         selector: '[data-tour="agent-prompt"]',
@@ -674,7 +674,7 @@ export default function AgentForm({
         description:
           "This prompt guides the agent's tone, constraints, and decision-making. Refine the interview summary or write your own instructions.",
         hint: "Include guardrails, preferred voice, and escalation rules.",
-        placement: "top-start",
+        placement: "left-start",
       },
       {
         selector: '[data-tour="agent-actions"]',
@@ -682,7 +682,7 @@ export default function AgentForm({
         description:
           "Once everything looks good, create the agent. You can reset the form or come back to edit it anytime.",
         finishLabel: "OK",
-        placement: "top-center",
+        placement: "right-end",
       },
     ],
     []
